@@ -5,7 +5,8 @@
     "saveButton": "Guardar Registro",
     "errorSaving": "Error al guardar. Revisa los datos.",
     "viewModeMessage": "Modo visualización • Inicia sesión como administrador para editar datos",
-    "adminAccess": "Acceso de Administrador"
+    "adminAccess": "Acceso de Administrador",
+    "exit": "Salir"
   },
   "Form": {
     "physiologicalData": "Datos Fisiológicos",
@@ -43,7 +44,20 @@
   },
   "History": {
     "edit": "Editar",
-    "delete": "Eliminar"
+    "delete": "Eliminar",
+    "tableView": "Vista Lista",
+    "cardView": "Vista Tarjetas",
+    "cols": {
+      "date": "Fecha",
+      "context": "Contexto",
+      "bp": "Tensión",
+      "pulse": "Pulso",
+      "spo2": "Oxígeno",
+      "weight": "Peso",
+      "site": "Lugar",
+      "note": "Nota",
+      "actions": "Acciones"
+    }
   },
   "ContextOptions": {
     "exercise": "🏃 Post-Ejercicio",

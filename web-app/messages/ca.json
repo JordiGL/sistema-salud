@@ -5,7 +5,8 @@
     "saveButton": "Desar Registre",
     "errorSaving": "Error al desar. Revisa les dades.",
     "viewModeMessage": "Mode visualització • Inicia sessió com a administrador per editar dades",
-    "adminAccess": "Accés d'Administrador"
+    "adminAccess": "Accés d'Administrador",
+    "exit": "Sortir"
   },
   "Form": {
     "physiologicalData": "Dades Fisiològiques",
@@ -43,7 +44,20 @@
   },
   "History": {
     "edit": "Editar",
-    "delete": "Eliminar"
+    "delete": "Eliminar",
+    "tableView": "Vista Llista",
+    "cardView": "Vista Targetes",
+    "cols": {
+      "date": "Data",
+      "context": "Context",
+      "bp": "Tensió",
+      "pulse": "Pols",
+      "spo2": "Oxigen",
+      "weight": "Pes",
+      "site": "Lloc",
+      "note": "Nota",
+      "actions": "Accions"
+    }
   },
   "ContextOptions": {
     "exercise": "🏃 Post-Exercici",

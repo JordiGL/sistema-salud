@@ -13,11 +13,13 @@ import { WeightChart } from '@/components/charts/WeightChart';
 import { SpO2Chart } from '@/components/charts/SpO2Chart';
 import { CA125Chart } from '@/components/charts/CA125Chart';
 import { MetricCard } from '@/components/MetricCard';
+// IMPORTAR EL NUEVO COMPONENTE DE TABLA
+import { HistoryTableView } from '@/components/HistoryTableView';
 
 // Iconos
 import { 
   Activity, ClipboardList, Heart, Scale, Droplets, TestTube, 
-  Globe, LayoutList, Lock, LogOut 
+  Globe, LayoutList, Lock, LogOut, LayoutGrid, List // <--- Nuevos iconos añadidos
 } from 'lucide-react';
 
 export default function Home() {
@@ -30,7 +32,11 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
   
+  // Estado de Pestañas
   const [activeTab, setActiveTab] = useState<'history' | 'bp' | 'pulse' | 'weight' | 'spo2' | 'ca125'>('history');
+  
+  // NUEVO: Estado para alternar vista (Grid vs Tabla)
+  const [viewMode, setViewMode] = useState<'grid' | 'table'>('table');
 
   const [formData, setFormData] = useState({
     bloodPressure: '', pulse: '', weight: '', spo2: '', ca125: '',
@@ -59,6 +65,9 @@ export default function Home() {
 
   async function loadData() {
     const data = await fetchMetrics();
+    // La API devuelve los datos, los guardamos en el estado.
+    // Nota: En tu código anterior hacías .reverse() aquí. 
+    // Mantendremos el orden cronológico descendente en el renderizado para consistencia.
     setMetrics(data.reverse()); 
     setLoading(false);
   }
@@ -121,8 +130,8 @@ export default function Home() {
                 className="w-44 flex items-center p-1 bg-white rounded-full shadow-sm border border-slate-200 mr-2 group transition-all"
                 title="Cerrar Sesión"
             >
-                <span className="w-full py-1 rounded-full bg-red-50 text-red-500 group-hover:bg-red-100 text-xs font-bold flex items-center justify-center gap-2 transition-colors">
-                    <LogOut size={14} /> Salir
+                <span className="w-full py-1 rounded-full bg-white text-red-500 group-hover:bg-red-100 text-xs font-bold flex items-center justify-center gap-2 transition-colors">
+                    <LogOut size={14} /> {t('HomePage.exit')}
                 </span>
             </button>
         ) : (
@@ -131,14 +140,13 @@ export default function Home() {
                 href={`/${locale}/login`}
                 className="w-44 flex items-center p-1 bg-slate-900 rounded-full shadow-sm border border-slate-200 mr-2 hover:shadow-md transition-all group"
             >
-                {/* INTERIOR: La pastilla sólida oscura */}
                 <span className="w-full py-1 rounded-full bg-slate-900 text-white group-hover:bg-slate-800 text-xs font-bold flex items-center justify-center gap-2 transition-colors">
                    {t('HomePage.adminAccess')}
                 </span>
             </Link>
         )}
 
-        {/* SELECTOR IDIOMA (Referencia) */}
+        {/* SELECTOR IDIOMA */}
         <div className="flex items-center gap-2 bg-white p-1 rounded-full shadow-sm border border-slate-200">
             <Globe size={14} className="ml-2 text-slate-400" />
             <Link href="/es" className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${locale === 'es' ? 'bg-slate-800 text-white shadow-md' : 'text-slate-500 hover:bg-slate-100'}`}>ES</Link>
@@ -176,20 +184,63 @@ export default function Home() {
         <div className="min-h-100">
             
         {activeTab === 'history' && (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4 animate-in fade-in slide-in-from-bottom-2 duration-500">
+            <div className="animate-in fade-in slide-in-from-bottom-2 duration-500 space-y-4">
+                
+                {/* --- HEADER DE VISTA (GRID / TABLE) --- */}
+                <div className="flex justify-between items-center mb-2 px-1">
+                   {/* Título de la vista actual (Opcional, ayuda a saber qué se ve) */}
+                   <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
+                      {viewMode === 'grid' ? t('History.cardView') : t('History.tableView')}
+                   </span>
+
+                   {/* SELECTOR DE VISTA */}
+                   <div className="bg-white p-1 rounded-lg border border-slate-200 flex shadow-sm">
+                      <button 
+                        onClick={() => setViewMode('grid')}
+                        className={`p-1.5 rounded-md transition-all ${viewMode === 'grid' ? 'bg-slate-100 text-slate-800 shadow-inner' : 'text-slate-400 hover:text-slate-600'}`}
+                        title={t('History.cardView')}
+                      >
+                        <LayoutGrid size={16} />
+                      </button>
+                      <button 
+                        onClick={() => setViewMode('table')}
+                        className={`p-1.5 rounded-md transition-all ${viewMode === 'table' ? 'bg-slate-100 text-slate-800 shadow-inner' : 'text-slate-400 hover:text-slate-600'}`}
+                        title={t('History.tableView')}
+                      >
+                        <List size={16} />
+                      </button>
+                   </div>
+                </div>
+
+                {/* MENSAJE SI NO HAY DATOS */}
                 {metrics.length === 0 && !loading && (
                     <div className="col-span-full text-center py-20 text-slate-400">
                         <p>No hay registros todavía.</p>
                     </div>
                 )}
-                {[...metrics].reverse().map((metric) => (
-                    <MetricCard 
-                        key={metric.id} 
-                        data={metric} 
-                        isAdmin={isAdmin}
-                        onRefresh={loadData}
+
+                {/* --- RENDERIZADO CONDICIONAL: GRID vs TABLE --- */}
+                {viewMode === 'grid' ? (
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+                        {/* Mantenemos el reverse() para ver lo más nuevo primero */}
+                        {[...metrics].reverse().map((metric) => (
+                            <MetricCard 
+                                key={metric.id} 
+                                data={metric} 
+                                isAdmin={isAdmin}
+                                onRefresh={loadData}
+                            />
+                        ))}
+                    </div>
+                ) : (
+                    // Aquí usamos el nuevo componente Tabla
+                    // Pasamos los datos invertidos igual que en las cards
+                    <HistoryTableView 
+                        data={[...metrics].reverse()} 
+                        isAdmin={isAdmin} 
+                        onRefresh={loadData} 
                     />
-                ))}
+                )}
             </div>
           )}
 
