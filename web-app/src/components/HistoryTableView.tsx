@@ -198,7 +198,7 @@ export function HistoryTableView({ data, isAdmin, onRefresh }: HistoryTableViewP
                   {isAdmin && (
                     <td className="px-4 py-3 text-right border-l border-slate-100">
                         <div className="flex justify-end gap-2">
-                            <button onClick={() => openEditModal(row)} className="p-1.5 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"><Pencil size={16}/></button>
+                            <button onClick={() => openEditModal(row)} className="p-1.5 text-slate-500 hover:bg-blue-50 rounded-lg transition-colors"><Pencil size={16}/></button>
                             <button onClick={() => setMetricToDelete(row)} className="p-1.5 text-red-500 hover:bg-red-50 rounded-lg transition-colors"><Trash2 size={16}/></button>
                         </div>
                     </td>
