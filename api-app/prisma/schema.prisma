@@ -1,0 +1,43 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model HealthMetric {
+  id          String   @id @default(uuid())
+  createdAt   DateTime @default(now())
+
+  // --- CAMBIOS SOLICITADOS ---
+  
+  // 1. Tensión unificada (Ej: "120/80")
+  bloodPressure String? 
+
+  // 2. Contexto (Selector: Post-Ejercicio, etc.)
+  measurementContext String?
+
+  // 3. Lugar del pesaje (Selector: Casa, Farmacia, etc.)
+  weightLocation String?
+
+  // 4. Notas adicionales
+  notes String?
+
+  // Datos numéricos que se mantienen
+  pulse       Int?
+  spo2        Float?
+  weight      Float?
+  ca125       Float?
+
+  @@map("health_metrics")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+}

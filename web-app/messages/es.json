@@ -1,0 +1,71 @@
+{
+  "HomePage": {
+    "title": "Monitor de Salud",
+    "newRecord": "Nuevo Registro",
+    "saveButton": "Guardar Registro",
+    "errorSaving": "Error al guardar. Revisa los datos.",
+    "viewModeMessage": "Modo visualización • Inicia sesión como administrador para editar datos",
+    "adminAccess": "Acceso de Administrador"
+  },
+  "Form": {
+    "physiologicalData": "Datos Fisiológicos",
+    "weightControl": "Control de Peso",
+    "notes": "Notas Adicionales",
+    "contextLabel": "Contexto",
+    "contextPlaceholder": "-- Seleccionar Contexto General --",
+    "locationLabel": "Lugar de pesaje",
+    "locationPlaceholder": "-- ¿Dónde te pesaste? --",
+    "bpLabel": "Tensión (120/80)",
+    "pulseLabel": "Pulso (BPM)",
+    "weightLabel": "Peso (Kg)",
+    "spo2Label": "SpO2 (%)",
+    "ca125Label": "Marcador CA125",
+    "notesPlaceholder": "Ej: Hoy me he sentido un poco mareado...",
+    "contextHint": "Selecciona esto si mides Tensión, Pulso, SpO2 o CA125"
+  },
+  "Charts": {
+    "bpTitle": "Tensión Arterial",
+    "pulseTitle": "Pulso (BPM)",
+    "weightTitle": "Control de Peso (Kg)",
+    "spo2Title": "Oxígeno (SpO2)",
+    "ca125Title": "Marcador CA125",
+    "noData": "Sin datos registrados",
+    "systolic": "Sistólica",
+    "diastolic": "Diastólica"
+  },
+  "Tabs": {
+    "history": "Historial",
+    "bp": "Tensión",
+    "pulse": "Pulso",
+    "weight": "Peso",
+    "spo2": "SpO2",
+    "ca125": "CA125"
+  },
+  "History": {
+    "edit": "Editar",
+    "delete": "Eliminar"
+  },
+  "ContextOptions": {
+    "exercise": "🏃 Post-Ejercicio",
+    "drainage": "💧 Post-Drenaje",
+    "chemo": "🏥 Post-Quimioterapia",
+    "stress": "⚡ Momento de estrés"
+  },
+  "LocationOptions": {
+    "home": "🏠 Casa",
+    "pharmacy": "🏥 Farmacia",
+    "cap": "🩺 CAP",
+    "ico": "🏢 ICO"
+  },
+  "Filters": {
+    "7days": "7 DÍAS",
+    "30days": "30 DÍAS",
+    "all": "TODO",
+    "24h": "24H",
+    "am": "AM",
+    "pm": "PM",
+    "contexts": "Contextos",
+    "allContexts": "Todos",
+    "location": "Lugar"
+  }
+}

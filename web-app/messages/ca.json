@@ -1,0 +1,71 @@
+{
+  "HomePage": {
+    "title": "Monitor de Salut",
+    "newRecord": "Nou Registre",
+    "saveButton": "Desar Registre",
+    "errorSaving": "Error al desar. Revisa les dades.",
+    "viewModeMessage": "Mode visualització • Inicia sessió com a administrador per editar dades",
+    "adminAccess": "Accés d'Administrador"
+  },
+  "Form": {
+    "physiologicalData": "Dades Fisiològiques",
+    "weightControl": "Control de Pes",
+    "notes": "Notes Addicionals",
+    "contextLabel": "Context",
+    "contextPlaceholder": "-- Seleccionar Context General --",
+    "locationLabel": "Lloc de pesatge",
+    "locationPlaceholder": "-- On t'has pesat? --",
+    "bpLabel": "Tensió (120/80)",
+    "pulseLabel": "Pulsacions (BPM)",
+    "weightLabel": "Pes (Kg)",
+    "spo2Label": "SpO2 (%)",
+    "ca125Label": "Marcador CA125",
+    "notesPlaceholder": "Ex: Avui m'he sentit una mica marejat...",
+    "contextHint": "Selecciona això si mesures Tensió, Pulsacions, SpO2 o CA125"
+  },
+  "Charts": {
+    "bpTitle": "Tensió Arterial",
+    "pulseTitle": "Pulsacions (BPM)",
+    "weightTitle": "Control de Pes (Kg)",
+    "spo2Title": "Oxigen (SpO2)",
+    "ca125Title": "Marcador CA125",
+    "noData": "Sense dades registrades",
+    "systolic": "Sistòlica",
+    "diastolic": "Diastòlica"
+  },
+  "Tabs": {
+    "history": "Historial",
+    "bp": "Tensió",
+    "pulse": "Pulsacions",
+    "weight": "Pes",
+    "spo2": "SpO2",
+    "ca125": "CA125"
+  },
+  "History": {
+    "edit": "Editar",
+    "delete": "Eliminar"
+  },
+  "ContextOptions": {
+    "exercise": "🏃 Post-Exercici",
+    "drainage": "💧 Post-Drenatge",
+    "chemo": "🏥 Post-Quimioteràpia",
+    "stress": "⚡ Moment d'estrès"
+  },
+  "LocationOptions": {
+    "home": "🏠 Casa",
+    "pharmacy": "🏥 Farmàcia",
+    "cap": "🩺 CAP",
+    "ico": "🏢 ICO"
+  },
+  "Filters": {
+    "7days": "7 DIES",
+    "30days": "30 DIES",
+    "all": "TOT",
+    "24h": "24H",
+    "am": "AM",
+    "pm": "PM",
+    "contexts": "Contextos",
+    "allContexts": "Tots",
+    "location": "Lloc"
+  }
+}
