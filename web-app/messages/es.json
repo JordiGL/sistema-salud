@@ -48,6 +48,12 @@
     "delete": "Eliminar",
     "tableView": "Vista Lista",
     "cardView": "Vista Tarjetas",
+    "confirmDelete": "¿Estás seguro de que deseas eliminar este registro?",
+    "scrollHint": "Desliza para ver más",
+    "deleteTitle": "¿Eliminar registro?",
+    "editTitle": "Editar Registro",
+    "cancel": "Cancelar",
+    "save": "Guardar",
     "cols": {
       "date": "Fecha",
       "context": "Contexto",
