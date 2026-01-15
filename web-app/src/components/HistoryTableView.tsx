@@ -1,7 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { HealthMetric, deleteMetric, updateMetric } from '@/lib/api';
+import { useState, useEffect } from 'react';
+import { HealthMetric, deleteMetric, updateMetric, fetchContextOptions, fetchLocationOptions, SelectOption } from '@/lib/api';
 import { Pencil, Trash2, X, Save, AlertTriangle, FileText, MapPin, MoveHorizontal } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { HealthCriteria, STATUS_COLORS, HealthStatus } from '@/lib/health-criteria';
@@ -15,13 +15,32 @@ interface HistoryTableViewProps {
 export function HistoryTableView({ data, isAdmin, onRefresh }: HistoryTableViewProps) {
   const t = useTranslations();
   
-  // --- ESTADOS PARA MODALES ---
+  // --- ESTADOS ---
   const [metricToDelete, setMetricToDelete] = useState<HealthMetric | null>(null);
   const [metricToEdit, setMetricToEdit] = useState<HealthMetric | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Formulario temporal
+  // Estados Opciones Dinámicas
+  const [contextOptions, setContextOptions] = useState<SelectOption[]>([]);
+  const [locationOptions, setLocationOptions] = useState<SelectOption[]>([]);
   const [editForm, setEditForm] = useState<any>({});
+
+  // Cargar opciones al montar
+  useEffect(() => {
+    async function loadOptions() {
+        try {
+            const [ctx, loc] = await Promise.all([fetchContextOptions(), fetchLocationOptions()]);
+            setContextOptions(ctx);
+            setLocationOptions(loc);
+        } catch (e) { console.error(e); }
+    }
+    loadOptions();
+  }, []);
+
+  const translateOption = (category: string, option: SelectOption) => {
+      const translated = t(`${category}.${option.key}` as any);
+      return translated.includes(category) ? option.value : translated; 
+  };
 
   // --- HANDLERS ---
   const openEditModal = (metric: HealthMetric) => {
@@ -75,14 +94,16 @@ export function HistoryTableView({ data, isAdmin, onRefresh }: HistoryTableViewP
     <>
       {/* --- AVÍS DE SCROLL (Només mòbil) --- */}
       <div className="md:hidden flex items-center justify-end gap-2 text-xs text-slate-400 mb-2 animate-pulse">
-        {/* TRADUCCIÓ IMPLEMENTADA */}
         <span>{t('History.scrollHint')}</span>
         <MoveHorizontal size={16} />
       </div>
 
       {/* --- TABLA RESPONSIVA --- */}
       <div className="w-full overflow-hidden rounded-xl border border-slate-200 shadow-sm bg-white relative">
-        <div className="overflow-x-auto w-full pb-1">
+        
+        {/* Barra de scroll personalizada (fina y gris suave) */}
+        <div className="overflow-x-auto w-full pb-1 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-200 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-slate-300 transition-colors">
+          
           <table className="w-full min-w-full text-sm text-left border-collapse whitespace-nowrap">
             
             <thead className="bg-slate-50 text-slate-500 font-bold uppercase text-xs border-b border-slate-200">
@@ -94,7 +115,10 @@ export function HistoryTableView({ data, isAdmin, onRefresh }: HistoryTableViewP
                 <th className="px-4 py-3 min-w-[80px]">{t('History.cols.spo2')}</th>
                 <th className="px-4 py-3 border-l border-slate-300 min-w-[100px]">{t('History.cols.weight')}</th>
                 <th className="px-4 py-3 min-w-[120px]">{t('History.cols.site')}</th> 
-                <th className="px-4 py-3 border-l border-slate-300 min-w-[200px]">{t('History.cols.note')}</th>
+                
+                {/* CAMBIO AQUÍ: Reducido de 200px a 150px */}
+                <th className="px-4 py-3 border-l border-slate-300 min-w-[150px]">{t('History.cols.note')}</th>
+                
                 {isAdmin && <th className="px-4 py-3 text-right border-l border-slate-300 min-w-[100px] sticky right-0 bg-slate-50 shadow-[-5px_0px_10px_rgba(0,0,0,0.02)]">{t('History.cols.actions')}</th>}
               </tr>
             </thead>
@@ -176,7 +200,8 @@ export function HistoryTableView({ data, isAdmin, onRefresh }: HistoryTableViewP
 
                     <td className="px-4 py-3 border-l border-slate-100">
                       {row.notes ? (
-                          <div className="flex items-center gap-1 text-xs text-slate-600 italic max-w-[200px] truncate" title={row.notes}>
+                          // CAMBIO AQUÍ: Reducido también el truncado a 150px
+                          <div className="flex items-center gap-1 text-xs text-slate-600 italic max-w-[150px] truncate" title={row.notes}>
                                <FileText size={12} className="shrink-0 text-slate-400"/>
                                <span className="truncate">{row.notes}</span>
                           </div>
@@ -205,10 +230,8 @@ export function HistoryTableView({ data, isAdmin, onRefresh }: HistoryTableViewP
           <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl">
             <div className="flex flex-col items-center text-center gap-4">
               <div className="bg-red-100 p-3 rounded-full text-red-600"><AlertTriangle size={32} /></div>
-              {/* TRADUCCIÓ: Títol modal eliminar */}
               <h3 className="text-lg font-bold text-slate-800">{t('History.deleteTitle')}</h3>
               <div className="flex gap-3 w-full mt-2">
-                {/* TRADUCCIÓ: Botons modal eliminar */}
                 <button onClick={() => setMetricToDelete(null)} className="flex-1 py-2 rounded-xl border border-slate-200 font-bold text-slate-600 hover:bg-slate-50">{t('History.cancel')}</button>
                 <button onClick={handleDelete} disabled={isSubmitting} className="flex-1 py-2 rounded-xl bg-red-500 text-white font-bold hover:bg-red-600 disabled:opacity-50">{t('History.delete')}</button>
               </div>
@@ -222,13 +245,12 @@ export function HistoryTableView({ data, isAdmin, onRefresh }: HistoryTableViewP
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in">
           <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl overflow-y-auto max-h-[90vh]">
             <div className="flex justify-between items-center mb-6">
-              {/* TRADUCCIÓ: Títol modal editar */}
               <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2"><Pencil size={18} /> {t('History.editTitle')}</h3>
               <button onClick={() => setMetricToEdit(null)} className="text-slate-400 hover:text-slate-600"><X size={20} /></button>
             </div>
+            
             <form onSubmit={handleUpdate} className="space-y-4">
                <div className="grid grid-cols-2 gap-4">
-                  {/* TRADUCCIONS: Etiquetes del formulari (reutilitzant claus de 'Form') */}
                   <div><label className="text-xs font-bold text-slate-500 uppercase">{t('Form.bpLabel')}</label><input type="text" className="w-full p-2 border rounded-lg mt-1" value={editForm.bloodPressure} onChange={e => setEditForm({...editForm, bloodPressure: e.target.value})} /></div>
                   <div><label className="text-xs font-bold text-slate-500 uppercase">{t('Form.pulseLabel')}</label><input type="number" className="w-full p-2 border rounded-lg mt-1" value={editForm.pulse} onChange={e => setEditForm({...editForm, pulse: e.target.value})} /></div>
                   <div><label className="text-xs font-bold text-slate-500 uppercase">{t('Form.spo2Label')}</label><input type="number" className="w-full p-2 border rounded-lg mt-1" value={editForm.spo2} onChange={e => setEditForm({...editForm, spo2: e.target.value})} /></div>
@@ -237,10 +259,9 @@ export function HistoryTableView({ data, isAdmin, onRefresh }: HistoryTableViewP
                     <label className="text-xs font-bold text-slate-500 uppercase">{t('Form.contextLabel')}</label>
                     <select className="w-full p-2 border rounded-lg mt-1 text-sm bg-white" value={editForm.measurementContext} onChange={e => setEditForm({...editForm, measurementContext: e.target.value})}>
                         <option value="">-</option>
-                        <option value="Post-Ejercicio">{t('ContextOptions.exercise')}</option>
-                        <option value="Post-Drenaje">{t('ContextOptions.drainage')}</option>
-                        <option value="Post-Quimioterapia">{t('ContextOptions.chemo')}</option>
-                        <option value="Momento de estres">{t('ContextOptions.stress')}</option>
+                        {contextOptions.map(opt => (
+                            <option key={opt.key} value={opt.value}>{translateOption('ContextOptions', opt)}</option>
+                        ))}
                     </select>
                   </div>
 
@@ -250,17 +271,15 @@ export function HistoryTableView({ data, isAdmin, onRefresh }: HistoryTableViewP
                     <label className="text-xs font-bold text-slate-500 uppercase">{t('Form.locationLabel')}</label>
                     <select className="w-full p-2 border rounded-lg mt-1 text-sm bg-white" value={editForm.weightLocation} onChange={e => setEditForm({...editForm, weightLocation: e.target.value})}>
                         <option value="">-</option>
-                        <option value="Casa">{t('LocationOptions.home')}</option>
-                        <option value="Farmacia">{t('LocationOptions.pharmacy')}</option>
-                        <option value="CAP">{t('LocationOptions.cap')}</option>
-                        <option value="ICO">{t('LocationOptions.ico')}</option>
+                        {locationOptions.map(opt => (
+                            <option key={opt.key} value={opt.value}>{translateOption('LocationOptions', opt)}</option>
+                        ))}
                     </select>
                   </div>
                </div>
                <div><label className="text-xs font-bold text-slate-500 uppercase">{t('Form.notes')}</label><textarea className="w-full p-2 border rounded-lg mt-1 h-20 resize-none" value={editForm.notes} onChange={e => setEditForm({...editForm, notes: e.target.value})} /></div>
                
                <div className="flex gap-3 pt-2">
-                {/* TRADUCCIONS: Botons modal editar */}
                 <button type="button" onClick={() => setMetricToEdit(null)} className="flex-1 py-3 rounded-xl border border-slate-200 font-bold text-slate-600 hover:bg-slate-50">{t('History.cancel')}</button>
                 <button type="submit" disabled={isSubmitting} className="flex-1 py-3 rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-800 disabled:opacity-50 flex justify-center items-center gap-2"><Save size={18} /> {t('History.save')}</button>
                </div>

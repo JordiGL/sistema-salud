@@ -1,15 +1,17 @@
 import { NestFactory } from '@nestjs/core';
-import { HealthModule } from './health/health.module';
+import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
-  const app = await NestFactory.create(HealthModule);
+  const app = await NestFactory.create(AppModule);
 
-  // 1. Habilitar validación global (para que funcionen los DTOs)
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
-  // 2. Habilitar CORS (Crucial para que el Frontend pueda conectarse)
-  app.enableCors();
+  // CAMBIO AQUÍ: Permitir el puerto 3001 (o ambos para no fallar)
+  app.enableCors({
+    origin: ['http://localhost:3000', 'http://localhost:3001'],
+    credentials: true,
+  });
 
   await app.listen(3000);
 }

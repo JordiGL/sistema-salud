@@ -41,3 +41,19 @@ model User {
   password  String
   createdAt DateTime @default(now())
 }
+
+// Opciones para el selector de Contexto
+model ContextOption {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique  // ej: "exercise", "stress"
+  value     String            // ej: "Post-Ejercicio" (Texto fallback)
+  createdAt DateTime @default(now())
+}
+
+// Opciones para el selector de Lugar de Peso
+model LocationOption {
+  id        Int      @id @default(autoincrement())
+  key       String   @unique  // ej: "home", "pharmacy"
+  value     String            // ej: "Casa" (Texto fallback)
+  createdAt DateTime @default(now())
+}

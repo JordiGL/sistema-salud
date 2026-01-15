@@ -1,9 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react'; // <--- Añadir useEffect
 import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { saveMetric, HealthMetric } from '@/lib/api';
+// AÑADIR los nuevos imports de api
+import { saveMetric, HealthMetric, fetchContextOptions, fetchLocationOptions, SelectOption } from '@/lib/api';
 import { ClipboardList, Heart, Scale, Save, RotateCcw, ChevronDown, ChevronUp, Plus, Trash2 } from 'lucide-react'; 
 
 interface HealthDataFormProps {
@@ -18,16 +19,46 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   
+  // --- ESTADOS PARA OPCIONES DINÁMICAS ---
+  const [contextOptions, setContextOptions] = useState<SelectOption[]>([]);
+  const [locationOptions, setLocationOptions] = useState<SelectOption[]>([]);
+
   const initialFormState = {
     bloodPressure: '', pulse: '', weight: '', spo2: '', ca125: '',
     measurementContext: '', weightLocation: '', notes: ''
   };
   const [formData, setFormData] = useState(initialFormState);
 
+  // --- EFECTO: CARGAR OPCIONES AL MONTAR ---
+  useEffect(() => {
+    async function loadOptions() {
+        try {
+            const [ctx, loc] = await Promise.all([
+                fetchContextOptions(),
+                fetchLocationOptions()
+            ]);
+            setContextOptions(ctx);
+            setLocationOptions(loc);
+        } catch (error) {
+            console.error("Error cargando opciones", error);
+        }
+    }
+    loadOptions();
+  }, []);
+
+  // Función helper para traducir opciones dinámicas
+  // Intenta buscar "ContextOptions.clave", si no existe o falla, devuelve el valor por defecto de la BD
+  const translateOption = (category: string, option: SelectOption) => {
+      const translationKey = `${category}.${option.key}`;
+      // next-intl devuelve la clave si no encuentra la traducción, pero para estar seguros:
+      const translated = t(translationKey as any); 
+      return translated === translationKey ? option.value : translated;
+  };
+
   const handleReset = (e?: React.MouseEvent) => {
     if(e) {
         e.stopPropagation();
-        e.preventDefault(); // Importante para evitar submits accidentales
+        e.preventDefault();
     }
     setFormData(initialFormState);
   };
@@ -38,6 +69,9 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
     
     const payload: Partial<HealthMetric> = {
         bloodPressure: formData.bloodPressure || undefined,
+        // Guardamos el VALUE (lo que ve el usuario o la clave, según tu preferencia de backend)
+        // Normalmente se guarda el valor legible "Post-Ejercicio" o la clave "exercise".
+        // Asumo que tu backend actual guarda el string legible:
         measurementContext: formData.measurementContext || undefined,
         weightLocation: formData.weightLocation || undefined,
         notes: formData.notes || undefined,
@@ -64,14 +98,13 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
     }
   }
 
-  // Estilos comunes
   const inputClasses = "w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-slate-500 outline-none transition-all shadow-sm text-slate-800 placeholder:text-slate-300";
   const labelClasses = "block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1";
 
   return (
     <div className={`bg-white rounded-2xl shadow-sm border border-slate-200 mt-8 animate-in fade-in slide-in-from-bottom-4 duration-700 overflow-hidden transition-all ${isOpen ? 'ring-1 ring-slate-200' : ''}`}>
         
-        {/* CABECERA (Ahora más limpia, solo título y flecha) */}
+        {/* CABECERA */}
         <div 
             onClick={() => setIsOpen(!isOpen)}
             className={`flex justify-between items-center p-4 cursor-pointer transition-colors select-none ${isOpen ? 'bg-slate-50 border-b border-slate-200' : 'bg-white hover:bg-slate-50'}`}
@@ -104,12 +137,14 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
 
                         <div className="mb-4">
                             <label className={labelClasses}>{t('Form.contextLabel')}</label>
+                            {/* SELECTOR DINÁMICO DE CONTEXTO */}
                             <select className={`${inputClasses} bg-white`} value={formData.measurementContext} onChange={e => setFormData({...formData, measurementContext: e.target.value})}>
                                 <option value="">{t('Form.contextPlaceholder')}</option>
-                                <option value="Post-Ejercicio">{t('ContextOptions.exercise')}</option>
-                                <option value="Post-Drenaje">{t('ContextOptions.drainage')}</option>
-                                <option value="Post-Quimioterapia">{t('ContextOptions.chemo')}</option>
-                                <option value="Momento de estres">{t('ContextOptions.stress')}</option>
+                                {contextOptions.map((opt) => (
+                                    <option key={opt.key} value={opt.value}>
+                                        {translateOption('ContextOptions', opt)}
+                                    </option>
+                                ))}
                             </select>
                         </div>
 
@@ -127,44 +162,35 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                             <Scale size={18} /> {t('Form.weightControl')}
                         </div>
                         <div className="space-y-4 grow">
-                            <div><label className={labelClasses}>{t('Form.locationLabel')}</label><select className={`${inputClasses} bg-white`} value={formData.weightLocation} onChange={e => setFormData({...formData, weightLocation: e.target.value})}><option value="">{t('Form.locationPlaceholder')}</option><option value="Casa">{t('LocationOptions.home')}</option><option value="Farmacia">{t('LocationOptions.pharmacy')}</option><option value="CAP">{t('LocationOptions.cap')}</option><option value="ICO">{t('LocationOptions.ico')}</option></select></div>
+                            <div>
+                                <label className={labelClasses}>{t('Form.locationLabel')}</label>
+                                {/* SELECTOR DINÁMICO DE LUGAR */}
+                                <select className={`${inputClasses} bg-white`} value={formData.weightLocation} onChange={e => setFormData({...formData, weightLocation: e.target.value})}>
+                                    <option value="">{t('Form.locationPlaceholder')}</option>
+                                    {locationOptions.map((opt) => (
+                                        <option key={opt.key} value={opt.value}>
+                                            {translateOption('LocationOptions', opt)}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
                             <div><label className={labelClasses}>{t('Form.weightLabel')}</label><input type="number" placeholder="75.5" className={`${inputClasses} text-center font-mono text-lg`} value={formData.weight} onChange={e => setFormData({...formData, weight: e.target.value})} /></div>
                         </div>
                     </div>
 
-                    {/* FILA INFERIOR: NOTAS Y ACCIONES */}
+                    {/* FILA INFERIOR... (igual) */}
                     <div className="lg:col-span-12 space-y-4">
                         <div>
                             <label className="block text-sm font-medium text-slate-700 mb-1">{t('Form.notes')}</label>
                             <textarea className="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-400 outline-none h-20 resize-none shadow-sm placeholder:text-slate-300 text-slate-700 transition-all" placeholder={t('Form.notesPlaceholder')} value={formData.notes} onChange={e => setFormData({...formData, notes: e.target.value})} />
                         </div>
 
-                        {/* --- ZONA DE ACCIONES (NUEVO DISEÑO) --- */}
                         <div className="flex gap-3">
-                            {/* Botón LIMPIAR (Secundario) */}
-                            <button 
-                                type="button" 
-                                onClick={handleReset}
-                                className="px-6 py-4 rounded-xl font-bold text-slate-500 bg-white border border-slate-200 hover:bg-slate-50 hover:text-slate-700 hover:border-slate-300 transition-all flex items-center gap-2"
-                                title="Limpiar formulario"
-                            >
-                                <RotateCcw size={18} /> 
-                                <span className="hidden sm:inline">{t('HomePage.clear') || 'Limpiar'}</span>
+                            <button type="button" onClick={handleReset} className="px-6 py-4 rounded-xl font-bold text-slate-500 bg-white border border-slate-200 hover:bg-slate-50 hover:text-slate-700 hover:border-slate-300 transition-all flex items-center gap-2" title="Limpiar formulario">
+                                <RotateCcw size={18} /> <span className="hidden sm:inline">{t('HomePage.clear') || 'Limpiar'}</span>
                             </button>
-
-                            {/* Botón GUARDAR (Principal, ocupa el resto) */}
-                            <button 
-                                type="submit" 
-                                disabled={isSubmitting} 
-                                className="flex-1 bg-slate-900 text-white py-4 rounded-xl hover:bg-slate-800 font-bold text-lg shadow-lg hover:shadow-xl transition-all transform active:scale-[0.99] flex justify-center items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
-                            >
-                                {isSubmitting ? (
-                                    <span>...</span>
-                                ) : (
-                                    <>
-                                        <Save size={20} /> {t('HomePage.saveButton')}
-                                    </>
-                                )}
+                            <button type="submit" disabled={isSubmitting} className="flex-1 bg-slate-900 text-white py-4 rounded-xl hover:bg-slate-800 font-bold text-lg shadow-lg hover:shadow-xl transition-all transform active:scale-[0.99] flex justify-center items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed">
+                                {isSubmitting ? <span>...</span> : <><Save size={20} /> {t('HomePage.saveButton')}</>}
                             </button>
                         </div>
                     </div>

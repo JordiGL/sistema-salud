@@ -128,3 +128,50 @@ export async function deleteMetric(id: string) {
   if (!res.ok) throw new Error("Error eliminando datos");
   return true;
 }
+
+export interface SelectOption {
+  key: string; // La clave para guardar en BD y para traducir (ej: "exercise")
+  value: string; // El valor por defecto o fallback (ej: "Post-Ejercicio")
+}
+
+export async function fetchContextOptions(): Promise<SelectOption[]> {
+  // TODO: Conectar con tu endpoint real
+  // const res = await fetch(`${API_URL}/options/context`, { headers: getHeaders() });
+  // if (!res.ok) throw new Error('Failed to fetch contexts');
+  // return res.json();
+
+  // MOCK TEMPORAL (Simula la BD):
+  return new Promise((resolve) => {
+    setTimeout(
+      () =>
+        resolve([
+          { key: "exercise", value: "Post-Ejercicio" },
+          { key: "drainage", value: "Post-Drenaje" },
+          { key: "chemo", value: "Post-Quimioterapia" },
+          { key: "stress", value: "Momento de estres" },
+        ]),
+      100
+    );
+  });
+}
+
+export async function fetchLocationOptions(): Promise<SelectOption[]> {
+  // TODO: Conectar con tu endpoint real
+  // const res = await fetch(`${API_URL}/options/location`, { headers: getHeaders() });
+  // if (!res.ok) throw new Error('Failed to fetch locations');
+  // return res.json();
+
+  // MOCK TEMPORAL (Simula la BD):
+  return new Promise((resolve) => {
+    setTimeout(
+      () =>
+        resolve([
+          { key: "home", value: "Casa" },
+          { key: "pharmacy", value: "Farmacia" },
+          { key: "cap", value: "CAP" },
+          { key: "ico", value: "ICO" },
+        ]),
+      100
+    );
+  });
+}
