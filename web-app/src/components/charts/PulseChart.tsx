@@ -1,10 +1,11 @@
 'use client';
 import { useState, useEffect, useMemo } from 'react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
-import { Heart, Loader2 } from 'lucide-react';
+import { Heart, Loader2, FileSpreadsheet, FileCode } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { fetchMetrics, HealthMetric } from '@/lib/api';
 import { StatsSummary } from './StatsSummary';
+import { downloadCSV, downloadXML } from '@/lib/export-utils';
 
 const CustomXAxisTick = ({ x, y, payload }: any) => {
   const date = new Date(payload.value);
@@ -23,7 +24,8 @@ const CustomXAxisTick = ({ x, y, payload }: any) => {
 };
 
 export function PulseChart({ data: initialData }: { data: HealthMetric[] }) {
-  const t = useTranslations('Charts');
+  const t = useTranslations();
+  const tCharts = useTranslations('Charts');
   const tFilter = useTranslations('Filters');
 
   // --- ESTADOS ---
@@ -96,20 +98,33 @@ export function PulseChart({ data: initialData }: { data: HealthMetric[] }) {
         </div>
       )}
 
-      {/* CABECERA */}
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6">
-        <h3 className="text-lg font-bold flex items-center gap-3 text-slate-800">
-          <div className="p-2 bg-red-100 text-red-600 rounded-full">
-            <Heart size={20} />
-          </div>
-          {t('pulseTitle')}
-        </h3>
+      {/* --- BARRA DE HERRAMIENTAS (HEADER) --- */}
+      {/* Sin título, solo controles alineados */}
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+        
+        {/* GRUPO IZQUIERDO: EXPORTAR */}
+        <div className="flex gap-2">
+            <button 
+                onClick={() => downloadCSV(finalData, 'pulsaciones_data', t)}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-500 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:text-red-600 transition-colors"
+                title="Descargar CSV"
+            >
+                <FileSpreadsheet size={14} /> <span className="hidden sm:inline">CSV</span>
+            </button>
+            <button 
+                onClick={() => downloadXML(finalData, 'pulsaciones_data', t)}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-500 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:text-red-600 transition-colors"
+                title="Descargar XML"
+            >
+                <FileCode size={14} /> <span className="hidden sm:inline">XML</span>
+            </button>
+        </div>
 
-        {/* BARRA DE HERRAMIENTAS */}
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+        {/* GRUPO DERECHO: FILTROS */}
+        <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center overflow-x-auto pb-1 sm:pb-0">
           
           {/* Rango Fechas */}
-          <div className="flex bg-slate-100 p-1 rounded-xl">
+          <div className="flex bg-slate-100 p-1 rounded-xl shrink-0">
             {['7d', '30d', 'all'].map((val) => (
               <button
                 key={val}
@@ -128,7 +143,7 @@ export function PulseChart({ data: initialData }: { data: HealthMetric[] }) {
           </div>
 
           {/* Hora */}
-          <div className="flex bg-slate-100 p-1 rounded-xl">
+          <div className="flex bg-slate-100 p-1 rounded-xl shrink-0">
              {['24h', 'am', 'pm'].map((val) => (
               <button
                 key={val}
@@ -146,18 +161,18 @@ export function PulseChart({ data: initialData }: { data: HealthMetric[] }) {
             ))}
           </div>
 
-          <div className="hidden sm:block w-px h-8 bg-slate-100 mx-1"></div>
+          <div className="hidden sm:block w-px h-6 bg-slate-200 mx-1"></div>
 
           {/* Contextos */}
-          <div className="flex items-center gap-2">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider hidden md:inline">
               {tFilter('contexts')}
             </span>
             <div className="relative group">
               <select 
                 value={contextFilter}
                 onChange={(e) => setContextFilter(e.target.value)}
-                className="appearance-none bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold py-2 pl-3 pr-8 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-red-100 transition-colors min-w-[120px]"
+                className="appearance-none bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold py-2 pl-3 pr-8 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-red-100 transition-colors min-w-[100px]"
               >
                 <option value="all">{tFilter('allContexts')}</option>
                 {availableContexts.map((ctx: any, idx) => (
@@ -179,7 +194,7 @@ export function PulseChart({ data: initialData }: { data: HealthMetric[] }) {
             <div className="p-4 bg-slate-50 rounded-full mb-3">
               <Heart size={32} className="opacity-20 text-slate-500" />
             </div>
-            <p className="font-medium text-sm text-slate-500">{t('noData')}</p>
+            <p className="font-medium text-sm text-slate-500">{tCharts('noData')}</p>
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
@@ -213,7 +228,7 @@ export function PulseChart({ data: initialData }: { data: HealthMetric[] }) {
         <div className="pt-6 border-t border-slate-100">
             {/* Solo una estadística porque es una sola línea */}
             <StatsSummary 
-                label={t('pulseTitle')} /* O "Pulsaciones" */
+                label={tCharts('pulseTitle')} /* O "Pulsaciones" */
                 data={pulseData} 
                 colorClass="text-red-600" 
                 bgClass="bg-red-50"

@@ -15,17 +15,17 @@ interface HistoryTableViewProps {
 export function HistoryTableView({ data, isAdmin, onRefresh }: HistoryTableViewProps) {
   const t = useTranslations();
   
-  // --- ESTADOS ---
+  // --- ESTATS ---
   const [metricToDelete, setMetricToDelete] = useState<HealthMetric | null>(null);
   const [metricToEdit, setMetricToEdit] = useState<HealthMetric | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Estados Opciones Dinámicas
+  // Estats Opcions Dinàmiques (per al modal d'edició)
   const [contextOptions, setContextOptions] = useState<SelectOption[]>([]);
   const [locationOptions, setLocationOptions] = useState<SelectOption[]>([]);
   const [editForm, setEditForm] = useState<any>({});
 
-  // Cargar opciones al montar
+  // Cargar opcions al muntar
   useEffect(() => {
     async function loadOptions() {
         try {
@@ -38,6 +38,7 @@ export function HistoryTableView({ data, isAdmin, onRefresh }: HistoryTableViewP
   }, []);
 
   const translateOption = (category: string, option: SelectOption) => {
+      // Intenta traduir la clau, si falla (retorna la clau amb punts), usa el valor original
       const translated = t(`${category}.${option.key}` as any);
       return translated.includes(category) ? option.value : translated; 
   };
@@ -52,7 +53,8 @@ export function HistoryTableView({ data, isAdmin, onRefresh }: HistoryTableViewP
       weight: metric.weight || '',
       notes: metric.notes || '',
       measurementContext: metric.measurementContext || '',
-      weightLocation: metric.weightLocation || ''
+      weightLocation: metric.weightLocation || '',
+      ca125: metric.ca125 || ''
     });
   };
 
@@ -78,6 +80,7 @@ export function HistoryTableView({ data, isAdmin, onRefresh }: HistoryTableViewP
         pulse: editForm.pulse ? Number(editForm.pulse) : undefined,
         weight: editForm.weight ? Number(editForm.weight) : undefined,
         spo2: editForm.spo2 ? Number(editForm.spo2) : undefined,
+        ca125: editForm.ca125 ? Number(editForm.ca125) : undefined,
         measurementContext: editForm.measurementContext || undefined,
         weightLocation: editForm.weightLocation || undefined,
     };
@@ -98,10 +101,10 @@ export function HistoryTableView({ data, isAdmin, onRefresh }: HistoryTableViewP
         <MoveHorizontal size={16} />
       </div>
 
-      {/* --- TABLA RESPONSIVA --- */}
+      {/* --- TAULA RESPONSIVA --- */}
       <div className="w-full overflow-hidden rounded-xl border border-slate-200 shadow-sm bg-white relative">
         
-        {/* Barra de scroll personalizada (fina y gris suave) */}
+        {/* Barra de scroll estilitzada */}
         <div className="overflow-x-auto w-full pb-1 [&::-webkit-scrollbar]:h-2 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:bg-slate-200 [&::-webkit-scrollbar-thumb]:rounded-full hover:[&::-webkit-scrollbar-thumb]:bg-slate-300 transition-colors">
           
           <table className="w-full min-w-full text-sm text-left border-collapse whitespace-nowrap">
@@ -115,10 +118,7 @@ export function HistoryTableView({ data, isAdmin, onRefresh }: HistoryTableViewP
                 <th className="px-4 py-3 min-w-[80px]">{t('History.cols.spo2')}</th>
                 <th className="px-4 py-3 border-l border-slate-300 min-w-[100px]">{t('History.cols.weight')}</th>
                 <th className="px-4 py-3 min-w-[120px]">{t('History.cols.site')}</th> 
-                
-                {/* CAMBIO AQUÍ: Reducido de 200px a 150px */}
                 <th className="px-4 py-3 border-l border-slate-300 min-w-[150px]">{t('History.cols.note')}</th>
-                
                 {isAdmin && <th className="px-4 py-3 text-right border-l border-slate-300 min-w-[100px] sticky right-0 bg-slate-50 shadow-[-5px_0px_10px_rgba(0,0,0,0.02)]">{t('History.cols.actions')}</th>}
               </tr>
             </thead>
@@ -127,6 +127,7 @@ export function HistoryTableView({ data, isAdmin, onRefresh }: HistoryTableViewP
               {data.map((row) => {
                 const dateObj = new Date(row.createdAt);
                 
+                // Lògica de colors
                 let sysStatus: HealthStatus = 'normal';
                 let diaStatus: HealthStatus = 'normal';
                 let sys = 0, dia = 0;
@@ -200,7 +201,6 @@ export function HistoryTableView({ data, isAdmin, onRefresh }: HistoryTableViewP
 
                     <td className="px-4 py-3 border-l border-slate-100">
                       {row.notes ? (
-                          // CAMBIO AQUÍ: Reducido también el truncado a 150px
                           <div className="flex items-center gap-1 text-xs text-slate-600 italic max-w-[150px] truncate" title={row.notes}>
                                <FileText size={12} className="shrink-0 text-slate-400"/>
                                <span className="truncate">{row.notes}</span>
@@ -255,6 +255,7 @@ export function HistoryTableView({ data, isAdmin, onRefresh }: HistoryTableViewP
                   <div><label className="text-xs font-bold text-slate-500 uppercase">{t('Form.pulseLabel')}</label><input type="number" className="w-full p-2 border rounded-lg mt-1" value={editForm.pulse} onChange={e => setEditForm({...editForm, pulse: e.target.value})} /></div>
                   <div><label className="text-xs font-bold text-slate-500 uppercase">{t('Form.spo2Label')}</label><input type="number" className="w-full p-2 border rounded-lg mt-1" value={editForm.spo2} onChange={e => setEditForm({...editForm, spo2: e.target.value})} /></div>
                   
+                  {/* Select Contextos */}
                   <div>
                     <label className="text-xs font-bold text-slate-500 uppercase">{t('Form.contextLabel')}</label>
                     <select className="w-full p-2 border rounded-lg mt-1 text-sm bg-white" value={editForm.measurementContext} onChange={e => setEditForm({...editForm, measurementContext: e.target.value})}>
@@ -267,6 +268,7 @@ export function HistoryTableView({ data, isAdmin, onRefresh }: HistoryTableViewP
 
                   <div><label className="text-xs font-bold text-slate-500 uppercase">{t('Form.weightLabel')}</label><input type="number" className="w-full p-2 border rounded-lg mt-1" value={editForm.weight} onChange={e => setEditForm({...editForm, weight: e.target.value})} /></div>
                   
+                  {/* Select Ubicaciones */}
                   <div>
                     <label className="text-xs font-bold text-slate-500 uppercase">{t('Form.locationLabel')}</label>
                     <select className="w-full p-2 border rounded-lg mt-1 text-sm bg-white" value={editForm.weightLocation} onChange={e => setEditForm({...editForm, weightLocation: e.target.value})}>
@@ -276,7 +278,11 @@ export function HistoryTableView({ data, isAdmin, onRefresh }: HistoryTableViewP
                         ))}
                     </select>
                   </div>
+
+                  {/* CA125 */}
+                  <div><label className="text-xs font-bold text-slate-500 uppercase">{t('Form.ca125Label')}</label><input type="number" className="w-full p-2 border rounded-lg mt-1" value={editForm.ca125} onChange={e => setEditForm({...editForm, ca125: e.target.value})} /></div>
                </div>
+               
                <div><label className="text-xs font-bold text-slate-500 uppercase">{t('Form.notes')}</label><textarea className="w-full p-2 border rounded-lg mt-1 h-20 resize-none" value={editForm.notes} onChange={e => setEditForm({...editForm, notes: e.target.value})} /></div>
                
                <div className="flex gap-3 pt-2">

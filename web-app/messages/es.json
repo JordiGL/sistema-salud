@@ -93,5 +93,16 @@
     "contexts": "Contextos",
     "allContexts": "Todos",
     "location": "Lugar"
+  },
+  "Export": {
+    "date": "Fecha",
+    "context": "Contexto",
+    "bp": "Tensión",
+    "pulse": "Pulso",
+    "spo2": "SpO2",
+    "weight": "Peso",
+    "location": "Lugar",
+    "ca125": "CA125",
+    "notes": "Notas"
   }
 }

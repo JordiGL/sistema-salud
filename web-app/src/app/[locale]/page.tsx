@@ -12,14 +12,18 @@ import { PulseChart } from '@/components/charts/PulseChart';
 import { WeightChart } from '@/components/charts/WeightChart';
 import { SpO2Chart } from '@/components/charts/SpO2Chart';
 import { CA125Chart } from '@/components/charts/CA125Chart';
-import { MetricCard } from '@/components/MetricCard';
+import { HistoryGridView } from '@/components/HistoryGridView';
 import { HistoryTableView } from '@/components/HistoryTableView';
 import { HealthDataForm } from '@/components/HealthDataForm';
+
+// Utils
+import { downloadCSV, downloadXML } from '@/lib/export-utils';
 
 // Iconos
 import { 
   Activity, Heart, Scale, Droplets, TestTube, 
-  Globe, LayoutList, Lock, LogOut, LayoutGrid, List 
+  Globe, LayoutList, LogOut, LayoutGrid, List,
+  FileSpreadsheet, FileCode
 } from 'lucide-react';
 
 export default function Home() {
@@ -27,7 +31,7 @@ export default function Home() {
   const locale = useLocale();
   const router = useRouter();
   
-  // --- ESTADOS ---
+  // --- ESTATS ---
   const [metrics, setMetrics] = useState<HealthMetric[]>([]);
   const [loading, setLoading] = useState(true);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -35,13 +39,13 @@ export default function Home() {
   const [activeTab, setActiveTab] = useState<'history' | 'bp' | 'pulse' | 'weight' | 'spo2' | 'ca125'>('history');
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('table');
 
-  // --- EFECTOS ---
+  // --- EFECTES ---
   useEffect(() => { 
     loadData(); 
     checkAuth(); 
   }, []);
 
-  // --- FUNCIONES ---
+  // --- FUNCIONS ---
   function checkAuth() {
     const token = localStorage.getItem('health_token');
     setIsAdmin(!!token);
@@ -56,7 +60,7 @@ export default function Home() {
 
   async function loadData() {
     const data = await fetchMetrics();
-    setMetrics(data.reverse()); 
+    setMetrics(data); 
     setLoading(false);
   }
 
@@ -72,13 +76,13 @@ export default function Home() {
   return (
     <main className="min-h-screen bg-slate-50 p-4 md:p-8 font-sans text-gray-800 relative">
       
-      {/* --- CABECERA SUPERIOR --- */}
+      {/* --- CAPÇALERA SUPERIOR --- */}
       <div className="absolute top-6 right-6 flex items-center gap-2 z-10">
         {isAdmin ? (
             <button 
                 onClick={handleLogout}
                 className="w-44 flex items-center p-1 bg-white rounded-full shadow-sm border border-slate-200 mr-2 group transition-all"
-                title="Cerrar Sesión"
+                title="Tancar Sessió"
             >
                 <span className="w-full py-1 rounded-full bg-white text-slate-900 group-hover:bg-slate-100 text-xs font-bold flex items-center justify-center gap-2 transition-colors">
                     <LogOut size={14} /> {t('HomePage.adminExit')}
@@ -104,17 +108,14 @@ export default function Home() {
 
       <div className="max-w-5xl mx-auto space-y-8 pt-12">
         
-        {/* --- FORMULARIO (MOVIDO ARRIBA) --- */}
-        {/* Solo visible si es Admin */}
+        {/* --- FORMULARI --- */}
         {isAdmin && (
-           // Nota: Le he quitado un poco de margen superior en el componente original o aquí 
-           // para que no quede demasiado separado, pero el componente ya tiene sus propios estilos.
            <div className="mb-8">
                <HealthDataForm onSuccess={loadData} />
            </div>
         )}
 
-        {/* --- NAVEGACIÓN (TABS) --- */}
+        {/* --- NAVEGACIÓ (TABS) --- */}
         <div className="flex flex-wrap gap-2 md:gap-4 p-1 bg-white rounded-xl border border-slate-200 shadow-sm overflow-x-auto">
           {tabs.map((tab) => {
             const isActive = activeTab === tab.id;
@@ -138,52 +139,70 @@ export default function Home() {
           })}
         </div>
 
-        {/* --- ÁREA DE CONTENIDO (GRÁFICAS Y TABLAS) --- */}
+        {/* --- ÀREA DE CONTINGUT --- */}
         <div className="min-h-100">
             
         {activeTab === 'history' && (
             <div className="animate-in fade-in slide-in-from-bottom-2 duration-500 space-y-4">
                 
-                <div className="flex justify-between items-center mb-2 px-1">
-                   <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">
-                      {viewMode === 'grid' ? t('History.cardView') : t('History.tableView')}
-                   </span>
-                   <div className="bg-white p-1 rounded-lg border border-slate-200 flex shadow-sm">
+                {/* --- BARRA D'EINES UNIFICADA --- */}
+                {/* Un sol bloc blanc amb totes les accions juntes */}
+                <div className="flex justify-end items-center mb-4 px-1">
+                   <div className="bg-white p-1 rounded-xl border border-slate-200 flex items-center shadow-sm">
+                      
+                      {/* Grup 1: Exportació */}
+                      <button 
+                          onClick={() => downloadCSV(metrics, 'historial_salud', t)}
+                          className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-slate-500 hover:text-black hover:bg-slate-50 rounded-lg transition-colors"
+                          title="Descarregar CSV"
+                      >
+                          <FileSpreadsheet size={16} /> <span className="hidden sm:inline">CSV</span>
+                      </button>
+                      <button 
+                          onClick={() => downloadXML(metrics, 'historial_salud', t)}
+                          className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-slate-500 hover:text-black hover:bg-slate-50 rounded-lg transition-colors"
+                          title="Descarregar XML"
+                      >
+                          <FileCode size={16} /> <span className="hidden sm:inline">XML</span>
+                      </button>
+
+                      {/* Separador Vertical */}
+                      <div className="w-px h-6 bg-slate-100 mx-2"></div>
+
+                      {/* Grup 2: Vistes */}
                       <button 
                         onClick={() => setViewMode('grid')}
-                        className={`p-1.5 rounded-md transition-all ${viewMode === 'grid' ? 'bg-slate-100 text-slate-800 shadow-inner' : 'text-slate-400 hover:text-slate-600'}`}
+                        className={`p-2 rounded-lg transition-all ${viewMode === 'grid' ? 'bg-slate-100 text-slate-800 shadow-inner' : 'text-slate-400 hover:text-slate-600'}`}
+                        title={t('History.cardView')}
                       >
-                        <LayoutGrid size={16} />
+                        <LayoutGrid size={18} />
                       </button>
                       <button 
                         onClick={() => setViewMode('table')}
-                        className={`p-1.5 rounded-md transition-all ${viewMode === 'table' ? 'bg-slate-100 text-slate-800 shadow-inner' : 'text-slate-400 hover:text-slate-600'}`}
+                        className={`p-2 rounded-lg transition-all ${viewMode === 'table' ? 'bg-slate-100 text-slate-800 shadow-inner' : 'text-slate-400 hover:text-slate-600'}`}
+                        title={t('History.tableView')}
                       >
-                        <List size={16} />
+                        <List size={18} />
                       </button>
                    </div>
                 </div>
 
                 {metrics.length === 0 && !loading && (
                     <div className="col-span-full text-center py-20 text-slate-400">
-                        <p>No hay registros todavía.</p>
+                        <p>No hi ha registres encara.</p>
                     </div>
                 )}
 
+                {/* Contingut */}
                 {viewMode === 'grid' ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
-                        {[...metrics].reverse().map((metric) => (
-                            <MetricCard 
-                                key={metric.id} 
-                                data={metric} 
-                                isAdmin={isAdmin}
-                                onRefresh={loadData}
-                            />
-                        ))}
-                    </div>
+                    <HistoryGridView 
+                        data={metrics} 
+                        isAdmin={isAdmin}
+                        onRefresh={loadData}
+                    />
                 ) : (
                     <HistoryTableView 
-                        data={[...metrics].reverse()} 
+                        data={metrics} 
                         isAdmin={isAdmin} 
                         onRefresh={loadData} 
                     />
@@ -198,7 +217,7 @@ export default function Home() {
           {activeTab === 'ca125' && <CA125Chart data={metrics} />}
         </div>
 
-        {/* MENSAJE VISITANTE */}
+        {/* MISSATGE VISITANT */}
         {!isAdmin && (
             <div className="mt-10 text-center text-slate-400 text-sm pb-10">
                 <p>{t('HomePage.viewModeMessage')}</p>

@@ -93,5 +93,16 @@
     "contexts": "Contextos",
     "allContexts": "Tots",
     "location": "Lloc"
+  },
+  "Export": {
+    "date": "Data",
+    "context": "Context",
+    "bp": "Tensió",
+    "pulse": "Pulsacions",
+    "spo2": "SpO2",
+    "weight": "Pes",
+    "location": "Lloc",
+    "ca125": "CA125",
+    "notes": "Notes"
   }
 }
