@@ -156,14 +156,14 @@ export default function Home() {
                           className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-slate-500 hover:text-black hover:bg-slate-50 rounded-lg transition-colors"
                           title="Descarregar CSV"
                       >
-                          <FileSpreadsheet size={16} /> <span className="hidden sm:inline">CSV</span>
+                          <FileSpreadsheet size={16} /> <span>CSV</span>
                       </button>
                       <button 
                           onClick={() => downloadXML(metrics, 'historial_salud', t)}
                           className="flex items-center gap-1.5 px-3 py-2 text-xs font-bold text-slate-500 hover:text-black hover:bg-slate-50 rounded-lg transition-colors"
                           title="Descarregar XML"
                       >
-                          <FileCode size={16} /> <span className="hidden sm:inline">XML</span>
+                          <FileCode size={16} /> <span>XML</span>
                       </button>
 
                       {/* Separador Vertical */}

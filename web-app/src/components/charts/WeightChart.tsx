@@ -108,14 +108,14 @@ export function WeightChart({ data: initialData }: { data: HealthMetric[] }) {
                 className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-500 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:text-blue-600 transition-colors"
                 title="Descargar CSV"
             >
-                <FileSpreadsheet size={14} /> <span className="hidden sm:inline">CSV</span>
+                <FileSpreadsheet size={14} /> <span>CSV</span>
             </button>
             <button 
                 onClick={() => downloadXML(finalData, 'peso_data', t)}
                 className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-500 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:text-blue-600 transition-colors"
                 title="Descargar XML"
             >
-                <FileCode size={14} /> <span className="hidden sm:inline">XML</span>
+                <FileCode size={14} /> <span>XML</span>
             </button>
         </div>
 
