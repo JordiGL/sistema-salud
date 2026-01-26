@@ -1,9 +1,10 @@
 'use client';
 import { useState, useEffect, useMemo } from 'react';
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { Heart, Loader2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { fetchMetrics, HealthMetric } from '@/lib/api';
+import { StatsSummary } from './StatsSummary';
 
 const CustomXAxisTick = ({ x, y, payload }: any) => {
   const date = new Date(payload.value);
@@ -76,8 +77,15 @@ export function PulseChart({ data: initialData }: { data: HealthMetric[] }) {
     return result;
   }, [chartData, timeOfDay]);
 
+  // CALCULO DE DATOS PARA ESTADÍSTICAS (PULSO)
+  const pulseData = useMemo(() => 
+    finalData
+      .map(d => d.pulse || 0)
+      .filter(n => n > 0),
+  [finalData]);
+
   return (
-    <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col relative overflow-hidden">
+    <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col relative overflow-hidden space-y-6">
       
       {/* LOADER */}
       {loading && (
@@ -89,7 +97,7 @@ export function PulseChart({ data: initialData }: { data: HealthMetric[] }) {
       )}
 
       {/* CABECERA */}
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 mb-6">
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6">
         <h3 className="text-lg font-bold flex items-center gap-3 text-slate-800">
           <div className="p-2 bg-red-100 text-red-600 rounded-full">
             <Heart size={20} />
@@ -190,12 +198,30 @@ export function PulseChart({ data: initialData }: { data: HealthMetric[] }) {
                 labelStyle={{ color: '#64748b', marginBottom: '0.5rem', fontSize: '12px' }}
                 labelFormatter={(v) => new Date(v).toLocaleString()} 
               />
-              <Legend wrapperStyle={{ paddingTop: '20px' }} iconType="circle" />
+              
+              {/* --- ELIMINADO <Legend /> --- */}
+              {/* Eliminado para no tener duplicidad con la estadística de abajo */}
+
               <Line type="monotone" dataKey="pulse" stroke="#ef4444" strokeWidth={3} name="BPM" dot={{r:4, fill: '#ef4444', strokeWidth: 2, stroke: '#fff'}} activeDot={{r:6}} />
             </LineChart>
           </ResponsiveContainer>
         )}
       </div>
+
+      {/* --- SECCIÓN DE ESTADÍSTICAS --- */}
+      {finalData.length > 0 && (
+        <div className="pt-6 border-t border-slate-100">
+            {/* Solo una estadística porque es una sola línea */}
+            <StatsSummary 
+                label={t('pulseTitle')} /* O "Pulsaciones" */
+                data={pulseData} 
+                colorClass="text-red-600" 
+                bgClass="bg-red-50"
+                unit="bpm"
+                legendDotColor="#ef4444"
+            />
+        </div>
+      )}
     </div>
   );
 }

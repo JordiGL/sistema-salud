@@ -1,9 +1,10 @@
 'use client';
 import { useState, useEffect, useMemo } from 'react';
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { Droplets, Loader2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { fetchMetrics, HealthMetric } from '@/lib/api';
+import { StatsSummary } from './StatsSummary';
 
 const CustomXAxisTick = ({ x, y, payload }: any) => {
   const date = new Date(payload.value);
@@ -69,8 +70,15 @@ export function SpO2Chart({ data: initialData }: { data: HealthMetric[] }) {
     return result;
   }, [chartData, timeOfDay]);
 
+  // CALCULO DE DATOS PARA ESTADÍSTICAS (SpO2)
+  const spo2Data = useMemo(() => 
+    finalData
+      .map(d => d.spo2 || 0)
+      .filter(n => n > 0),
+  [finalData]);
+
   return (
-    <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col relative overflow-hidden">
+    <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col relative overflow-hidden space-y-6">
       
       {loading && (
         <div className="absolute inset-0 bg-white/60 z-10 flex items-center justify-center backdrop-blur-[1px]">
@@ -80,7 +88,7 @@ export function SpO2Chart({ data: initialData }: { data: HealthMetric[] }) {
         </div>
       )}
 
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 mb-6">
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6">
         <h3 className="text-lg font-bold flex items-center gap-3 text-slate-800">
           <div className="p-2 bg-teal-100 text-teal-600 rounded-full">
             <Droplets size={20} />
@@ -178,12 +186,30 @@ export function SpO2Chart({ data: initialData }: { data: HealthMetric[] }) {
                 labelStyle={{ color: '#64748b', marginBottom: '0.5rem', fontSize: '12px' }}
                 labelFormatter={(v) => new Date(v).toLocaleString()} 
               />
-              <Legend wrapperStyle={{ paddingTop: '20px' }} iconType="circle" />
+              
+              {/* --- ELIMINADO <Legend /> --- */}
+              {/* Eliminado para no tener duplicidad con la estadística de abajo */}
+
               <Line type="monotone" dataKey="spo2" stroke="#0d9488" strokeWidth={3} name="%" dot={{r:4, fill: '#0d9488', strokeWidth: 2, stroke: '#fff'}} activeDot={{r:6}} />
             </LineChart>
           </ResponsiveContainer>
         )}
       </div>
+
+      {/* --- SECCIÓN DE ESTADÍSTICAS --- */}
+      {finalData.length > 0 && (
+        <div className="pt-6 border-t border-slate-100">
+            {/* Solo una estadística porque es una sola línea */}
+            <StatsSummary 
+                label={t('spo2Title')} /* O "SpO2" */
+                data={spo2Data} 
+                colorClass="text-teal-700" 
+                bgClass="bg-teal-50"
+                unit="%"
+                legendDotColor="#0d9488"
+            />
+        </div>
+      )}
     </div>
   );
 }

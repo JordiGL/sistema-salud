@@ -1,9 +1,10 @@
 'use client';
 import { useState, useEffect, useMemo } from 'react';
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { Scale, Loader2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { fetchMetrics, HealthMetric } from '@/lib/api';
+import { StatsSummary } from './StatsSummary';
 
 const CustomXAxisTick = ({ x, y, payload }: any) => {
   const date = new Date(payload.value);
@@ -76,8 +77,15 @@ export function WeightChart({ data: initialData }: { data: HealthMetric[] }) {
     return result;
   }, [chartData, timeOfDay]);
 
+  // CALCULO DE DATOS PARA ESTADÍSTICAS (PESO)
+  const weightData = useMemo(() => 
+    finalData
+      .map(d => d.weight || 0)
+      .filter(n => n > 0),
+  [finalData]);
+
   return (
-    <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col relative overflow-hidden">
+    <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col relative overflow-hidden space-y-6">
       
       {loading && (
         <div className="absolute inset-0 bg-white/60 z-10 flex items-center justify-center backdrop-blur-[1px]">
@@ -88,7 +96,7 @@ export function WeightChart({ data: initialData }: { data: HealthMetric[] }) {
       )}
 
       {/* CABECERA */}
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 mb-6">
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6">
         <h3 className="text-lg font-bold flex items-center gap-3 text-slate-800">
           <div className="p-2 bg-blue-100 text-blue-600 rounded-full">
             <Scale size={20} />
@@ -183,7 +191,6 @@ export function WeightChart({ data: initialData }: { data: HealthMetric[] }) {
               <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} stroke="#94a3b8" />
               <XAxis dataKey="createdAt" tick={<CustomXAxisTick />} interval={0} axisLine={false} tickLine={false} />
               
-              {/* CAMBIO AQUÍ: domain={[0, 'auto']} fuerza el inicio en 0 */}
               <YAxis 
                 domain={[40, 'auto']} 
                 tick={{fontSize: 11, fill: '#94a3b8'}} 
@@ -197,12 +204,31 @@ export function WeightChart({ data: initialData }: { data: HealthMetric[] }) {
                 labelStyle={{ color: '#64748b', marginBottom: '0.5rem', fontSize: '12px' }}
                 labelFormatter={(v) => new Date(v).toLocaleString()} 
               />
-              <Legend wrapperStyle={{ paddingTop: '20px' }} iconType="circle" />
+              
+              {/* --- ELIMINADO <Legend /> --- */}
+              {/* Eliminado para no tener duplicidad con la estadística de abajo */}
+
               <Line type="monotone" dataKey="weight" stroke="#2563eb" strokeWidth={3} name="Kg" dot={{r:4, fill: '#2563eb', strokeWidth: 2, stroke: '#fff'}} />
             </LineChart>
           </ResponsiveContainer>
         )}
       </div>
+
+      {/* --- SECCIÓN DE ESTADÍSTICAS --- */}
+      {finalData.length > 0 && (
+        <div className="pt-6 border-t border-slate-100">
+            {/* Estadísticas sin media para Peso */}
+            <StatsSummary 
+                label={t('weightTitle')}
+                data={weightData} 
+                colorClass="text-blue-600" 
+                bgClass="bg-blue-50"
+                unit="Kg"
+                legendDotColor="#2563eb"
+                showAvg={false} // Hide average
+            />
+        </div>
+      )}
     </div>
   );
 }

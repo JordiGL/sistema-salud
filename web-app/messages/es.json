@@ -33,7 +33,12 @@
     "ca125Title": "Marcador CA125",
     "noData": "Sin datos registrados",
     "systolic": "Sistólica",
-    "diastolic": "Diastólica"
+    "diastolic": "Diastólica",
+    "stats": {
+      "min": "Mínimo",
+      "avg": "Media",
+      "max": "Máximo"
+    }
   },
   "Tabs": {
     "history": "Historial",

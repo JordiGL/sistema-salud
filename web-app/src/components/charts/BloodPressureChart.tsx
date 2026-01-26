@@ -1,9 +1,10 @@
 'use client';
 import { useState, useEffect, useMemo } from 'react';
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
-import { Activity, Loader2 } from 'lucide-react'; // Importamos Loader2 para el spinner
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+import { Activity, Loader2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { fetchMetrics, HealthMetric } from '@/lib/api'; // Importamos la función de la API
+import { fetchMetrics, HealthMetric } from '@/lib/api';
+import { StatsSummary } from './StatsSummary';
 
 const CustomXAxisTick = ({ x, y, payload }: any) => {
   const date = new Date(payload.value);
@@ -91,9 +92,22 @@ export function BloodPressureChart({ data: initialData }: { data: HealthMetric[]
     return result;
   }, [chartData, timeOfDay]);
 
+  // CALCULO DE DATOS PARA ESTADÍSTICAS (Basado en finalData filtrada)
+  const systolicData = useMemo(() => 
+    finalData
+      .map(d => d.bloodPressure ? Number(d.bloodPressure.split('/')[0]) : 0)
+      .filter(n => n > 0), 
+  [finalData]);
+
+  const diastolicData = useMemo(() => 
+    finalData
+      .map(d => d.bloodPressure ? Number(d.bloodPressure.split('/')[1]) : 0)
+      .filter(n => n > 0),
+  [finalData]);
+
 
   return (
-    <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col relative overflow-hidden">
+    <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col relative overflow-hidden space-y-6">
       
       {/* INDICADOR DE CARGA (Overlay) */}
       {loading && (
@@ -105,7 +119,7 @@ export function BloodPressureChart({ data: initialData }: { data: HealthMetric[]
       )}
 
       {/* --- CABECERA --- */}
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 mb-6">
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6">
         <h3 className="text-lg font-bold flex items-center gap-3 text-slate-800">
           <div className="p-2 bg-purple-100 text-purple-600 rounded-full">
             <Activity size={20} />
@@ -180,14 +194,13 @@ export function BloodPressureChart({ data: initialData }: { data: HealthMetric[]
         </div>
       </div>
 
-      {/* ÁREA DE GRÁFICA */}
-      <div className="w-full h-[400px]">
+{/* ÁREA DE GRÁFICA */}
+<div className="w-full h-[400px]">
         {finalData.length === 0 ? (
+          // ... (Empty state igual) ...
           <div className="h-full flex flex-col items-center justify-center text-gray-400 animate-in fade-in duration-500">
-            <div className="p-4 bg-slate-50 rounded-full mb-3">
-              <Activity size={32} className="opacity-20 text-slate-500" />
-            </div>
-            <p className="font-medium text-sm text-slate-500">{t('noData')}</p>
+             {/* ... */}
+             <p className="font-medium text-sm text-slate-500">{t('noData')}</p>
           </div>
         ) : (
           <ResponsiveContainer width="100%" height="100%">
@@ -218,13 +231,42 @@ export function BloodPressureChart({ data: initialData }: { data: HealthMetric[]
                 labelStyle={{ color: '#64748b', marginBottom: '0.5rem', fontSize: '12px' }}
                 labelFormatter={(v) => new Date(v).toLocaleString()} 
               />
-              <Legend wrapperStyle={{ paddingTop: '20px' }} iconType="circle" />
+              
+              {/* --- ELIMINADO <Legend /> --- */}
+              {/* Ya no mostramos la leyenda aquí arriba/abajo */}
+
               <Line type="monotone" dataKey="systolic_graph" stroke="#9333ea" strokeWidth={3} name={t('systolic')} dot={{r:4, fill: '#9333ea', strokeWidth: 2, stroke: '#fff'}} activeDot={{r:6}} />
               <Line type="monotone" dataKey="diastolic_graph" stroke="#d8b4fe" strokeWidth={3} name={t('diastolic')} dot={{r:4, fill: '#d8b4fe', strokeWidth: 2, stroke: '#fff'}} />
             </LineChart>
           </ResponsiveContainer>
         )}
       </div>
+
+      {/* --- SECCIÓN DE ESTADÍSTICAS CON LEYENDA INTEGRADA --- */}
+      {finalData.length > 0 && (
+        <div className="pt-6 border-t border-slate-100">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8"> {/* Aumentado gap para separar un poco más */}
+                
+                {/* SISTÓLICA */}
+                <StatsSummary 
+                    label={t('systolic')} 
+                    data={systolicData} 
+                    colorClass="text-purple-600" 
+                    bgClass="bg-purple-50"
+                    legendDotColor="#9333ea" /* Color exacto de la línea sistólica */
+                />
+
+                {/* DIASTÓLICA */}
+                <StatsSummary 
+                    label={t('diastolic')} 
+                    data={diastolicData} 
+                    colorClass="text-purple-400" 
+                    bgClass="bg-purple-50/50" 
+                    legendDotColor="#d8b4fe" /* Color exacto de la línea diastólica */
+                />
+            </div>
+        </div>
+      )}
     </div>
   );
 }

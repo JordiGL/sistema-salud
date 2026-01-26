@@ -1,9 +1,10 @@
 'use client';
 import { useState, useEffect, useMemo } from 'react';
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend } from 'recharts';
-import { TestTube, Loader2 } from 'lucide-react';
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+import { TestTube2, Loader2 } from 'lucide-react'; // Assuming TestTube2 for CA125 icon
 import { useTranslations } from 'next-intl';
 import { fetchMetrics, HealthMetric } from '@/lib/api';
+import { StatsSummary } from './StatsSummary';
 
 const CustomXAxisTick = ({ x, y, payload }: any) => {
   const date = new Date(payload.value);
@@ -69,8 +70,15 @@ export function CA125Chart({ data: initialData }: { data: HealthMetric[] }) {
     return result;
   }, [chartData, timeOfDay]);
 
+  // CALCULO DE DATOS PARA ESTADÍSTICAS (CA125)
+  const ca125Data = useMemo(() => 
+    finalData
+      .map(d => d.ca125 || 0)
+      .filter(n => n > 0),
+  [finalData]);
+
   return (
-    <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col relative overflow-hidden">
+    <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col relative overflow-hidden space-y-6">
       
       {loading && (
         <div className="absolute inset-0 bg-white/60 z-10 flex items-center justify-center backdrop-blur-[1px]">
@@ -80,10 +88,10 @@ export function CA125Chart({ data: initialData }: { data: HealthMetric[] }) {
         </div>
       )}
 
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6 mb-6">
+      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-6">
         <h3 className="text-lg font-bold flex items-center gap-3 text-slate-800">
           <div className="p-2 bg-orange-100 text-orange-600 rounded-full">
-            <TestTube size={20} />
+            <TestTube2 size={20} />
           </div>
           {t('ca125Title')}
         </h3>
@@ -99,7 +107,7 @@ export function CA125Chart({ data: initialData }: { data: HealthMetric[] }) {
                 className={`
                   px-3 py-1.5 text-[11px] font-bold rounded-lg transition-all duration-200
                   ${dateRange === val 
-                    ? 'bg-white text-orange-600 shadow-sm ring-1 ring-black/5' 
+                    ? 'bg-white text-orange-700 shadow-sm ring-1 ring-black/5' 
                     : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
                   }
                 `}
@@ -118,7 +126,7 @@ export function CA125Chart({ data: initialData }: { data: HealthMetric[] }) {
                 className={`
                   px-3 py-1.5 text-[11px] font-bold rounded-lg transition-all duration-200 uppercase
                   ${timeOfDay === val 
-                    ? 'bg-white text-orange-600 shadow-sm ring-1 ring-black/5' 
+                    ? 'bg-white text-orange-700 shadow-sm ring-1 ring-black/5' 
                     : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
                   }
                 `}
@@ -157,7 +165,7 @@ export function CA125Chart({ data: initialData }: { data: HealthMetric[] }) {
         {finalData.length === 0 ? (
           <div className="h-full flex flex-col items-center justify-center text-gray-400 animate-in fade-in duration-500">
             <div className="p-4 bg-slate-50 rounded-full mb-3">
-              <TestTube size={32} className="opacity-20 text-slate-500" />
+              <TestTube2 size={32} className="opacity-20 text-slate-500" />
             </div>
             <p className="font-medium text-sm text-slate-500">{t('noData')}</p>
           </div>
@@ -166,24 +174,40 @@ export function CA125Chart({ data: initialData }: { data: HealthMetric[] }) {
             <LineChart data={finalData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="colorCa125" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#ea580c" stopOpacity={0.1}/>
-                  <stop offset="95%" stopColor="#ea580c" stopOpacity={0}/>
+                  <stop offset="5%" stopColor="#f97316" stopOpacity={0.1}/>
+                  <stop offset="95%" stopColor="#f97316" stopOpacity={0}/>
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} stroke="#94a3b8" />
               <XAxis dataKey="createdAt" tick={<CustomXAxisTick />} interval={0} axisLine={false} tickLine={false} />
-              <YAxis tick={{fontSize: 11, fill: '#94a3b8'}} axisLine={false} tickLine={false} tickCount={6} />
+              <YAxis domain={['auto', 'auto']} tick={{fontSize: 11, fill: '#94a3b8'}} axisLine={false} tickLine={false} tickCount={6} />
               <Tooltip 
                 contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
                 labelStyle={{ color: '#64748b', marginBottom: '0.5rem', fontSize: '12px' }}
                 labelFormatter={(v) => new Date(v).toLocaleString()} 
               />
-              <Legend wrapperStyle={{ paddingTop: '20px' }} iconType="circle" />
-              <Line type="monotone" dataKey="ca125" stroke="#ea580c" strokeWidth={3} name="U/mL" dot={{r:4, fill: '#ea580c', strokeWidth: 2, stroke: '#fff'}} activeDot={{r:6}} />
+              
+              <Line type="monotone" dataKey="ca125" stroke="#f97316" strokeWidth={3} name="U/ml" dot={{r:4, fill: '#f97316', strokeWidth: 2, stroke: '#fff'}} activeDot={{r:6}} />
             </LineChart>
           </ResponsiveContainer>
         )}
       </div>
+
+      {/* --- SECCIÓN DE ESTADÍSTICAS --- */}
+      {finalData.length > 0 && (
+        <div className="pt-6 border-t border-slate-100">
+            {/* Estadísticas sin media para CA125 */}
+            <StatsSummary 
+                label={t('ca125Title')}
+                data={ca125Data} 
+                colorClass="text-orange-700" 
+                bgClass="bg-orange-50"
+                unit="U/ml"
+                legendDotColor="#f97316"
+                showAvg={false}
+            />
+        </div>
+      )}
     </div>
   );
 }
