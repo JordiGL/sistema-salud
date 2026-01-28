@@ -11,8 +11,6 @@ datasource db {
 model HealthMetric {
   id          String   @id @default(uuid())
   createdAt   DateTime @default(now())
-
-  // --- CAMBIOS SOLICITADOS ---
   
   // 1. Tensión unificada (Ej: "120/80")
   bloodPressure String? 

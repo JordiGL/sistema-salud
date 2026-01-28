@@ -66,6 +66,8 @@
     "editTitle": "Editar Registro",
     "cancel": "Cancelar",
     "save": "Guardar",
+    "clickToRead": "Haz clic para leer la nota completa",
+    "close": "Cerrar",
     "cols": {
       "date": "Fecha",
       "context": "Contexto",
@@ -75,7 +77,8 @@
       "weight": "Peso",
       "site": "Lugar",
       "note": "Nota",
-      "actions": "Acciones"
+      "actions": "Acciones",
+      "ca125": "CA125"
     }
   },
   "ContextOptions": {

@@ -13,7 +13,7 @@
   "Form": {
     "physiologicalData": "Dades Fisiològiques",
     "weightControl": "Control de Pes",
-    "notes": "Notes Addicionals",
+    "notes": "Notes",
     "contextLabel": "Context",
     "contextPlaceholder": "-- Context General --",
     "locationLabel": "Lloc de pesatge",
@@ -66,6 +66,8 @@
     "editTitle": "Editar Registre",
     "cancel": "Cancel·lar",
     "save": "Desar",
+    "clickToRead": "Fes clic per llegir la nota completa",
+    "close": "Tancar",
     "cols": {
       "date": "Data",
       "context": "Context",
@@ -75,7 +77,8 @@
       "weight": "Pes",
       "site": "Lloc",
       "note": "Nota",
-      "actions": "Accions"
+      "actions": "Accions",
+      "ca125": "CA125"
     }
   },
   "ContextOptions": {
