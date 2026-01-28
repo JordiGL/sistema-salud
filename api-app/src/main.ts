@@ -7,12 +7,16 @@ async function bootstrap() {
 
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
-  // CAMBIO AQUÍ: Permitir el puerto 3001 (o ambos para no fallar)
+  // 1. CORS: Acceptar tothom (*) o posar la URL del teu frontend a Vercel
   app.enableCors({
-    origin: ['http://localhost:3000', 'http://localhost:3001'],
+    origin:
+      process.env.NODE_ENV === 'production'
+        ? ['https://sistema-salud.vercel.app', /\.vercel\.app$/] // Posa la teva URL de producció
+        : ['http://localhost:3000', 'http://localhost:3001'], // Localhost per desenvolupament
     credentials: true,
   });
 
-  await app.listen(3000);
+  // 2. PORT: Vercel assigna un port via variable d'entorn, no sempre és el 3000
+  await app.listen(process.env.PORT || 3000);
 }
 bootstrap();
