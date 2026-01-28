@@ -10,6 +10,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
   const router = useRouter();
+  const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -18,7 +19,7 @@ export default function LoginPage() {
 
     try {
       // 1. Enviamos email y password
-      const res = await fetch('http://localhost:3000/auth/login', {
+      const res = await fetch(`${API_URL}/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }), // <--- Payload actualizado
