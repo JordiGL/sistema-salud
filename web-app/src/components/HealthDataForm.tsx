@@ -1,14 +1,16 @@
 'use client';
 
-import { useState, useEffect } from 'react'; // <--- Añadir useEffect
+import { useState, useEffect, useRef } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
-// AÑADIR los nuevos imports de api
 import { saveMetric, HealthMetric, fetchContextOptions, fetchLocationOptions, SelectOption } from '@/lib/api';
-import { ClipboardList, Heart, Scale, Save, RotateCcw, ChevronDown, ChevronUp, Plus, Trash2 } from 'lucide-react'; 
+import { 
+  ClipboardList, Heart, Scale, Save, RotateCcw, 
+  ChevronDown, ChevronUp, Plus, Camera, Loader2 
+} from 'lucide-react';
 
 interface HealthDataFormProps {
-  onSuccess: () => void; 
+  onSuccess: () => void;
 }
 
 export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
@@ -16,10 +18,12 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
   const locale = useLocale();
   const router = useRouter();
 
+  // --- ESTATS ---
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  
-  // --- ESTADOS PARA OPCIONES DINÁMICAS ---
+  const [isScanning, setIsScanning] = useState(false); // New state for AI scanning loader
+
+  // --- ESTATS PER OPCIONS DINÀMIQUES ---
   const [contextOptions, setContextOptions] = useState<SelectOption[]>([]);
   const [locationOptions, setLocationOptions] = useState<SelectOption[]>([]);
 
@@ -29,7 +33,10 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
   };
   const [formData, setFormData] = useState(initialFormState);
 
-  // --- EFECTO: CARGAR OPCIONES AL MONTAR ---
+  // Referencia per l'input de fitxer ocult
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // --- EFECTE: CARREGAR OPCIONS AL MUNTAR ---
   useEffect(() => {
     async function loadOptions() {
         try {
@@ -40,18 +47,16 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
             setContextOptions(ctx);
             setLocationOptions(loc);
         } catch (error) {
-            console.error("Error cargando opciones", error);
+            console.error("Error carregant opcions", error);
         }
     }
     loadOptions();
   }, []);
 
-  // Función helper para traducir opciones dinámicas
-  // Intenta buscar "ContextOptions.clave", si no existe o falla, devuelve el valor por defecto de la BD
+  // Funció helper per traduir opcions dinàmiques
   const translateOption = (category: string, option: SelectOption) => {
       const translationKey = `${category}.${option.key}`;
-      // next-intl devuelve la clave si no encuentra la traducción, pero para estar seguros:
-      const translated = t(translationKey as any); 
+      const translated = t(translationKey as any);
       return translated === translationKey ? option.value : translated;
   };
 
@@ -63,15 +68,57 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
     setFormData(initialFormState);
   };
 
+  // --- NOVA FUNCIÓ: Gestionar la captura de càmera ---
+  const handleCameraCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsScanning(true);
+    try {
+      // Preparem l'enviament a la nostra API (web-app/src/app/api/analyze)
+      const uploadData = new FormData();
+      uploadData.append("file", file);
+
+      const response = await fetch("/api/analyze", {
+        method: "POST",
+        body: uploadData,
+      });
+
+      if (!response.ok) {
+        throw new Error(t('Form.aiErrorAnalysis'));
+      }
+
+      const datos = await response.json();
+      
+      // Actualitzem l'estat amb la resposta de la IA
+      setFormData(prev => ({
+        ...prev,
+        bloodPressure: datos.bloodPressure || prev.bloodPressure,
+        pulse: datos.pulse ? datos.pulse.toString() : prev.pulse,
+        spo2: datos.spo2 ? datos.spo2.toString() : prev.spo2,
+        weight: datos.weight ? datos.weight.toString() : prev.weight,
+        notes: prev.notes ? prev.notes : (datos.bloodPressure || datos.weight || datos.spo2 ? t('Form.aiAutoNote') : '')
+      }));
+
+      // Obrim el formulari si estava tancat per veure els resultats
+      if (!isOpen) setIsOpen(true);
+
+    } catch (error) {
+      console.error(error);
+      alert(t('Form.aiErrorRead'));
+    } finally {
+      setIsScanning(false);
+      // Netejem l'input per poder tornar a seleccionar la mateixa foto si cal
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setIsSubmitting(true);
     
     const payload: Partial<HealthMetric> = {
         bloodPressure: formData.bloodPressure || undefined,
-        // Guardamos el VALUE (lo que ve el usuario o la clave, según tu preferencia de backend)
-        // Normalmente se guarda el valor legible "Post-Ejercicio" o la clave "exercise".
-        // Asumo que tu backend actual guarda el string legible:
         measurementContext: formData.measurementContext || undefined,
         weightLocation: formData.weightLocation || undefined,
         notes: formData.notes || undefined,
@@ -87,7 +134,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
       onSuccess();   
     } catch (err: any) { 
       if (err.message === "UNAUTHORIZED") {
-        alert("Tu sesión ha caducado.");
+        alert(t('HomePage.sessionExpired'));
         localStorage.removeItem('health_token');
         router.push(`/${locale}/login`);
       } else {
@@ -119,8 +166,32 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                 </h2>
             </div>
 
-            <div className="text-slate-400">
-                {isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+            <div className="flex items-center gap-4">
+                {/* BOTÓ CÀMERA (Visible sempre a la capçalera) */}
+                <div className="relative" onClick={(e) => e.stopPropagation()}>
+                    <input 
+                        type="file" 
+                        accept="image/*" 
+                        capture="environment" 
+                        className="hidden" 
+                        ref={fileInputRef}
+                        onChange={handleCameraCapture}
+                    />
+                    <button 
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={isScanning || isSubmitting}
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 text-black hover:bg-slate-100 transition-colors text-xs font-bold disabled:opacity-50 uppercase tracking-wide border border-indigo-100"
+                        title={t('Form.aiButtonTitle')}
+                    >
+                        {isScanning ? <Loader2 size={16} className="animate-spin" /> : <Camera size={16} />}
+                        <span className="hidden sm:inline">{isScanning ? t('Form.aiScanning') : t('Form.aiButtonLabel')}</span>
+                    </button>
+                </div>
+
+                <div className="text-slate-400">
+                    {isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                </div>
             </div>
         </div>
         
@@ -178,7 +249,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                         </div>
                     </div>
 
-                    {/* FILA INFERIOR... (igual) */}
+                    {/* FILA INFERIOR */}
                     <div className="lg:col-span-12 space-y-4">
                         <div>
                             <label className="block text-sm font-medium text-slate-700 mb-1">{t('Form.notes')}</label>
@@ -190,7 +261,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                 <RotateCcw size={18} /> <span className="hidden sm:inline">{t('HomePage.clear') || 'Limpiar'}</span>
                             </button>
                             <button type="submit" disabled={isSubmitting} className="flex-1 bg-slate-900 text-white py-4 rounded-xl hover:bg-slate-800 font-bold text-lg shadow-lg hover:shadow-xl transition-all transform active:scale-[0.99] flex justify-center items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed">
-                                {isSubmitting ? <span>...</span> : <><Save size={20} /> {t('HomePage.saveButton')}</>}
+                                {isSubmitting ? <Loader2 size={20} className="animate-spin" /> : <><Save size={20} /> {t('HomePage.saveButton')}</>}
                             </button>
                         </div>
                     </div>

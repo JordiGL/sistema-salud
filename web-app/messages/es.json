@@ -7,6 +7,7 @@
     "viewModeMessage": "Modo visualización • Inicia sesión como administrador para editar datos",
     "adminAccess": "Acceso de Administrador",
     "adminExit": "Salir",
+    "sessionExpired": "Tu sesión ha caducado.",
     "clear": "Limpiar"
   },
   "Form": {
@@ -23,7 +24,13 @@
     "spo2Label": "SpO2",
     "ca125Label": "CA125",
     "notesPlaceholder": "Ej: Hoy me he sentido un poco mareado...",
-    "contextHint": "Selecciona esto si mides Tensión, Pulso, SpO2 o CA125"
+    "contextHint": "Selecciona esto si mides Tensión, Pulso, SpO2 o CA125",
+    "aiButtonLabel": "ESCÁNER IA",
+    "aiScanning": "Analizando...",
+    "aiButtonTitle": "Escanear medición con IA",
+    "aiAutoNote": "Escaneado con IA",
+    "aiErrorAnalysis": "Error analizando la imagen",
+    "aiErrorRead": "No se pudo leer la imagen. Prueba con más luz."
   },
   "Charts": {
     "bpTitle": "Tensión Arterial",
