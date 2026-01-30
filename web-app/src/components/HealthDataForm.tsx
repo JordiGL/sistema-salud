@@ -1,13 +1,14 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { saveMetric, HealthMetric, fetchContextOptions, fetchLocationOptions, SelectOption } from '@/lib/api';
+import { saveMetric, HealthMetric } from '@/lib/api';
 import { 
-  ClipboardList, Heart, Scale, Save, RotateCcw, 
+  Heart, Scale, Save, RotateCcw, 
   ChevronDown, ChevronUp, Plus, Camera, Loader2 
 } from 'lucide-react';
+import { useMetricManager } from '@/hooks/useMetricManager';
 
 interface HealthDataFormProps {
   onSuccess: () => void;
@@ -18,14 +19,13 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
   const locale = useLocale();
   const router = useRouter();
 
+  // --- ÚS DEL HOOK (Opcions + Traduccions) ---
+  const { contextOptions, locationOptions, translateOption } = useMetricManager();
+
   // --- ESTATS ---
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [isScanning, setIsScanning] = useState(false); // New state for AI scanning loader
-
-  // --- ESTATS PER OPCIONS DINÀMIQUES ---
-  const [contextOptions, setContextOptions] = useState<SelectOption[]>([]);
-  const [locationOptions, setLocationOptions] = useState<SelectOption[]>([]);
+  const [isScanning, setIsScanning] = useState(false);
 
   const initialFormState = {
     bloodPressure: '', pulse: '', weight: '', spo2: '', ca125: '',
@@ -33,32 +33,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
   };
   const [formData, setFormData] = useState(initialFormState);
 
-  // Referencia per l'input de fitxer ocult
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  // --- EFECTE: CARREGAR OPCIONS AL MUNTAR ---
-  useEffect(() => {
-    async function loadOptions() {
-        try {
-            const [ctx, loc] = await Promise.all([
-                fetchContextOptions(),
-                fetchLocationOptions()
-            ]);
-            setContextOptions(ctx);
-            setLocationOptions(loc);
-        } catch (error) {
-            console.error("Error carregant opcions", error);
-        }
-    }
-    loadOptions();
-  }, []);
-
-  // Funció helper per traduir opcions dinàmiques
-  const translateOption = (category: string, option: SelectOption) => {
-      const translationKey = `${category}.${option.key}`;
-      const translated = t(translationKey as any);
-      return translated === translationKey ? option.value : translated;
-  };
 
   const handleReset = (e?: React.MouseEvent) => {
     if(e) {
@@ -68,14 +43,12 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
     setFormData(initialFormState);
   };
 
-  // --- NOVA FUNCIÓ: Gestionar la captura de càmera ---
   const handleCameraCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     setIsScanning(true);
     try {
-      // Preparem l'enviament a la nostra API (web-app/src/app/api/analyze)
       const uploadData = new FormData();
       uploadData.append("file", file);
 
@@ -84,13 +57,10 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
         body: uploadData,
       });
 
-      if (!response.ok) {
-        throw new Error(t('Form.aiErrorAnalysis'));
-      }
+      if (!response.ok) throw new Error(t('Form.aiErrorAnalysis'));
 
       const datos = await response.json();
       
-      // Actualitzem l'estat amb la resposta de la IA
       setFormData(prev => ({
         ...prev,
         bloodPressure: datos.bloodPressure || prev.bloodPressure,
@@ -100,7 +70,6 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
         notes: prev.notes ? prev.notes : (datos.bloodPressure || datos.weight || datos.spo2 ? t('Form.aiAutoNote') : '')
       }));
 
-      // Obrim el formulari si estava tancat per veure els resultats
       if (!isOpen) setIsOpen(true);
 
     } catch (error) {
@@ -108,7 +77,6 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
       alert(t('Form.aiErrorRead'));
     } finally {
       setIsScanning(false);
-      // Netejem l'input per poder tornar a seleccionar la mateixa foto si cal
       if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
@@ -117,6 +85,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
     e.preventDefault();
     setIsSubmitting(true);
     
+    // Convertim cadenes buides a undefined perquè Prisma no es queixi
     const payload: Partial<HealthMetric> = {
         bloodPressure: formData.bloodPressure || undefined,
         measurementContext: formData.measurementContext || undefined,
@@ -128,11 +97,15 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
         ca125: formData.ca125 ? Number(formData.ca125) : undefined,
     };
 
+    console.log("📤 Enviant payload:", payload); // DEBUG: Mira la consola del navegador
+
     try {
       await saveMetric(payload);
       handleReset(); 
       onSuccess();   
     } catch (err: any) { 
+      console.error("❌ Error al backend:", err);
+
       if (err.message === "UNAUTHORIZED") {
         alert(t('HomePage.sessionExpired'));
         localStorage.removeItem('health_token');
@@ -167,7 +140,6 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
             </div>
 
             <div className="flex items-center gap-4">
-                {/* BOTÓ CÀMERA (Visible sempre a la capçalera) */}
                 <div className="relative" onClick={(e) => e.stopPropagation()}>
                     <input 
                         type="file" 
@@ -208,11 +180,16 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
 
                         <div className="mb-4">
                             <label className={labelClasses}>{t('Form.contextLabel')}</label>
+                            
                             {/* SELECTOR DINÁMICO DE CONTEXTO */}
-                            <select className={`${inputClasses} bg-white`} value={formData.measurementContext} onChange={e => setFormData({...formData, measurementContext: e.target.value})}>
+                            <select 
+                                className={`${inputClasses} bg-white`} 
+                                value={formData.measurementContext} 
+                                onChange={e => setFormData({...formData, measurementContext: e.target.value})}
+                            >
                                 <option value="">{t('Form.contextPlaceholder')}</option>
                                 {contextOptions.map((opt) => (
-                                    <option key={opt.key} value={opt.value}>
+                                    <option key={opt.key} value={opt.key}>
                                         {translateOption('ContextOptions', opt)}
                                     </option>
                                 ))}
@@ -235,11 +212,16 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                         <div className="space-y-4 grow">
                             <div>
                                 <label className={labelClasses}>{t('Form.locationLabel')}</label>
+                                
                                 {/* SELECTOR DINÁMICO DE LUGAR */}
-                                <select className={`${inputClasses} bg-white`} value={formData.weightLocation} onChange={e => setFormData({...formData, weightLocation: e.target.value})}>
+                                <select 
+                                    className={`${inputClasses} bg-white`} 
+                                    value={formData.weightLocation} 
+                                    onChange={e => setFormData({...formData, weightLocation: e.target.value})}
+                                >
                                     <option value="">{t('Form.locationPlaceholder')}</option>
                                     {locationOptions.map((opt) => (
-                                        <option key={opt.key} value={opt.value}>
+                                        <option key={opt.key} value={opt.key}>
                                             {translateOption('LocationOptions', opt)}
                                         </option>
                                     ))}

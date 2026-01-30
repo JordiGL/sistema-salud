@@ -9,13 +9,8 @@ import {
 } from 'class-validator';
 
 // Definimos las opciones válidas para evitar datos basura
-const CONTEXT_OPTIONS = [
-  'Post-Ejercicio',
-  'Post-Drenaje',
-  'Post-Quimioterapia',
-  'Momento de estres',
-];
-const WEIGHT_LOCATIONS = ['Casa', 'Farmacia', 'CAP', 'ICO'];
+const CONTEXT_OPTIONS = ['exercise', 'drainage', 'chemo', 'stress'];
+const WEIGHT_LOCATIONS = ['home', 'pharmacy', 'cap', 'ico'];
 
 export class CreateMetricDto {
   // Regex: Busca digitos, una barra, digitos (ej: 120/80)

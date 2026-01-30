@@ -58,8 +58,8 @@ export function EditMetricModal({ isOpen, onClose, metric, onSuccess, contextOpt
         weight: form.weight ? Number(form.weight) : undefined,
         spo2: form.spo2 ? Number(form.spo2) : undefined,
         ca125: form.ca125 ? Number(form.ca125) : undefined,
-        measurementContext: form.measurementContext || undefined,
-        weightLocation: form.weightLocation || undefined,
+        measurementContext: form.measurementContext || null,
+        weightLocation: form.weightLocation || null,
     };
 
     try {

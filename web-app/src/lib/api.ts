@@ -3,14 +3,14 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
 export interface HealthMetric {
   id: string;
   createdAt: string;
-  bloodPressure?: string;
-  measurementContext?: string;
-  weightLocation?: string;
-  notes?: string;
-  pulse?: number;
-  spo2?: number;
-  weight?: number;
-  ca125?: number;
+  bloodPressure?: string | null;
+  measurementContext?: string | null;
+  weightLocation?: string | null;
+  notes?: string | null;
+  pulse?: number | null;
+  spo2?: number | null;
+  weight?: number | null;
+  ca125?: number | null;
   // Propiedades virtuales para la gráfica
   systolic_graph?: number;
   diastolic_graph?: number;
@@ -72,30 +72,34 @@ export async function fetchMetrics(
 }
 
 export async function saveMetric(data: Partial<HealthMetric>) {
-  // 1. Recuperamos el token real
   const token = localStorage.getItem("health_token");
 
   const res = await fetch(`${API_URL}/metrics`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      // 2. Si hay token lo enviamos, si no, enviamos string vacío (fallará en backend)
       Authorization: token ? `Bearer ${token}` : "",
     },
     body: JSON.stringify(data),
   });
 
-  // 3. Si el backend nos dice "Unauthorized" (401), es que el token caducó o no existe
   if (res.status === 401) {
-    // Opcional: Redirigir al login o lanzar un error específico
     throw new Error("UNAUTHORIZED");
   }
 
-  if (!res.ok) throw new Error("Error guardando datos");
+  if (!res.ok) {
+    // 🔍 LLEGIM EL MISSATGE REAL DEL SERVIDOR
+    const errorData = await res.json().catch(() => ({}));
+    const errorMessage =
+      errorData.error || errorData.message || "Error guardando datos";
+
+    console.error("❌ Error detallado del servidor:", errorData); // Mira la consola del navegador!
+    throw new Error(errorMessage);
+  }
+
   return await res.json();
 }
 
-//Función para actualizar
 export async function updateMetric(id: string, data: Partial<HealthMetric>) {
   const token = localStorage.getItem("health_token");
 
@@ -109,7 +113,17 @@ export async function updateMetric(id: string, data: Partial<HealthMetric>) {
   });
 
   if (res.status === 401) throw new Error("UNAUTHORIZED");
-  if (!res.ok) throw new Error("Error actualizando datos");
+
+  if (!res.ok) {
+    // 🔍 LLEGIM EL MISSATGE REAL DEL SERVIDOR TAMBÉ AQUÍ
+    const errorData = await res.json().catch(() => ({}));
+    const errorMessage =
+      errorData.error || errorData.message || "Error actualizando datos";
+
+    console.error("❌ Error detallado del servidor:", errorData);
+    throw new Error(errorMessage);
+  }
+
   return await res.json();
 }
 
