@@ -52,12 +52,12 @@ export function EditMetricModal({ isOpen, onClose, metric, onSuccess, contextOpt
     setIsSubmitting(true);
     
     const payload: Partial<HealthMetric> = {
-        bloodPressure: form.bloodPressure || undefined,
-        notes: form.notes || undefined,
-        pulse: form.pulse ? Number(form.pulse) : undefined,
-        weight: form.weight ? Number(form.weight) : undefined,
-        spo2: form.spo2 ? Number(form.spo2) : undefined,
-        ca125: form.ca125 ? Number(form.ca125) : undefined,
+        bloodPressure: form.bloodPressure || null,
+        notes: form.notes || null,
+        pulse: form.pulse ? Number(form.pulse) : null,
+        weight: form.weight ? Number(form.weight) : null,
+        spo2: form.spo2 ? Number(form.spo2) : null,
+        ca125: form.ca125 ? Number(form.ca125) : null,
         measurementContext: form.measurementContext || null,
         weightLocation: form.weightLocation || null,
     };
