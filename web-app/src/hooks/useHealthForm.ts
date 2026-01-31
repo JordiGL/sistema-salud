@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { metricApi, ApiError } from '@/lib/api';
+import { toast } from 'sonner';
 
 export interface HealthFormData {
     bloodPressure: string;
@@ -56,15 +57,30 @@ export function useHealthForm({ onSuccess }: UseHealthFormProps) {
         e.preventDefault();
         setIsSubmitting(true);
 
+        // Validation Logic
+        if (formData.bloodPressure) {
+            const parts = formData.bloodPressure.split('/');
+            if (parts.length === 2) {
+                const sys = Number(parts[0]);
+                const dia = Number(parts[1]);
+                if (!isNaN(sys) && !isNaN(dia) && sys < dia) {
+                    toast.error(t('Form.Errors.invalidBP'));
+                    setIsSubmitting(false);
+                    return;
+                }
+            }
+        }
+
         try {
             await metricApi.create(formData);
             resetForm();
+            toast.success(t('HomePage.saveButton')); // Feedback positiu reutilitzant clau o text generic
             onSuccess();
         } catch (err: any) {
             if (err instanceof ApiError && err.message === "UNAUTHORIZED") {
-                alert(t('HomePage.sessionExpired'));
+                toast.error(t('HomePage.sessionExpired'));
             } else {
-                alert(err.message || t('HomePage.errorSaving'));
+                toast.error(err.message || t('HomePage.errorSaving'));
             }
         } finally {
             setIsSubmitting(false);

@@ -16,6 +16,15 @@
     "downloadXML": "Descargar XML",
     "noRecords": "No hay registros todavía."
   },
+  "Login": {
+    "title": "Acceso Admin",
+    "subtitle": "Introduce tus credenciales para gestionar registros.",
+    "emailPlaceholder": "correo@ejemplo.com",
+    "passwordPlaceholder": "Contraseña...",
+    "errorCredentials": "Credenciales incorrectas",
+    "success": "Sesión iniciada correctamente",
+    "button": "Entrar"
+  },
   "Form": {
     "toggleCollapse": "Contraer",
     "toggleExpand": "Desplegar para añadir datos",
@@ -39,7 +48,10 @@
     "aiButtonTitle": "Escanear medición con IA",
     "aiAutoNote": "Escaneado con IA",
     "aiErrorAnalysis": "Error analizando la imagen",
-    "aiErrorRead": "No se pudo leer la imagen. Prueba con más luz."
+    "aiErrorRead": "No se pudo leer la imagen. Prueba con más luz.",
+    "Errors": {
+      "invalidBP": "La tensión sistólica debe ser mayor que la diastólica."
+    }
   },
   "Charts": {
     "bpTitle": "Tensión Arterial",

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { metricApi } from '@/lib/api';
+import { toast } from 'sonner';
 
 interface DeleteMetricModalProps {
   isOpen: boolean;
@@ -20,12 +21,13 @@ export function DeleteMetricModal({ isOpen, onClose, metricId, onSuccess }: Dele
     setIsSubmitting(true);
     try {
       await metricApi.delete(metricId); // NOVA CRIDA
+      toast.success(t('History.delete')); // Feedback 
       onSuccess();
       onClose();
-    } catch (e: any) { 
-        alert(e.message || "Error al eliminar"); 
-    } finally { 
-        setIsSubmitting(false); 
+    } catch (e: any) {
+      toast.error(e.message || t('HomePage.errorSaving'));
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -37,20 +39,20 @@ export function DeleteMetricModal({ isOpen, onClose, metricId, onSuccess }: Dele
         <div className="flex flex-col items-center text-center gap-4">
           <div className="bg-red-100 p-3 rounded-full text-red-600"><AlertTriangle size={32} /></div>
           <h3 className="text-lg font-bold text-slate-800">{t('History.deleteTitle')}</h3>
-          
+
           <div className="flex gap-3 w-full mt-2">
-            <button 
-                onClick={onClose} 
-                className="flex-1 py-3 rounded-xl border border-slate-200 font-bold text-slate-600 hover:bg-slate-50 transition-colors"
+            <button
+              onClick={onClose}
+              className="flex-1 py-3 rounded-xl border border-slate-200 font-bold text-slate-600 hover:bg-slate-50 transition-colors"
             >
-                {t('History.cancel')}
+              {t('History.cancel')}
             </button>
-            <button 
-                onClick={handleDelete} 
-                disabled={isSubmitting} 
-                className="flex-1 py-3 rounded-xl bg-red-500 text-white font-bold hover:bg-red-600 disabled:opacity-50 transition-colors"
+            <button
+              onClick={handleDelete}
+              disabled={isSubmitting}
+              className="flex-1 py-3 rounded-xl bg-red-500 text-white font-bold hover:bg-red-600 disabled:opacity-50 transition-colors"
             >
-                {t('History.delete')}
+              {t('History.delete')}
             </button>
           </div>
         </div>

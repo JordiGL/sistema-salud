@@ -16,6 +16,15 @@
     "downloadXML": "Descarregar XML",
     "noRecords": "No hi ha registres encara."
   },
+  "Login": {
+    "title": "Accés Admin",
+    "subtitle": "Introdueix les teves credencials per gestionar registres.",
+    "emailPlaceholder": "correu@exemple.com",
+    "passwordPlaceholder": "Contrasenya...",
+    "errorCredentials": "Credencials incorrectes",
+    "success": "Sessió iniciada correctament",
+    "button": "Entrar"
+  },
   "Form": {
     "toggleCollapse": "Contraure",
     "toggleExpand": "Desplegar per afegir dades",
@@ -39,7 +48,10 @@
     "aiButtonTitle": "Escanejar mesura amb IA",
     "aiAutoNote": "Escanejat amb IA",
     "aiErrorAnalysis": "Error analitzant la imatge",
-    "aiErrorRead": "No s'ha pogut llegir la imatge. Prova amb més llum."
+    "aiErrorRead": "No s'ha pogut llegir la imatge. Prova amb més llum.",
+    "Errors": {
+      "invalidBP": "La tensió sistòlica ha de ser major que la diastòlica."
+    }
   },
   "Charts": {
     "bpTitle": "Tensió Arterial",

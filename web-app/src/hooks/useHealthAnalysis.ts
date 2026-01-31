@@ -1,6 +1,7 @@
 import { useState, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { API_ROUTES } from '@/lib/constants';
+import { toast } from 'sonner';
 
 interface AnalysisResult {
     bloodPressure?: string;
@@ -16,6 +17,8 @@ export function useHealthAnalysis() {
 
     const analyzeImage = async (file: File): Promise<AnalysisResult | null> => {
         setIsScanning(true);
+        const toastId = toast.loading(t('Form.aiScanning')); // Feedback visual immediat
+
         try {
             const uploadData = new FormData();
             uploadData.append("file", file);
@@ -29,10 +32,11 @@ export function useHealthAnalysis() {
             if (!response.ok) throw new Error(t('Form.aiErrorAnalysis'));
 
             const data = await response.json();
+            toast.success(t('Form.aiAutoNote'), { id: toastId }); // Actualitza el toast
             return data;
         } catch (error) {
             console.error(error);
-            alert(t('Form.aiErrorRead'));
+            toast.error(t('Form.aiErrorRead'), { id: toastId });
             return null;
         } finally {
             setIsScanning(false);

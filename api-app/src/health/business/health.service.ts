@@ -33,14 +33,14 @@ export class HealthService {
         const dia = Number(parts[1]);
         if (!isNaN(sys) && !isNaN(dia) && sys < dia) {
           throw new BadRequestException(
-            'La tensión sistólica debe ser mayor que la diastólica.',
+            'Systolic blood pressure must be greater than diastolic.',
           );
         }
       }
     }
 
     if (data.spo2 && data.spo2 < 90) {
-      console.warn('ALERTA: Nivel de oxígeno crítico detectado.');
+      console.warn('WARNING: Critical oxygen level detected.');
     }
 
     return this.repository.createMetric(data);

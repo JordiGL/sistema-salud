@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { X, Save, Pencil } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { metricApi, HealthMetric, SelectOption } from '@/lib/api';
+import { toast } from 'sonner';
 
 interface EditMetricModalProps {
   isOpen: boolean;
@@ -54,10 +55,11 @@ export function EditMetricModal({ isOpen, onClose, metric, onSuccess, contextOpt
     try {
       // L'API s'encarrega de netejar els tipus
       await metricApi.update(metric.id, form);
+      toast.success(t('History.save')); // Feedback visual
       onSuccess();
       onClose();
     } catch (e: any) {
-      alert(e.message || "Error al guardar");
+      toast.error(e.message || t('HomePage.errorSaving'));
     } finally {
       setIsSubmitting(false);
     }
