@@ -1,44 +1,66 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextResponse } from "next/server";
 
-// Assegura't que tens GEMINI_API_KEY a .env.local (sense NEXT_PUBLIC)
+// Ensure GEMINI_API_KEY is in .env.local
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 export async function POST(req: Request) {
   try {
-    // 1. Llegim el FormData
+    // 1. Read FormData
     const formData = await req.formData();
     const file = formData.get("file") as File;
 
     if (!file) {
       return NextResponse.json(
-        { error: "No s'ha rebut cap fitxer" },
+        { error: "No file received" },
         { status: 400 }
       );
     }
 
-    // 2. Comprovem que és una imatge (opcional, però recomanat)
+    // 2. Validate Image Type
     if (!file.type.startsWith("image/")) {
       return NextResponse.json(
-        { error: "L'arxiu no és una imatge vàlida" },
+        { error: "Invalid file type. Only images are allowed." },
         { status: 400 }
       );
     }
 
-    // 3. Convertim a Base64
+    // 3. Convert to Base64
     const arrayBuffer = await file.arrayBuffer();
     const base64Data = Buffer.from(arrayBuffer).toString("base64");
 
-    // 4. Inicialitzem model
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+    // 4. Initialize Model with Production settings
+    // Using gemini-1.5-flash for speed and JSON mode support
+    const model = genAI.getGenerativeModel({
+      model: "gemini-2.0-flash",
+      generationConfig: {
+        responseMimeType: "application/json",
+        temperature: 0, // Deterministic output
+      },
+    });
 
-    const prompt = `Actúa como un OCR médico experto. Analiza la imagen de este dispositivo médico.
-    Extrae los valores visibles.
-    Responde ÚNICAMENTE un objeto JSON válido con este formato: 
-    {"bloodPressure": "SIS/DIA", "pulse": number, "spo2": number, "weight": number, "ca125": number}.
-    Si un valor no aparece, usa null. No uses markdown.`;
+    // 5. Refined Prompt for Strict Extraction
+    const prompt = `
+      Analyze this image of a medical device display (e.g., blood pressure monitor, oximeter, scale).
+      Extract the numeric readings strictly.
+      
+      Return a RAW JSON object with the following schema:
+      {
+        "bloodPressure": string | null, // Format "SYS/DIA" (e.g., "120/80"). Use null if not a BP monitor.
+        "pulse": number | null,         // Heart rate in BPM.
+        "spo2": number | null,          // Oxygen saturation %.
+        "weight": number | null,        // Weight in kg.
+        "ca125": number | null          // CA125 marker.
+      }
 
-    // 5. Generem contingut
+      Rules:
+      - If a value is not clearly visible or the image is blurry, return null for that field.
+      - Do not guess or hallucinate values.
+      - For Blood Pressure, look for two numbers usually displayed together (SYS/DIA).
+      - Ignore units (kg, mmHg, bpm) in the output numbers.
+    `;
+
+    // 6. Generate Content
     const result = await model.generateContent([
       prompt,
       { inlineData: { data: base64Data, mimeType: file.type } },
@@ -47,22 +69,25 @@ export async function POST(req: Request) {
     const response = await result.response;
     const text = response.text();
 
-    // 6. Neteja JSON (per si la IA posa ```json ... ```)
-    const cleanText = text.replace(/```json|```/g, "").trim();
-
+    // 7. Parse JSON safely (JSON mode ensures valid JSON, but good to be safe)
     let json;
     try {
-      json = JSON.parse(cleanText);
+      json = JSON.parse(text);
     } catch (e) {
-      console.error("Error parsejant JSON de la IA:", cleanText);
-      throw new Error("La IA no ha retornat un JSON vàlid.");
+      console.error("AI JSON Parse Error:", text);
+      return NextResponse.json(
+        { error: "Failed to parse AI response" },
+        { status: 500 }
+      );
     }
 
+    // 8. Return formatted response
     return NextResponse.json(json);
+
   } catch (error: any) {
     console.error("Server Error /api/analyze:", error);
     return NextResponse.json(
-      { error: error.message || "Error intern del servidor" },
+      { error: error.message || "Internal Server Error" },
       { status: 500 }
     );
   }
