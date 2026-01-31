@@ -1,56 +1,68 @@
+"use client";
+
 import { useState, useEffect } from "react";
 import { useTranslations } from "next-intl";
-import {
-  fetchContextOptions,
-  fetchLocationOptions,
-  SelectOption,
-} from "@/lib/api";
+// Importem la nova API
+import { SelectOption, optionsApi } from "@/lib/api";
 
 export function useMetricManager() {
   const t = useTranslations();
+
   const [contextOptions, setContextOptions] = useState<SelectOption[]>([]);
   const [locationOptions, setLocationOptions] = useState<SelectOption[]>([]);
+  const [loadingOptions, setLoadingOptions] = useState(true);
 
   useEffect(() => {
-    async function load() {
+    let mounted = true;
+
+    async function loadOptions() {
       try {
+        // Usem la nova estructura optionsApi
         const [ctx, loc] = await Promise.all([
-          fetchContextOptions(),
-          fetchLocationOptions(),
+          optionsApi.fetchContexts(),
+          optionsApi.fetchLocations(),
         ]);
-        setContextOptions(ctx);
-        setLocationOptions(loc);
-      } catch (e) {
-        console.error(e);
+
+        if (mounted) {
+          setContextOptions(ctx);
+          setLocationOptions(loc);
+        }
+      } catch (error) {
+        console.error("Error loading options manager", error);
+      } finally {
+        if (mounted) setLoadingOptions(false);
       }
     }
-    load();
+
+    loadOptions();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
-  // Helpers de traducció (Visualització)
-  const renderContext = (key: string | null) => {
-    if (!key) return null;
-    const label = t(`ContextOptions.${key}` as any);
-    return label.includes("ContextOptions.") ? key : label;
-  };
-
-  const renderLocation = (key: string | null) => {
-    if (!key) return null;
-    const label = t(`LocationOptions.${key}` as any);
-    return label.includes("LocationOptions.") ? key : label;
-  };
-
-  // Helper per als Selects (Dropdowns)
   const translateOption = (category: string, option: SelectOption) => {
-    const translated = t(`${category}.${option.key}` as any);
-    return translated.includes(category) ? option.value : translated;
+    const translationKey = `${category}.${option.key}`;
+    const translated = t(translationKey as any);
+    return translated === translationKey ? option.value : translated;
+  };
+
+  const renderContext = (contextKey: string) => {
+    const option = contextOptions.find((o) => o.key === contextKey);
+    return option ? translateOption("ContextOptions", option) : contextKey;
+  };
+
+  const renderLocation = (locationKey: string) => {
+    const option = locationOptions.find((o) => o.key === locationKey);
+    return option ? translateOption("LocationOptions", option) : locationKey;
   };
 
   return {
     contextOptions,
     locationOptions,
+    loadingOptions,
+    translateOption,
     renderContext,
     renderLocation,
-    translateOption,
   };
 }

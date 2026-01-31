@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { TestTube2, Loader2, FileSpreadsheet, FileCode } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { fetchMetrics, HealthMetric } from '@/lib/api';
+import { HealthMetric, metricApi } from '@/lib/api';
 import { StatsSummary } from './StatsSummary';
 import { downloadCSV, downloadXML } from '@/lib/export-utils';
 
@@ -46,7 +46,10 @@ export function CA125Chart({ data: initialData }: { data: HealthMetric[] }) {
     const loadFilteredData = async () => {
       setLoading(true);
       try {
-        const newData = await fetchMetrics({ range: dateRange, context: contextFilter });
+        const newData = await metricApi.getAll({ 
+          range: dateRange, 
+          context: contextFilter 
+        });
         setChartData(newData.reverse());
       } catch (error) {
         console.error("Error filtrando:", error);

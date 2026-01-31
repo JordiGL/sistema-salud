@@ -1,8 +1,11 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+import { STORAGE_KEYS, API_ROUTES } from "./constants";
+
+// --- INTERFÍCIES ---
 
 export interface HealthMetric {
   id: string;
   createdAt: string;
+  // Afegim | null perquè la BD retorna null
   bloodPressure?: string | null;
   measurementContext?: string | null;
   weightLocation?: string | null;
@@ -11,49 +14,102 @@ export interface HealthMetric {
   spo2?: number | null;
   weight?: number | null;
   ca125?: number | null;
-  // Propiedades virtuales para la gráfica
+  // Camps virtuals (frontend)
   systolic_graph?: number;
   diastolic_graph?: number;
 }
 
-// NUEVA INTERFAZ: Definimos qué filtros acepta nuestra API
 export interface MetricsFilters {
   range?: "7d" | "30d" | "all";
   context?: string;
   location?: string;
 }
 
-// MODIFICADO: Acepta el objeto de filtros opcionalmente
-export async function fetchMetrics(
-  filters?: MetricsFilters
-): Promise<HealthMetric[]> {
+export interface SelectOption {
+  key: string;
+  value: string;
+}
+
+// --- ERROR CLASS ---
+export class ApiError extends Error {
+  constructor(
+    public message: string,
+    public status: number,
+    public data?: any
+  ) {
+    super(message);
+    this.name = "ApiError";
+  }
+}
+
+// --- CORE HTTP CLIENT ---
+async function httpClient<T>(
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<T> {
+  const { headers, ...customConfig } = options;
+  const token =
+    typeof window !== "undefined"
+      ? localStorage.getItem(STORAGE_KEYS.TOKEN)
+      : null;
+
+  const config: RequestInit = {
+    ...customConfig,
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      ...headers,
+    },
+  };
+
+  const url = endpoint.startsWith("http")
+    ? endpoint
+    : `${API_ROUTES.BASE}${endpoint}`;
+
   try {
-    // 1. Construimos la URL base
-    const url = new URL(`${API_URL}/metrics`);
+    const response = await fetch(url, config);
 
-    // 2. Añadimos los parámetros si existen
-    if (filters?.range) {
-      url.searchParams.append("range", filters.range);
+    if (response.status === 401) {
+      // Aquí podries netejar el token si volguessis
+      // localStorage.removeItem(STORAGE_KEYS.TOKEN);
+      throw new ApiError("UNAUTHORIZED", 401);
     }
 
-    // Solo enviamos el contexto si no es 'all' (para que el backend entienda que no hay filtro)
-    if (filters?.context && filters.context !== "all") {
-      url.searchParams.append("context", filters.context);
+    if (!response.ok) {
+      const errorBody = await response.json().catch(() => ({}));
+      const message =
+        errorBody.message || errorBody.error || "Error desconegut";
+      throw new ApiError(message, response.status, errorBody);
     }
 
-    if (filters?.location && filters.location !== "all") {
-      url.searchParams.append("location", filters.location);
-    }
+    if (response.status === 204) return null as unknown as T;
+    return await response.json();
+  } catch (error) {
+    if (error instanceof ApiError) throw error;
+    throw new ApiError(
+      error instanceof Error ? error.message : "Error de xarxa",
+      0
+    );
+  }
+}
 
-    // 3. Hacemos la petición a la URL construida (ej: .../metrics?range=7d&context=Post-Ejercicio)
-    const res = await fetch(url.toString(), { cache: "no-store" });
+// --- MÈTODES PÚBLICS ---
 
-    if (!res.ok) throw new Error("Error al conectar");
+export const metricApi = {
+  getAll: async (filters?: MetricsFilters) => {
+    const params = new URLSearchParams();
+    if (filters?.range) params.append("range", filters.range);
+    if (filters?.context && filters.context !== "all")
+      params.append("context", filters.context);
+    if (filters?.location && filters.location !== "all")
+      params.append("location", filters.location);
 
-    const data: HealthMetric[] = await res.json();
+    const data = await httpClient<HealthMetric[]>(
+      `${API_ROUTES.METRICS}?${params.toString()}`,
+      { cache: "no-store" }
+    );
 
-    // PROCESAMIENTO DE DATOS (Se mantiene igual)
-    // Convertimos "120/80" en números para la gráfica
+    // Mapper per les gràfiques (es manté igual)
     return data.map((item) => {
       let sys, dia;
       if (item.bloodPressure) {
@@ -65,127 +121,52 @@ export async function fetchMetrics(
       }
       return { ...item, systolic_graph: sys, diastolic_graph: dia };
     });
-  } catch (error) {
-    console.error(error);
-    return [];
-  }
-}
+  },
 
-export async function saveMetric(data: Partial<HealthMetric>) {
-  const token = localStorage.getItem("health_token");
+  create: (data: Partial<HealthMetric>) =>
+    httpClient<HealthMetric>(API_ROUTES.METRICS, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
 
-  const res = await fetch(`${API_URL}/metrics`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: token ? `Bearer ${token}` : "",
-    },
-    body: JSON.stringify(data),
-  });
+  update: (id: string, data: Partial<HealthMetric>) =>
+    httpClient<HealthMetric>(`${API_ROUTES.METRICS}/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
 
-  if (res.status === 401) {
-    throw new Error("UNAUTHORIZED");
-  }
+  delete: (id: string) =>
+    httpClient<void>(`${API_ROUTES.METRICS}/${id}`, { method: "DELETE" }),
+};
 
-  if (!res.ok) {
-    // 🔍 LLEGIM EL MISSATGE REAL DEL SERVIDOR
-    const errorData = await res.json().catch(() => ({}));
-    const errorMessage =
-      errorData.error || errorData.message || "Error guardando datos";
-
-    console.error("❌ Error detallado del servidor:", errorData); // Mira la consola del navegador!
-    throw new Error(errorMessage);
-  }
-
-  return await res.json();
-}
-
-export async function updateMetric(id: string, data: Partial<HealthMetric>) {
-  const token = localStorage.getItem("health_token");
-
-  const res = await fetch(`${API_URL}/metrics/${id}`, {
-    method: "PATCH",
-    headers: {
-      "Content-Type": "application/json",
-      Authorization: token ? `Bearer ${token}` : "",
-    },
-    body: JSON.stringify(data),
-  });
-
-  if (res.status === 401) throw new Error("UNAUTHORIZED");
-
-  if (!res.ok) {
-    // 🔍 LLEGIM EL MISSATGE REAL DEL SERVIDOR TAMBÉ AQUÍ
-    const errorData = await res.json().catch(() => ({}));
-    const errorMessage =
-      errorData.error || errorData.message || "Error actualizando datos";
-
-    console.error("❌ Error detallado del servidor:", errorData);
-    throw new Error(errorMessage);
-  }
-
-  return await res.json();
-}
-
-//Función para eliminar
-export async function deleteMetric(id: string) {
-  const token = localStorage.getItem("health_token");
-
-  const res = await fetch(`${API_URL}/metrics/${id}`, {
-    method: "DELETE",
-    headers: {
-      Authorization: token ? `Bearer ${token}` : "",
-    },
-  });
-
-  if (res.status === 401) throw new Error("UNAUTHORIZED");
-  if (!res.ok) throw new Error("Error eliminando datos");
-  return true;
-}
-
-export interface SelectOption {
-  key: string; // La clave para guardar en BD y para traducir (ej: "exercise")
-  value: string; // El valor por defecto o fallback (ej: "Post-Ejercicio")
-}
-
-export async function fetchContextOptions(): Promise<SelectOption[]> {
-  // TODO: Conectar con tu endpoint real
-  // const res = await fetch(`${API_URL}/options/context`, { headers: getHeaders() });
-  // if (!res.ok) throw new Error('Failed to fetch contexts');
-  // return res.json();
-
-  // MOCK TEMPORAL (Simula la BD):
-  return new Promise((resolve) => {
-    setTimeout(
-      () =>
-        resolve([
-          { key: "exercise", value: "Post-Ejercicio" },
-          { key: "drainage", value: "Post-Drenaje" },
-          { key: "chemo", value: "Post-Quimioterapia" },
-          { key: "stress", value: "Momento de estres" },
-        ]),
-      100
+export const optionsApi = {
+  fetchContexts: async (): Promise<SelectOption[]> => {
+    // Simulació (a substituir per endpoint real quan el tinguis)
+    return new Promise((resolve) =>
+      setTimeout(
+        () =>
+          resolve([
+            { key: "exercise", value: "Post-Ejercicio" },
+            { key: "drainage", value: "Post-Drenaje" },
+            { key: "chemo", value: "Post-Quimioterapia" },
+            { key: "stress", value: "Momento de estres" },
+          ]),
+        100
+      )
     );
-  });
-}
-
-export async function fetchLocationOptions(): Promise<SelectOption[]> {
-  // TODO: Conectar con tu endpoint real
-  // const res = await fetch(`${API_URL}/options/location`, { headers: getHeaders() });
-  // if (!res.ok) throw new Error('Failed to fetch locations');
-  // return res.json();
-
-  // MOCK TEMPORAL (Simula la BD):
-  return new Promise((resolve) => {
-    setTimeout(
-      () =>
-        resolve([
-          { key: "home", value: "Casa" },
-          { key: "pharmacy", value: "Farmacia" },
-          { key: "cap", value: "CAP" },
-          { key: "ico", value: "ICO" },
-        ]),
-      100
+  },
+  fetchLocations: async (): Promise<SelectOption[]> => {
+    return new Promise((resolve) =>
+      setTimeout(
+        () =>
+          resolve([
+            { key: "home", value: "Casa" },
+            { key: "pharmacy", value: "Farmacia" },
+            { key: "cap", value: "CAP" },
+            { key: "ico", value: "ICO" },
+          ]),
+        100
+      )
     );
-  });
-}
+  },
+};

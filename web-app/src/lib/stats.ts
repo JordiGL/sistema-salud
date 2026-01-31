@@ -4,18 +4,24 @@ export interface ChartStats {
   avg: number;
 }
 
-export function calculateStats(data: number[]): ChartStats | null {
+// Ara acceptem (number | null | undefined)[]
+export function calculateStats(
+  data: (number | null | undefined)[]
+): ChartStats | null {
   if (!data || data.length === 0) return null;
 
-  // Filtrem valors nuls o 0 si fos necessari, però assumim que arriben nets
-  const validData = data.filter((n) => typeof n === "number" && !isNaN(n));
+  // Filtrem per quedar-nos només amb números vàlids
+  // TypeScript entendrà que 'validData' és number[] gràcies al predicate "val is number" implícit
+  const validData = data.filter(
+    (n): n is number => typeof n === "number" && !isNaN(n)
+  );
 
   if (validData.length === 0) return null;
 
   const min = Math.min(...validData);
   const max = Math.max(...validData);
   const sum = validData.reduce((a, b) => a + b, 0);
-  const avg = Math.round((sum / validData.length) * 10) / 10; // Arrodonir a 1 decimal
+  const avg = Math.round(sum / validData.length);
 
   return { min, max, avg };
 }

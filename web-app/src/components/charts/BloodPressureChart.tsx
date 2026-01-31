@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { Activity, Loader2, FileSpreadsheet, FileCode } from 'lucide-react'; // Removed Download, added FileSpreadsheet, FileCode
 import { useTranslations } from 'next-intl';
-import { fetchMetrics, HealthMetric } from '@/lib/api';
+import { HealthMetric, metricApi } from '@/lib/api';
 import { StatsSummary } from './StatsSummary';
 import { downloadCSV, downloadXML } from '@/lib/export-utils';
 
@@ -54,8 +54,7 @@ export function BloodPressureChart({ data: initialData }: { data: HealthMetric[]
     const loadFilteredData = async () => {
       setLoading(true);
       try {
-        // Llamamos a la API con los filtros
-        const newData = await fetchMetrics({ 
+        const newData = await metricApi.getAll({ 
           range: dateRange, 
           context: contextFilter 
         });

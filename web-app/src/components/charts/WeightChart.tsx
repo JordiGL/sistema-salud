@@ -1,9 +1,10 @@
 'use client';
+
 import { useState, useEffect, useMemo } from 'react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { Scale, Loader2, FileSpreadsheet, FileCode } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { fetchMetrics, HealthMetric } from '@/lib/api';
+import { HealthMetric, metricApi } from '@/lib/api';
 import { StatsSummary } from './StatsSummary';
 import { downloadCSV, downloadXML } from '@/lib/export-utils';
 
@@ -49,7 +50,8 @@ export function WeightChart({ data: initialData }: { data: HealthMetric[] }) {
     const loadFilteredData = async () => {
       setLoading(true);
       try {
-        const newData = await fetchMetrics({ 
+        // 2. CANVI: Usem metricApi.getAll en lloc de fetchMetrics
+        const newData = await metricApi.getAll({ 
           range: dateRange, 
           location: locationFilter 
         });
@@ -98,7 +100,6 @@ export function WeightChart({ data: initialData }: { data: HealthMetric[] }) {
       )}
 
       {/* --- BARRA DE HERRAMIENTAS (HEADER) --- */}
-      {/* Sin título, solo controles alineados */}
       <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
         
         {/* GRUPO IZQUIERDO: EXPORTAR */}
@@ -229,7 +230,6 @@ export function WeightChart({ data: initialData }: { data: HealthMetric[] }) {
       {/* --- SECCIÓN DE ESTADÍSTICAS --- */}
       {finalData.length > 0 && (
         <div className="pt-6 border-t border-slate-100">
-            {/* Estadísticas sin media para Peso */}
             <StatsSummary 
                 label={tCharts('weightTitle')}
                 data={weightData} 
@@ -237,7 +237,7 @@ export function WeightChart({ data: initialData }: { data: HealthMetric[] }) {
                 bgClass="bg-blue-50"
                 unit="Kg"
                 legendDotColor="#2563eb"
-                showAvg={false} // Hide average
+                showAvg={false}
             />
         </div>
       )}

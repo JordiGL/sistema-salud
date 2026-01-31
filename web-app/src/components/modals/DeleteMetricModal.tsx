@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { AlertTriangle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { deleteMetric } from '@/lib/api';
+import { metricApi } from '@/lib/api';
 
 interface DeleteMetricModalProps {
   isOpen: boolean;
@@ -19,11 +19,14 @@ export function DeleteMetricModal({ isOpen, onClose, metricId, onSuccess }: Dele
   const handleDelete = async () => {
     setIsSubmitting(true);
     try {
-      await deleteMetric(metricId);
+      await metricApi.delete(metricId); // NOVA CRIDA
       onSuccess();
       onClose();
-    } catch (e) { alert("Error"); }
-    finally { setIsSubmitting(false); }
+    } catch (e: any) { 
+        alert(e.message || "Error al eliminar"); 
+    } finally { 
+        setIsSubmitting(false); 
+    }
   };
 
   if (!isOpen) return null;

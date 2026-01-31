@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { X, Save, Pencil } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { HealthMetric, updateMetric, SelectOption } from '@/lib/api';
+import { metricApi, HealthMetric, SelectOption } from '@/lib/api';
 
 interface EditMetricModalProps {
   isOpen: boolean;
@@ -51,6 +51,7 @@ export function EditMetricModal({ isOpen, onClose, metric, onSuccess, contextOpt
     e.preventDefault();
     setIsSubmitting(true);
     
+    // IMPORTANT: || null
     const payload: Partial<HealthMetric> = {
         bloodPressure: form.bloodPressure || null,
         notes: form.notes || null,
@@ -63,11 +64,12 @@ export function EditMetricModal({ isOpen, onClose, metric, onSuccess, contextOpt
     };
 
     try {
-      await updateMetric(metric.id, payload);
+      // NOVA CRIDA
+      await metricApi.update(metric.id, payload);
       onSuccess();
       onClose();
-    } catch (e) { 
-      alert("Error al guardar"); 
+    } catch (e: any) { 
+      alert(e.message || "Error al guardar"); 
     } finally { 
       setIsSubmitting(false); 
     }

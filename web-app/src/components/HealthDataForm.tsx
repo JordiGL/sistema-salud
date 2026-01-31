@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useRouter } from 'next/navigation';
-import { saveMetric, HealthMetric } from '@/lib/api';
+import { metricApi, HealthMetric, ApiError } from '@/lib/api';
 import { 
   Heart, Scale, Save, RotateCcw, 
   ChevronDown, ChevronUp, Plus, Camera, Loader2 
@@ -85,33 +85,30 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
     e.preventDefault();
     setIsSubmitting(true);
     
-    // Convertim cadenes buides a undefined perquè Prisma no es queixi
+    // Usem || null per assegurar que es borren camps opcionals
     const payload: Partial<HealthMetric> = {
-        bloodPressure: formData.bloodPressure || undefined,
-        measurementContext: formData.measurementContext || undefined,
-        weightLocation: formData.weightLocation || undefined,
-        notes: formData.notes || undefined,
-        pulse: formData.pulse ? Number(formData.pulse) : undefined,
-        weight: formData.weight ? Number(formData.weight) : undefined,
-        spo2: formData.spo2 ? Number(formData.spo2) : undefined,
-        ca125: formData.ca125 ? Number(formData.ca125) : undefined,
+        bloodPressure: formData.bloodPressure || null,
+        measurementContext: formData.measurementContext || null,
+        weightLocation: formData.weightLocation || null,
+        notes: formData.notes || null,
+        pulse: formData.pulse ? Number(formData.pulse) : null,
+        weight: formData.weight ? Number(formData.weight) : null,
+        spo2: formData.spo2 ? Number(formData.spo2) : null,
+        ca125: formData.ca125 ? Number(formData.ca125) : null,
     };
 
-    console.log("📤 Enviant payload:", payload); // DEBUG: Mira la consola del navegador
-
     try {
-      await saveMetric(payload);
+      // NOVA CRIDA
+      await metricApi.create(payload);
       handleReset(); 
       onSuccess();   
     } catch (err: any) { 
-      console.error("❌ Error al backend:", err);
-
-      if (err.message === "UNAUTHORIZED") {
-        alert(t('HomePage.sessionExpired'));
-        localStorage.removeItem('health_token');
-        router.push(`/${locale}/login`);
+      // Gestió d'errors millorada
+      if (err instanceof ApiError && err.message === "UNAUTHORIZED") {
+         // redirigir login...
+         alert(t('HomePage.sessionExpired'));
       } else {
-        alert(t('HomePage.errorSaving'));
+         alert(err.message || t('HomePage.errorSaving'));
       }
     } finally {
       setIsSubmitting(false);

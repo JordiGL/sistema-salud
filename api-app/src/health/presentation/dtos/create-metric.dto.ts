@@ -8,12 +8,11 @@ import {
   IsIn,
 } from 'class-validator';
 
-// Definimos las opciones válidas para evitar datos basura
-const CONTEXT_OPTIONS = ['exercise', 'drainage', 'chemo', 'stress'];
-const WEIGHT_LOCATIONS = ['home', 'pharmacy', 'cap', 'ico'];
+// ARREGLAT: Usem les claus en anglès que envia el frontend
+const CONTEXT_KEYS = ['exercise', 'drainage', 'chemo', 'stress'];
+const LOCATION_KEYS = ['home', 'pharmacy', 'cap', 'ico'];
 
 export class CreateMetricDto {
-  // Regex: Busca digitos, una barra, digitos (ej: 120/80)
   @IsOptional()
   @IsString()
   @Matches(/^\d+\/\d+$/, { message: 'La tensión debe tener formato "120/80"' })
@@ -21,12 +20,16 @@ export class CreateMetricDto {
 
   @IsOptional()
   @IsString()
-  @IsIn(CONTEXT_OPTIONS, { message: 'Contexto no válido' })
+  @IsIn(CONTEXT_KEYS, {
+    message: 'Contexto no válido (use keys: exercise, drainage...)',
+  })
   measurementContext?: string;
 
   @IsOptional()
   @IsString()
-  @IsIn(WEIGHT_LOCATIONS, { message: 'Lugar de peso no válido' })
+  @IsIn(LOCATION_KEYS, {
+    message: 'Ubicación no válida (use keys: home, pharmacy...)',
+  })
   weightLocation?: string;
 
   @IsOptional()
