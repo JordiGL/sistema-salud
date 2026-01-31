@@ -66,7 +66,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
             <div
                 onClick={() => setIsOpen(!isOpen)}
                 className={`flex justify-between items-center p-4 cursor-pointer transition-colors select-none ${isOpen ? 'bg-slate-50 border-b border-slate-200' : 'bg-white hover:bg-slate-50'}`}
-                title={isOpen ? "Contraer" : "Desplegar para añadir datos"}
+                title={isOpen ? t('Form.toggleCollapse') : t('Form.toggleExpand')}
             >
                 <div className="flex items-center gap-3">
                     <div className={`p-2 rounded-lg transition-colors ${isOpen ? 'bg-slate-200 text-slate-700' : 'bg-slate-100 text-slate-500'}`}>
@@ -164,7 +164,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                             </div>
 
                             <div className="flex gap-3">
-                                <button type="button" onClick={handleResetClick} className="px-6 py-4 rounded-xl font-bold text-slate-500 bg-white border border-slate-200 hover:bg-slate-50 hover:text-slate-700 hover:border-slate-300 transition-all flex items-center gap-2" title="Limpiar formulario">
+                                <button type="button" onClick={handleResetClick} className="px-6 py-4 rounded-xl font-bold text-slate-500 bg-white border border-slate-200 hover:bg-slate-50 hover:text-slate-700 hover:border-slate-300 transition-all flex items-center gap-2" title={t('Form.clearTitle')}>
                                     <RotateCcw size={18} /> <span className="hidden sm:inline">{t('HomePage.clear') || 'Limpiar'}</span>
                                 </button>
                                 <button type="submit" disabled={isSubmitting} className="flex-1 bg-slate-900 text-white py-4 rounded-xl hover:bg-slate-800 font-bold text-lg shadow-lg hover:shadow-xl transition-all transform active:scale-[0.99] flex justify-center items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed">

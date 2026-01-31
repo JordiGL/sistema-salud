@@ -10,7 +10,16 @@
     "sessionExpired": "La teva sessió ha caducat.",
     "clear": "Netejar"
   },
+  "Dashboard": {
+    "logout": "Tancar Sessió",
+    "downloadCSV": "Descarregar CSV",
+    "downloadXML": "Descarregar XML",
+    "noRecords": "No hi ha registres encara."
+  },
   "Form": {
+    "toggleCollapse": "Contraure",
+    "toggleExpand": "Desplegar per afegir dades",
+    "clearTitle": "Netejar formulari",
     "physiologicalData": "Dades Fisiològiques",
     "weightControl": "Control de Pes",
     "notes": "Notes",

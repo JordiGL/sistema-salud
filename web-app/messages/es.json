@@ -10,7 +10,16 @@
     "sessionExpired": "Tu sesión ha caducado.",
     "clear": "Limpiar"
   },
+  "Dashboard": {
+    "logout": "Cerrar Sesión",
+    "downloadCSV": "Descargar CSV",
+    "downloadXML": "Descargar XML",
+    "noRecords": "No hay registros todavía."
+  },
   "Form": {
+    "toggleCollapse": "Contraer",
+    "toggleExpand": "Desplegar para añadir datos",
+    "clearTitle": "Limpiar formulario",
     "physiologicalData": "Datos Fisiológicos",
     "weightControl": "Control de Peso",
     "notes": "Notas Adicionales",
