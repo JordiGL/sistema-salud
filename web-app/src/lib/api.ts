@@ -5,7 +5,7 @@ import { STORAGE_KEYS, API_ROUTES } from "./constants";
 export interface HealthMetric {
   id: string;
   createdAt: string;
-  // Afegim | null perquè la BD retorna null
+  // Canvis: allow null OR undefined, per ser compatible amb Prisma i frontend
   bloodPressure?: string | null;
   measurementContext?: string | null;
   weightLocation?: string | null;
@@ -93,6 +93,37 @@ async function httpClient<T>(
   }
 }
 
+// Sanitize payload: Converts empty strings/NaN to undefined/null for backend
+function preparePayload(data: any): Partial<HealthMetric> {
+  const clean: any = {};
+
+  // Helper per netejar camps numèrics
+  const cleanNumber = (val: any) => {
+    if (val === '' || val === null || val === undefined) return null;
+    const num = Number(val);
+    return isNaN(num) ? null : num;
+  };
+
+  // Helper per netejar strings
+  const cleanString = (val: any) => {
+    if (!val || typeof val !== 'string') return null;
+    return val.trim() === '' ? null : val.trim();
+  };
+
+  // Mapeig explícit
+  if (data.bloodPressure !== undefined) clean.bloodPressure = cleanString(data.bloodPressure);
+  if (data.measurementContext !== undefined) clean.measurementContext = cleanString(data.measurementContext);
+  if (data.weightLocation !== undefined) clean.weightLocation = cleanString(data.weightLocation);
+  if (data.notes !== undefined) clean.notes = cleanString(data.notes);
+
+  if (data.pulse !== undefined) clean.pulse = cleanNumber(data.pulse);
+  if (data.spo2 !== undefined) clean.spo2 = cleanNumber(data.spo2);
+  if (data.weight !== undefined) clean.weight = cleanNumber(data.weight);
+  if (data.ca125 !== undefined) clean.ca125 = cleanNumber(data.ca125);
+
+  return clean;
+}
+
 // --- MÈTODES PÚBLICS ---
 
 export const metricApi = {
@@ -109,7 +140,7 @@ export const metricApi = {
       { cache: "no-store" }
     );
 
-    // Mapper per les gràfiques (es manté igual)
+    // Mapper per les gràfiques
     return data.map((item) => {
       let sys, dia;
       if (item.bloodPressure) {
@@ -123,20 +154,58 @@ export const metricApi = {
     });
   },
 
-  create: (data: Partial<HealthMetric>) =>
+  create: (data: any) =>
     httpClient<HealthMetric>(API_ROUTES.METRICS, {
       method: "POST",
-      body: JSON.stringify(data),
+      body: JSON.stringify(preparePayload(data)),
     }),
 
-  update: (id: string, data: Partial<HealthMetric>) =>
+  update: (id: string, data: any) =>
     httpClient<HealthMetric>(`${API_ROUTES.METRICS}/${id}`, {
       method: "PATCH",
-      body: JSON.stringify(data),
+      body: JSON.stringify(preparePayload(data)),
     }),
 
   delete: (id: string) =>
     httpClient<void>(`${API_ROUTES.METRICS}/${id}`, { method: "DELETE" }),
+};
+
+export interface LoginResponse {
+  access_token: string;
+}
+
+export const authApi = {
+  login: (credentials: { email: string; password: string }) =>
+    httpClient<LoginResponse>(API_ROUTES.AUTH_LOGIN, {
+      method: "POST",
+      body: JSON.stringify(credentials),
+    }),
+
+  getToken: () => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem(STORAGE_KEYS.TOKEN);
+    }
+    return null;
+  },
+
+  setToken: (token: string) => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem(STORAGE_KEYS.TOKEN, token);
+    }
+  },
+
+  logout: () => {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem(STORAGE_KEYS.TOKEN);
+    }
+  },
+
+  isAuthenticated: () => {
+    if (typeof window !== "undefined") {
+      return !!localStorage.getItem(STORAGE_KEYS.TOKEN);
+    }
+    return false;
+  }
 };
 
 export const optionsApi = {

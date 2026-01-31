@@ -15,10 +15,12 @@ import { HealthService } from '../business/health.service';
 import { CreateMetricDto } from './dtos/create-metric.dto';
 import { AuthGuard } from '../common/guards/auth.guard';
 
+import { GetHistoryDto, UpdateMetricDto } from './dtos/metric-operations.dto';
+
 // Componente C4: "Health Data Controller"
 @Controller('metrics')
 export class HealthController {
-  constructor(private readonly healthService: HealthService) {}
+  constructor(private readonly healthService: HealthService) { }
 
   // Relación C4: webApp -> authGuard -> healthController (Solo para POST)
   @Post()
@@ -30,15 +32,9 @@ export class HealthController {
 
   // El visitante puede consultar sin Auth
   @Get()
-  async getAllMetrics(
-    @Query('range') range?: '7d' | '30d' | 'all',
-    @Query('context') context?: string,
-    @Query('location') location?: string, // <--- NUEVO
-  ) {
+  async getAllMetrics(@Query() filters: GetHistoryDto) {
     // Pasamos el nuevo parámetro al servicio (que a su vez lo pasará al repo)
-    // Nota: Asegúrate de que tu health.service.ts simplemente pasa el objeto 'filters' completo
-    // o actualiza la interfaz GetHistoryDto en el servicio si la definiste estricta.
-    return this.healthService.getHistory({ range, context, location } as any);
+    return this.healthService.getHistory(filters);
   }
 
   // Endpoint para ELIMINAR (Protegido)
@@ -51,7 +47,10 @@ export class HealthController {
   // Endpoint para EDITAR (Protegido)
   @Patch(':id')
   @UseGuards(AuthGuard)
-  async updateMetric(@Param('id') id: string, @Body() updateData: any) {
+  async updateMetric(
+    @Param('id') id: string,
+    @Body() updateData: UpdateMetricDto,
+  ) {
     return this.healthService.updateHealthData(id, updateData);
   }
 }

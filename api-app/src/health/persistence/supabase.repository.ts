@@ -15,8 +15,8 @@ export class SupabaseRepository extends PrismaClient {
     await this.$connect();
   }
 
-  async createMetric(data: Partial<HealthMetric>): Promise<HealthMetric> {
-    return this.healthMetric.create({ data: data as any });
+  async createMetric(data: Prisma.HealthMetricCreateInput): Promise<HealthMetric> {
+    return this.healthMetric.create({ data });
   }
 
   // MODIFICADO: Ahora acepta un objeto de filtros opcional
@@ -50,11 +50,11 @@ export class SupabaseRepository extends PrismaClient {
 
   async updateMetric(
     id: string,
-    data: Partial<HealthMetric>,
+    data: Prisma.HealthMetricUpdateInput,
   ): Promise<HealthMetric> {
     return this.healthMetric.update({
       where: { id },
-      data: data as any,
+      data,
     });
   }
 

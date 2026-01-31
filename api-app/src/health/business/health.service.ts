@@ -1,9 +1,9 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { SupabaseRepository } from '../persistence/supabase.repository';
+import { HealthMetric } from '@prisma/client';
 
 export interface CreateHealthData {
-  systolic?: number;
-  diastolic?: number;
+  bloodPressure?: string;
   pulse?: number;
   spo2?: number;
   weight?: number;
@@ -22,15 +22,23 @@ export interface GetHistoryDto {
 
 @Injectable()
 export class HealthService {
-  constructor(private readonly repository: SupabaseRepository) {}
+  constructor(private readonly repository: SupabaseRepository) { }
 
   async recordHealthData(data: CreateHealthData) {
-    // Validaciones (se mantienen igual)
-    if (data.systolic && data.diastolic && data.systolic < data.diastolic) {
-      throw new BadRequestException(
-        'La tensión sistólica debe ser mayor que la diastólica.',
-      );
+    // Validaciones de negocio
+    if (data.bloodPressure) {
+      const parts = data.bloodPressure.split('/');
+      if (parts.length === 2) {
+        const sys = Number(parts[0]);
+        const dia = Number(parts[1]);
+        if (!isNaN(sys) && !isNaN(dia) && sys < dia) {
+          throw new BadRequestException(
+            'La tensión sistólica debe ser mayor que la diastólica.',
+          );
+        }
+      }
     }
+
     if (data.spo2 && data.spo2 < 90) {
       console.warn('ALERTA: Nivel de oxígeno crítico detectado.');
     }
@@ -70,7 +78,7 @@ export class HealthService {
 
   // Editar
   async updateHealthData(id: string, data: Partial<CreateHealthData>) {
-    // Aquí podrías repetir validaciones si quisieras (ej: sistólica > diastólica)
-    return this.repository.updateMetric(id, data as any);
+    // Validaciones extra si fueran necesarias
+    return this.repository.updateMetric(id, data);
   }
 }
