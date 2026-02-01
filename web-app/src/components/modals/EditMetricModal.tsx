@@ -3,13 +3,14 @@
 import { useState, useEffect } from 'react';
 import { X, Save, Pencil } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { metricApi, HealthMetric, SelectOption } from '@/lib/api';
+import { metricApi, SelectOption } from '@/lib/api';
+import { Metric } from '@/types/metrics';
 import { toast } from 'sonner';
 
 interface EditMetricModalProps {
   isOpen: boolean;
   onClose: () => void;
-  metric: HealthMetric;
+  metric: Metric;
   onSuccess: () => void;
   contextOptions: SelectOption[];
   locationOptions: SelectOption[];

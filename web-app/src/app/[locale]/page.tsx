@@ -1,5 +1,6 @@
 import { metricApi } from '@/lib/api';
 import { Dashboard } from '@/components/dashboard/Dashboard';
+import { Metric } from '@/types/metrics';
 
 interface PageProps {
   params: { locale: string };
@@ -7,7 +8,7 @@ interface PageProps {
 }
 
 export default async function Home({ params, searchParams }: PageProps) {
-  const metrics = await metricApi.getAll();
+  const metrics: Metric[] = await metricApi.getAll();
 
   return (
     <main>

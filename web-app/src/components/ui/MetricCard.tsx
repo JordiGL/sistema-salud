@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { HealthMetric } from '@/lib/api';
+import { Metric } from '@/types/metrics';
 import { Activity, Heart, Droplets, Scale, MapPin, FileText, Pencil, Trash2, TestTube } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { HealthCriteria, STATUS_COLORS, HealthStatus } from '@/lib/health-criteria';
@@ -10,7 +10,7 @@ import { EditMetricModal } from '@/components/modals/EditMetricModal';
 import { DeleteMetricModal } from '@/components/modals/DeleteMetricModal';
 
 interface MetricCardProps {
-  data: HealthMetric;
+  data: Metric;
   isAdmin: boolean;
   onRefresh: () => void;
 }

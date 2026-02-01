@@ -11,7 +11,8 @@ import {
 } from 'lucide-react';
 
 // Imports de la nova API i Constants
-import { HealthMetric, metricApi } from '@/lib/api';
+import { metricApi } from '@/lib/api';
+import { Metric } from '@/types/metrics';
 import { STORAGE_KEYS, APP_ROUTES } from '@/lib/constants';
 import { downloadCSV, downloadXML } from '@/lib/export-utils';
 
@@ -26,7 +27,7 @@ import { HistoryTableView } from '@/components/health-history/HistoryTableView';
 import { HealthDataForm } from '@/components/health-entry/HealthDataForm';
 
 interface DashboardProps {
-  initialMetrics: HealthMetric[];
+  initialMetrics: Metric[];
 }
 
 export function Dashboard({ initialMetrics }: DashboardProps) {
@@ -36,7 +37,7 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
 
   // --- ESTATS ---
   // Inicialitzem amb les dades del servidor -> Adéu loading inicial!
-  const [metrics, setMetrics] = useState<HealthMetric[]>(initialMetrics);
+  const [metrics, setMetrics] = useState<Metric[]>(initialMetrics);
   const [isAdmin, setIsAdmin] = useState(false);
 
   const [activeTab, setActiveTab] = useState<'history' | 'bp' | 'pulse' | 'weight' | 'spo2' | 'ca125'>('history');

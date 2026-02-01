@@ -2,28 +2,10 @@ import { STORAGE_KEYS, API_ROUTES } from "./constants";
 
 // --- INTERFÍCIES ---
 
-export interface HealthMetric {
-  id: string;
-  createdAt: string;
-  // Canvis: allow null OR undefined, per ser compatible amb Prisma i frontend
-  bloodPressure?: string | null;
-  measurementContext?: string | null;
-  weightLocation?: string | null;
-  notes?: string | null;
-  pulse?: number | null;
-  spo2?: number | null;
-  weight?: number | null;
-  ca125?: number | null;
-  // Camps virtuals (frontend)
-  systolic_graph?: number;
-  diastolic_graph?: number;
-}
+import { Metric, MetricsFilters } from "@/types/metrics";
 
-export interface MetricsFilters {
-  range?: "7d" | "30d" | "all";
-  context?: string;
-  location?: string;
-}
+// --- INTERFÍCIES ---
+// (Las interfaces Metric y MetricsFilters ahora se importan de types/metrics.ts)
 
 export interface SelectOption {
   key: string;
@@ -94,7 +76,7 @@ async function httpClient<T>(
 }
 
 // Sanitize payload: Converts empty strings/NaN to undefined/null for backend
-function preparePayload(data: any): Partial<HealthMetric> {
+function preparePayload(data: any): Partial<Metric> {
   const clean: any = {};
 
   // Helper per netejar camps numèrics
@@ -135,7 +117,7 @@ export const metricApi = {
     if (filters?.location && filters.location !== "all")
       params.append("location", filters.location);
 
-    const data = await httpClient<HealthMetric[]>(
+    const data = await httpClient<Metric[]>(
       `${API_ROUTES.METRICS}?${params.toString()}`,
       { cache: "no-store" }
     );
@@ -155,13 +137,13 @@ export const metricApi = {
   },
 
   create: (data: any) =>
-    httpClient<HealthMetric>(API_ROUTES.METRICS, {
+    httpClient<Metric>(API_ROUTES.METRICS, {
       method: "POST",
       body: JSON.stringify(preparePayload(data)),
     }),
 
   update: (id: string, data: any) =>
-    httpClient<HealthMetric>(`${API_ROUTES.METRICS}/${id}`, {
+    httpClient<Metric>(`${API_ROUTES.METRICS}/${id}`, {
       method: "PATCH",
       body: JSON.stringify(preparePayload(data)),
     }),

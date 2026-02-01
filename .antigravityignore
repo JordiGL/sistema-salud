@@ -1,0 +1,18 @@
+# Dependencias (como el build de Gradle)
+node_modules/
+.next/
+dist/
+build/
+
+# Archivos de entorno y logs
+.env*
+*.log
+npm-debug.log*
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Supabase
+supabase/.temp/
+supabase/migrations/.trash/

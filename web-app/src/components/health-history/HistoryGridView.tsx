@@ -1,11 +1,11 @@
 'use client';
 
-import { HealthMetric } from '@/lib/api';
+import { Metric } from '@/types/metrics';
 import { MetricCard } from '@/components/ui/MetricCard';
 // Eliminem imports de descàrrega i traduccions de capçalera
 
 interface HistoryGridViewProps {
-  data: HealthMetric[];
+  data: Metric[];
   isAdmin: boolean;
   onRefresh: () => void;
 }

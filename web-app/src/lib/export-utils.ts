@@ -1,7 +1,7 @@
-import { HealthMetric } from "./api";
+import { Metric } from "@/types/metrics";
 
 // Ara acceptem 't' com a argument per traduir les claus
-const formatDataForExport = (data: HealthMetric[], t: any) => {
+const formatDataForExport = (data: Metric[], t: any) => {
   return data.map((row) => ({
     [t("Export.date")]:
       new Date(row.createdAt).toLocaleDateString() +
@@ -20,7 +20,7 @@ const formatDataForExport = (data: HealthMetric[], t: any) => {
   }));
 };
 
-export const downloadCSV = (data: HealthMetric[], filename: string, t: any) => {
+export const downloadCSV = (data: Metric[], filename: string, t: any) => {
   const formattedData = formatDataForExport(data, t);
   if (formattedData.length === 0) return;
 
@@ -54,7 +54,7 @@ export const downloadCSV = (data: HealthMetric[], filename: string, t: any) => {
   }
 };
 
-export const downloadXML = (data: HealthMetric[], filename: string, t: any) => {
+export const downloadXML = (data: Metric[], filename: string, t: any) => {
   const formattedData = formatDataForExport(data, t);
   if (formattedData.length === 0) return;
 

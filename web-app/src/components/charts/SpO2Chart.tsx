@@ -3,7 +3,8 @@ import { useState, useEffect, useMemo } from 'react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { Droplets, Loader2, FileSpreadsheet, FileCode } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { HealthMetric, metricApi } from '@/lib/api';
+import { metricApi } from '@/lib/api';
+import { Metric } from '@/types/metrics';
 import { StatsSummary } from '@/components/dashboard/StatsSummary';
 import { downloadCSV, downloadXML } from '@/lib/export-utils';
 
@@ -23,12 +24,12 @@ const CustomXAxisTick = ({ x, y, payload }: any) => {
   );
 };
 
-export function SpO2Chart({ data: initialData }: { data: HealthMetric[] }) {
+export function SpO2Chart({ data: initialData }: { data: Metric[] }) {
   const t = useTranslations();
   const tCharts = useTranslations('Charts');
   const tFilter = useTranslations('Filters');
 
-  const [chartData, setChartData] = useState<HealthMetric[]>(initialData);
+  const [chartData, setChartData] = useState<Metric[]>(initialData);
   const [loading, setLoading] = useState(false);
 
   const [dateRange, setDateRange] = useState<'7d' | '30d' | 'all'>('all');
@@ -38,7 +39,7 @@ export function SpO2Chart({ data: initialData }: { data: HealthMetric[] }) {
   const availableContexts = useMemo(() => {
     const contexts = initialData
       .map(d => d.measurementContext)
-      .filter(c => c !== null && c !== undefined && c !== '');
+      .filter(c => c !== null && c !== undefined);
     return Array.from(new Set(contexts));
   }, [initialData]);
 

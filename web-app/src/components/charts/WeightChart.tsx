@@ -4,7 +4,8 @@ import { useState, useEffect, useMemo } from 'react';
 import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
 import { Scale, Loader2, FileSpreadsheet, FileCode } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { HealthMetric, metricApi } from '@/lib/api';
+import { metricApi } from '@/lib/api';
+import { Metric } from '@/types/metrics';
 import { StatsSummary } from '@/components/dashboard/StatsSummary';
 import { downloadCSV, downloadXML } from '@/lib/export-utils';
 
@@ -24,13 +25,13 @@ const CustomXAxisTick = ({ x, y, payload }: any) => {
   );
 };
 
-export function WeightChart({ data: initialData }: { data: HealthMetric[] }) {
+export function WeightChart({ data: initialData }: { data: Metric[] }) {
   const t = useTranslations();
   const tCharts = useTranslations('Charts');
   const tFilter = useTranslations('Filters');
 
   // --- ESTADOS ---
-  const [chartData, setChartData] = useState<HealthMetric[]>(initialData);
+  const [chartData, setChartData] = useState<Metric[]>(initialData);
   const [loading, setLoading] = useState(false);
 
   const [dateRange, setDateRange] = useState<'7d' | '30d' | 'all'>('all');
@@ -41,7 +42,7 @@ export function WeightChart({ data: initialData }: { data: HealthMetric[] }) {
   const availableLocations = useMemo(() => {
     const locs = initialData
       .map(d => d.weightLocation)
-      .filter(l => l !== null && l !== undefined && l !== '');
+      .filter(l => l !== null && l !== undefined);
     return Array.from(new Set(locs));
   }, [initialData]);
 
