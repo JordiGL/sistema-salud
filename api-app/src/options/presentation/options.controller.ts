@@ -1,9 +1,9 @@
 import { Controller, Get } from '@nestjs/common';
-import { OptionsService } from './options.service';
+import { OptionsService } from '../business/options.service';
 
 @Controller('options')
 export class OptionsController {
-  constructor(private readonly optionsService: OptionsService) {}
+  constructor(private readonly optionsService: OptionsService) { }
 
   @Get('context')
   async getContexts() {

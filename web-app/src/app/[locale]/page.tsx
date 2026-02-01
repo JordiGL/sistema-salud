@@ -1,5 +1,5 @@
 import { metricApi } from '@/lib/api';
-import { Dashboard } from '@/components/Dashboard';
+import { Dashboard } from '@/components/dashboard/Dashboard';
 
 interface PageProps {
   params: { locale: string };

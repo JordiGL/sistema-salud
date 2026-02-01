@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
 import { JwtModule } from '@nestjs/jwt';
-import { AuthService } from './auth.service';
-import { AuthController } from './auth.controller';
+import { AuthService } from './business/auth.service';
+import { AuthController } from './presentation/auth.controller';
 import { SupabaseRepository } from '../health/persistence/supabase.repository';
 
 @Module({
@@ -16,4 +16,4 @@ import { SupabaseRepository } from '../health/persistence/supabase.repository';
   providers: [AuthService, SupabaseRepository],
   exports: [JwtModule, AuthService],
 })
-export class AuthModule {}
+export class AuthModule { }

@@ -1,6 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { SupabaseRepository } from '../health/persistence/supabase.repository'; // O donde tengas PrismaClient
+import { SupabaseRepository } from '../../health/persistence/supabase.repository'; // O donde tengas PrismaClient
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -8,7 +8,7 @@ export class AuthService {
   constructor(
     private jwtService: JwtService,
     private prisma: SupabaseRepository,
-  ) {}
+  ) { }
 
   // MODIFICADO: Ahora acepta email y password
   async signIn(

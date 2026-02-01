@@ -21,9 +21,9 @@ import { PulseChart } from '@/components/charts/PulseChart';
 import { WeightChart } from '@/components/charts/WeightChart';
 import { SpO2Chart } from '@/components/charts/SpO2Chart';
 import { CA125Chart } from '@/components/charts/CA125Chart';
-import { HistoryGridView } from '@/components/HistoryGridView';
-import { HistoryTableView } from '@/components/HistoryTableView';
-import { HealthDataForm } from '@/components/HealthDataForm';
+import { HistoryGridView } from '@/components/health-history/HistoryGridView';
+import { HistoryTableView } from '@/components/health-history/HistoryTableView';
+import { HealthDataForm } from '@/components/health-entry/HealthDataForm';
 
 interface DashboardProps {
   initialMetrics: HealthMetric[];

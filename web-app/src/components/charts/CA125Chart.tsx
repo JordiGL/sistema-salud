@@ -4,7 +4,7 @@ import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tool
 import { TestTube2, Loader2, FileSpreadsheet, FileCode } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { HealthMetric, metricApi } from '@/lib/api';
-import { StatsSummary } from './StatsSummary';
+import { StatsSummary } from '@/components/dashboard/StatsSummary';
 import { downloadCSV, downloadXML } from '@/lib/export-utils';
 
 const CustomXAxisTick = ({ x, y, payload }: any) => {
@@ -46,9 +46,9 @@ export function CA125Chart({ data: initialData }: { data: HealthMetric[] }) {
     const loadFilteredData = async () => {
       setLoading(true);
       try {
-        const newData = await metricApi.getAll({ 
-          range: dateRange, 
-          context: contextFilter 
+        const newData = await metricApi.getAll({
+          range: dateRange,
+          context: contextFilter
         });
         setChartData(newData.reverse());
       } catch (error) {
@@ -67,7 +67,7 @@ export function CA125Chart({ data: initialData }: { data: HealthMetric[] }) {
       result = result.filter(d => {
         const dateObj = new Date(d.createdAt);
         const hour = dateObj.getHours();
-        if (timeOfDay === 'am') return hour < 12; 
+        if (timeOfDay === 'am') return hour < 12;
         if (timeOfDay === 'pm') return hour >= 12;
         return true;
       });
@@ -76,15 +76,15 @@ export function CA125Chart({ data: initialData }: { data: HealthMetric[] }) {
   }, [chartData, timeOfDay]);
 
   // CALCULO DE DATOS PARA ESTADÍSTICAS (CA125)
-  const ca125Data = useMemo(() => 
+  const ca125Data = useMemo(() =>
     finalData
       .map(d => d.ca125 || 0)
       .filter(n => n > 0),
-  [finalData]);
+    [finalData]);
 
   return (
     <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col relative overflow-hidden space-y-6">
-      
+
       {loading && (
         <div className="absolute inset-0 bg-white/60 z-10 flex items-center justify-center backdrop-blur-[1px]">
           <div className="bg-white p-3 rounded-full shadow-lg border border-orange-100">
@@ -96,28 +96,28 @@ export function CA125Chart({ data: initialData }: { data: HealthMetric[] }) {
       {/* --- BARRA DE HERRAMIENTAS (HEADER) --- */}
       {/* Sin título, solo controles alineados */}
       <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
-        
+
         {/* GRUPO IZQUIERDO: EXPORTAR */}
         <div className="flex gap-2">
-            <button 
-                onClick={() => downloadCSV(finalData, 'ca125_data', t)}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-500 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:text-orange-600 transition-colors"
-                title="Descargar CSV"
-            >
-                <FileSpreadsheet size={14} /> <span>CSV</span>
-            </button>
-            <button 
-                onClick={() => downloadXML(finalData, 'ca125_data', t)}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-500 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:text-orange-600 transition-colors"
-                title="Descargar XML"
-            >
-                <FileCode size={14} /> <span>XML</span>
-            </button>
+          <button
+            onClick={() => downloadCSV(finalData, 'ca125_data', t)}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-500 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:text-orange-600 transition-colors"
+            title="Descargar CSV"
+          >
+            <FileSpreadsheet size={14} /> <span>CSV</span>
+          </button>
+          <button
+            onClick={() => downloadXML(finalData, 'ca125_data', t)}
+            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-500 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:text-orange-600 transition-colors"
+            title="Descargar XML"
+          >
+            <FileCode size={14} /> <span>XML</span>
+          </button>
         </div>
 
         {/* GRUPO DERECHO: FILTROS */}
         <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center overflow-x-auto pb-1 sm:pb-0">
-          
+
           {/* Rango Fechas - Orange Theme */}
           <div className="flex bg-slate-100 p-1 rounded-xl shrink-0">
             {['7d', '30d', 'all'].map((val) => (
@@ -126,8 +126,8 @@ export function CA125Chart({ data: initialData }: { data: HealthMetric[] }) {
                 onClick={() => setDateRange(val as any)}
                 className={`
                   px-3 py-1.5 text-[11px] font-bold rounded-lg transition-all duration-200
-                  ${dateRange === val 
-                    ? 'bg-white text-orange-700 shadow-sm ring-1 ring-black/5' 
+                  ${dateRange === val
+                    ? 'bg-white text-orange-700 shadow-sm ring-1 ring-black/5'
                     : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
                   }
                 `}
@@ -139,14 +139,14 @@ export function CA125Chart({ data: initialData }: { data: HealthMetric[] }) {
 
           {/* Hora - Orange Theme */}
           <div className="flex bg-slate-100 p-1 rounded-xl shrink-0">
-             {['24h', 'am', 'pm'].map((val) => (
+            {['24h', 'am', 'pm'].map((val) => (
               <button
                 key={val}
                 onClick={() => setTimeOfDay(val as any)}
                 className={`
                   px-3 py-1.5 text-[11px] font-bold rounded-lg transition-all duration-200 uppercase
-                  ${timeOfDay === val 
-                    ? 'bg-white text-orange-700 shadow-sm ring-1 ring-black/5' 
+                  ${timeOfDay === val
+                    ? 'bg-white text-orange-700 shadow-sm ring-1 ring-black/5'
                     : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
                   }
                 `}
@@ -164,7 +164,7 @@ export function CA125Chart({ data: initialData }: { data: HealthMetric[] }) {
               {tFilter('contexts')}
             </span>
             <div className="relative group">
-              <select 
+              <select
                 value={contextFilter}
                 onChange={(e) => setContextFilter(e.target.value)}
                 className="appearance-none bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-bold py-2 pl-3 pr-8 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-orange-100 transition-colors min-w-[100px]"
@@ -175,7 +175,7 @@ export function CA125Chart({ data: initialData }: { data: HealthMetric[] }) {
                 ))}
               </select>
               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-500">
-                <svg className="fill-current h-3 w-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/></svg>
+                <svg className="fill-current h-3 w-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
               </div>
             </div>
           </div>
@@ -195,20 +195,20 @@ export function CA125Chart({ data: initialData }: { data: HealthMetric[] }) {
             <LineChart data={finalData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="colorCa125" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#f97316" stopOpacity={0.1}/>
-                  <stop offset="95%" stopColor="#f97316" stopOpacity={0}/>
+                  <stop offset="5%" stopColor="#f97316" stopOpacity={0.1} />
+                  <stop offset="95%" stopColor="#f97316" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} stroke="#94a3b8" />
               <XAxis dataKey="createdAt" tick={<CustomXAxisTick />} interval={0} axisLine={false} tickLine={false} />
-              <YAxis domain={['auto', 'auto']} tick={{fontSize: 11, fill: '#94a3b8'}} axisLine={false} tickLine={false} tickCount={6} />
-              <Tooltip 
+              <YAxis domain={['auto', 'auto']} tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} tickCount={6} />
+              <Tooltip
                 contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
                 labelStyle={{ color: '#64748b', marginBottom: '0.5rem', fontSize: '12px' }}
-                labelFormatter={(v) => new Date(v).toLocaleString()} 
+                labelFormatter={(v) => new Date(v).toLocaleString()}
               />
-              
-              <Line type="monotone" dataKey="ca125" stroke="#f97316" strokeWidth={3} name="U/ml" dot={{r:4, fill: '#f97316', strokeWidth: 2, stroke: '#fff'}} activeDot={{r:6}} />
+
+              <Line type="monotone" dataKey="ca125" stroke="#f97316" strokeWidth={3} name="U/ml" dot={{ r: 4, fill: '#f97316', strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 6 }} />
             </LineChart>
           </ResponsiveContainer>
         )}
@@ -217,16 +217,16 @@ export function CA125Chart({ data: initialData }: { data: HealthMetric[] }) {
       {/* --- SECCIÓN DE ESTADÍSTICAS --- */}
       {finalData.length > 0 && (
         <div className="pt-6 border-t border-slate-100">
-            {/* Estadísticas sin media para CA125 */}
-            <StatsSummary 
-                label={tCharts('ca125Title')}
-                data={ca125Data} 
-                colorClass="text-orange-700" 
-                bgClass="bg-orange-50"
-                unit="U/ml"
-                legendDotColor="#f97316"
-                showAvg={false} // Hide average
-            />
+          {/* Estadísticas sin media para CA125 */}
+          <StatsSummary
+            label={tCharts('ca125Title')}
+            data={ca125Data}
+            colorClass="text-orange-700"
+            bgClass="bg-orange-50"
+            unit="U/ml"
+            legendDotColor="#f97316"
+            showAvg={false} // Hide average
+          />
         </div>
       )}
     </div>
