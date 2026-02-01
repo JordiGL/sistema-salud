@@ -5,6 +5,8 @@ import { AlertTriangle } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { metricApi } from '@/lib/api';
 import { toast } from 'sonner';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from "@/components/ui/button";
 
 interface DeleteMetricModalProps {
   isOpen: boolean;
@@ -20,8 +22,8 @@ export function DeleteMetricModal({ isOpen, onClose, metricId, onSuccess }: Dele
   const handleDelete = async () => {
     setIsSubmitting(true);
     try {
-      await metricApi.delete(metricId); // NOVA CRIDA
-      toast.success(t('History.delete')); // Feedback 
+      await metricApi.delete(metricId);
+      toast.success(t('History.delete'));
       onSuccess();
       onClose();
     } catch (e: any) {
@@ -34,29 +36,33 @@ export function DeleteMetricModal({ isOpen, onClose, metricId, onSuccess }: Dele
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in">
-      <div className="bg-white rounded-2xl p-6 max-w-sm w-full shadow-2xl">
-        <div className="flex flex-col items-center text-center gap-4">
-          <div className="bg-red-100 p-3 rounded-full text-red-600"><AlertTriangle size={32} /></div>
-          <h3 className="text-lg font-bold text-slate-800">{t('History.deleteTitle')}</h3>
-
-          <div className="flex gap-3 w-full mt-2">
-            <button
-              onClick={onClose}
-              className="flex-1 py-3 rounded-xl border border-slate-200 font-bold text-slate-600 hover:bg-slate-50 transition-colors"
-            >
-              {t('History.cancel')}
-            </button>
-            <button
-              onClick={handleDelete}
-              disabled={isSubmitting}
-              className="flex-1 py-3 rounded-xl bg-red-500 text-white font-bold hover:bg-red-600 disabled:opacity-50 transition-colors"
-            >
-              {t('History.delete')}
-            </button>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-sm">
+        <DialogHeader>
+          <div className="flex flex-col items-center text-center gap-4">
+            <div className="bg-red-100 p-3 rounded-full text-red-600"><AlertTriangle size={32} /></div>
+            <DialogTitle className="text-lg font-bold text-slate-800 text-center">{t('History.deleteTitle')}</DialogTitle>
           </div>
+        </DialogHeader>
+
+        <div className="flex gap-3 w-full mt-2">
+          <Button
+            variant="outline"
+            onClick={onClose}
+            className="flex-1 py-6 rounded-xl font-bold text-slate-600"
+          >
+            {t('History.cancel')}
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={handleDelete}
+            disabled={isSubmitting}
+            className="flex-1 py-6 rounded-xl font-bold"
+          >
+            {t('History.delete')}
+          </Button>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

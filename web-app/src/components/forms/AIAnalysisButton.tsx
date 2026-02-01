@@ -1,5 +1,6 @@
 import { Camera, Loader2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
+import { Button } from "@/components/ui/button";
 
 interface AIAnalysisButtonProps {
     isScanning: boolean;
@@ -28,16 +29,18 @@ export function AIAnalysisButton({
                 ref={fileInputRef}
                 onChange={onFileChange}
             />
-            <button
+            <Button
                 type="button"
+                variant="outline"
+                size="sm"
                 onClick={onButtonClick}
                 disabled={isScanning || isSubmitting}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-50 text-black hover:bg-slate-100 transition-colors text-xs font-bold disabled:opacity-50 uppercase tracking-wide border border-indigo-100"
+                className="gap-2 bg-slate-50 text-black border-indigo-100 uppercase tracking-wide"
                 title={t('Form.aiButtonTitle')}
             >
                 {isScanning ? <Loader2 size={16} className="animate-spin" /> : <Camera size={16} />}
                 <span className="hidden sm:inline">{isScanning ? t('Form.aiScanning') : t('Form.aiButtonLabel')}</span>
-            </button>
+            </Button>
         </div>
     );
 }

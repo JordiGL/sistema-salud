@@ -6,6 +6,7 @@ import { Lock, ArrowRight, Loader2, Mail } from 'lucide-react'; // Añadimos ico
 import { authApi } from '@/lib/api';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
+import { Button } from "@/components/ui/button";
 
 export default function LoginPage() {
   const t = useTranslations('Login');
@@ -88,12 +89,12 @@ export default function LoginPage() {
             <p className="text-xs text-red-500 text-center font-bold">{t('errorCredentials')}</p>
           )}
 
-          <button
+          <Button
             disabled={loading || !password || !email}
-            className="w-full bg-slate-900 text-white py-4 rounded-xl font-bold hover:bg-slate-800 transition-all flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full h-auto py-4 rounded-xl font-bold bg-slate-900 hover:bg-slate-800 text-white shadow-lg transition-all flex items-center justify-center gap-2"
           >
             {loading ? <Loader2 className="animate-spin" /> : <>{t('button')} <ArrowRight size={18} /></>}
-          </button>
+          </Button>
         </form>
       </div>
     </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { Scale, Loader2, FileSpreadsheet, FileCode } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { metricApi } from '@/lib/api';
@@ -9,7 +9,13 @@ import { Metric } from '@/types/metrics';
 import { StatsSummary } from '@/components/dashboard/StatsSummary';
 import { downloadCSV, downloadXML } from '@/lib/export-utils';
 
-const CustomXAxisTick = ({ x, y, payload }: any) => {
+import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card";
+import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartConfig } from "@/components/ui/chart";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+
+const CustomXAxisTick = ({ x, y, payload, hideTime }: any) => {
   const date = new Date(payload.value);
   return (
     <g transform={`translate(${x},${y})`}>
@@ -17,13 +23,22 @@ const CustomXAxisTick = ({ x, y, payload }: any) => {
         <tspan x="0" dy="0">
           {date.toLocaleDateString(undefined, { day: '2-digit', month: '2-digit' })}
         </tspan>
-        <tspan x="0" dy="14">
-          {date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
-        </tspan>
+        {!hideTime && (
+          <tspan x="0" dy="14">
+            {date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
+          </tspan>
+        )}
       </text>
     </g>
   );
 };
+
+const chartConfig = {
+  weight: {
+    label: "Peso (Kg)",
+    color: "#2563eb",
+  },
+} satisfies ChartConfig;
 
 export function WeightChart({ data: initialData }: { data: Metric[] }) {
   const t = useTranslations();
@@ -34,9 +49,9 @@ export function WeightChart({ data: initialData }: { data: Metric[] }) {
   const [chartData, setChartData] = useState<Metric[]>(initialData);
   const [loading, setLoading] = useState(false);
 
-  const [dateRange, setDateRange] = useState<'7d' | '30d' | 'all'>('all');
+  const [dateRange, setDateRange] = useState<string>('all');
   const [locationFilter, setLocationFilter] = useState<string>('all');
-  const [timeOfDay, setTimeOfDay] = useState<'24h' | 'am' | 'pm'>('24h');
+  const [timeOfDay, setTimeOfDay] = useState<string>('24h');
 
   // Obtener LUGARES únicos
   const availableLocations = useMemo(() => {
@@ -51,9 +66,8 @@ export function WeightChart({ data: initialData }: { data: Metric[] }) {
     const loadFilteredData = async () => {
       setLoading(true);
       try {
-        // 2. CANVI: Usem metricApi.getAll en lloc de fetchMetrics
         const newData = await metricApi.getAll({
-          range: dateRange,
+          range: dateRange as any,
           location: locationFilter
         });
         setChartData(newData.reverse());
@@ -90,8 +104,7 @@ export function WeightChart({ data: initialData }: { data: Metric[] }) {
     [finalData]);
 
   return (
-    <div className="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 flex flex-col relative overflow-hidden space-y-6">
-
+    <Card className="w-full relative overflow-hidden border-slate-100 shadow-sm rounded-3xl">
       {loading && (
         <div className="absolute inset-0 bg-white/60 z-10 flex items-center justify-center backdrop-blur-[1px]">
           <div className="bg-white p-3 rounded-full shadow-lg border border-blue-100">
@@ -101,66 +114,49 @@ export function WeightChart({ data: initialData }: { data: Metric[] }) {
       )}
 
       {/* --- BARRA DE HERRAMIENTAS (HEADER) --- */}
-      <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
-
+      <CardHeader className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 p-6">
         {/* GRUPO IZQUIERDO: EXPORTAR */}
         <div className="flex gap-2">
-          <button
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() => downloadCSV(finalData, 'peso_data', t)}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-500 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:text-blue-600 transition-colors"
+            className="gap-1.5 text-xs font-bold text-slate-500 bg-white border-slate-200 hover:bg-slate-50 hover:text-blue-600"
             title="Descargar CSV"
           >
             <FileSpreadsheet size={14} /> <span>CSV</span>
-          </button>
-          <button
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() => downloadXML(finalData, 'peso_data', t)}
-            className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-500 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:text-blue-600 transition-colors"
+            className="gap-1.5 text-xs font-bold text-slate-500 bg-white border-slate-200 hover:bg-slate-50 hover:text-blue-600"
             title="Descargar XML"
           >
             <FileCode size={14} /> <span>XML</span>
-          </button>
+          </Button>
         </div>
 
         {/* GRUPO DERECHO: FILTROS */}
         <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center overflow-x-auto pb-1 sm:pb-0">
 
           {/* Rango Fechas */}
-          <div className="flex bg-slate-100 p-1 rounded-xl shrink-0">
-            {['7d', '30d', 'all'].map((val) => (
-              <button
-                key={val}
-                onClick={() => setDateRange(val as any)}
-                className={`
-                  px-3 py-1.5 text-[11px] font-bold rounded-lg transition-all duration-200
-                  ${dateRange === val
-                    ? 'bg-white text-blue-600 shadow-sm ring-1 ring-black/5'
-                    : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
-                  }
-                `}
-              >
-                {val === '7d' ? tFilter('7days') : val === '30d' ? tFilter('30days') : tFilter('all')}
-              </button>
-            ))}
-          </div>
+          <Tabs value={dateRange} onValueChange={setDateRange} className="shrink-0">
+            <TabsList className="bg-slate-100 h-9 p-1 rounded-xl">
+              <TabsTrigger value="7d" className="text-[11px] h-7 rounded-lg data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm">{tFilter('7days')}</TabsTrigger>
+              <TabsTrigger value="30d" className="text-[11px] h-7 rounded-lg data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm">{tFilter('30days')}</TabsTrigger>
+              <TabsTrigger value="all" className="text-[11px] h-7 rounded-lg data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm">{tFilter('all')}</TabsTrigger>
+            </TabsList>
+          </Tabs>
 
           {/* Hora */}
-          <div className="flex bg-slate-100 p-1 rounded-xl shrink-0">
-            {['24h', 'am', 'pm'].map((val) => (
-              <button
-                key={val}
-                onClick={() => setTimeOfDay(val as any)}
-                className={`
-                  px-3 py-1.5 text-[11px] font-bold rounded-lg transition-all duration-200 uppercase
-                  ${timeOfDay === val
-                    ? 'bg-white text-blue-600 shadow-sm ring-1 ring-black/5'
-                    : 'text-slate-500 hover:text-slate-700 hover:bg-slate-200/50'
-                  }
-                `}
-              >
-                {tFilter(val)}
-              </button>
-            ))}
-          </div>
+          <Tabs value={timeOfDay} onValueChange={setTimeOfDay} className="shrink-0">
+            <TabsList className="bg-slate-100 h-9 p-1 rounded-xl">
+              <TabsTrigger value="24h" className="text-[11px] h-7 rounded-lg uppercase data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm">{tFilter('24h')}</TabsTrigger>
+              <TabsTrigger value="am" className="text-[11px] h-7 rounded-lg uppercase data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm">{tFilter('am')}</TabsTrigger>
+              <TabsTrigger value="pm" className="text-[11px] h-7 rounded-lg uppercase data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm">{tFilter('pm')}</TabsTrigger>
+            </TabsList>
+          </Tabs>
 
           <div className="hidden sm:block w-px h-6 bg-slate-200 mx-1"></div>
 
@@ -169,44 +165,41 @@ export function WeightChart({ data: initialData }: { data: Metric[] }) {
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider hidden md:inline">
               {tFilter('location')}
             </span>
-            <div className="relative group">
-              <select
-                value={locationFilter}
-                onChange={(e) => setLocationFilter(e.target.value)}
-                className="appearance-none bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 text-xs font-semibold py-2 pl-3 pr-8 rounded-lg cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-100 transition-colors min-w-[100px]"
-              >
-                <option value="all">{tFilter('allContexts')}</option>
-                {availableLocations.map((loc: any, idx) => (
-                  <option key={idx} value={loc}>{loc}</option>
+            <Select value={locationFilter} onValueChange={setLocationFilter}>
+              <SelectTrigger className="h-9 min-w-[100px] text-xs font-bold border-slate-200 bg-slate-50 hover:bg-slate-100 focus:ring-blue-100">
+                <SelectValue placeholder={tFilter('allContexts')} />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">{tFilter('allContexts')}</SelectItem>
+                {availableLocations.map((loc: any) => (
+                  <SelectItem key={loc} value={loc}>{loc}</SelectItem>
                 ))}
-              </select>
-              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-slate-500">
-                <svg className="fill-current h-3 w-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
-              </div>
-            </div>
+              </SelectContent>
+            </Select>
           </div>
         </div>
-      </div>
+      </CardHeader>
 
-      <div className="w-full h-[400px]">
+      <CardContent>
         {finalData.length === 0 ? (
-          <div className="h-full flex flex-col items-center justify-center text-gray-400 animate-in fade-in duration-500">
+          <div className="h-[400px] flex flex-col items-center justify-center text-gray-400 animate-in fade-in duration-500">
             <div className="p-4 bg-slate-50 rounded-full mb-3">
               <Scale size={32} className="opacity-20 text-slate-500" />
             </div>
             <p className="font-medium text-sm text-slate-500">{tCharts('noData')}</p>
           </div>
         ) : (
-          <ResponsiveContainer width="100%" height="100%">
+          <ChartContainer config={chartConfig} className="w-full h-[400px]">
             <LineChart data={finalData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-              <defs>
-                <linearGradient id="colorWeight" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="#2563eb" stopOpacity={0.1} />
-                  <stop offset="95%" stopColor="#2563eb" stopOpacity={0} />
-                </linearGradient>
-              </defs>
               <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} stroke="#94a3b8" />
-              <XAxis dataKey="createdAt" tick={<CustomXAxisTick />} interval={0} axisLine={false} tickLine={false} />
+              <XAxis
+                dataKey="createdAt"
+                tick={(props) => <CustomXAxisTick {...props} hideTime={finalData.length > 30} />}
+                interval="preserveStartEnd"
+                minTickGap={50}
+                axisLine={false}
+                tickLine={false}
+              />
 
               <YAxis
                 domain={[40, 'auto']}
@@ -216,21 +209,78 @@ export function WeightChart({ data: initialData }: { data: Metric[] }) {
                 tickCount={6}
               />
 
-              <Tooltip
-                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
-                labelStyle={{ color: '#64748b', marginBottom: '0.5rem', fontSize: '12px' }}
-                labelFormatter={(v) => new Date(v).toLocaleString()}
-              />
+              <ChartTooltip
+                cursor={{ stroke: '#e2e8f0', strokeWidth: 2 }}
+                content={
+                  <ChartTooltipContent
+                    indicator="dot"
+                    className="w-[200px] rounded-2xl border-none shadow-2xl bg-white/95 backdrop-blur-md p-3"
+                    labelFormatter={(value, payload) => {
+                      const rawDate = value || (payload && payload[0]?.payload?.createdAt);
+                      if (!rawDate) return null;
+                      const date = new Date(rawDate);
 
-              <Line type="monotone" dataKey="weight" stroke="#2563eb" strokeWidth={3} name="Kg" dot={{ r: 4, fill: '#2563eb', strokeWidth: 2, stroke: '#fff' }} />
+                      return (
+                        <div className="flex flex-col border-b border-slate-100 pb-2 mb-2">
+                          <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                            {t('History.cols.date')}
+                          </span>
+                          <span className="text-xs font-bold text-slate-700">
+                            {date.toLocaleDateString('es-ES', {
+                              day: 'numeric',
+                              month: 'numeric',
+                              year: 'numeric',
+                            })}
+                            <span className="mx-1 text-slate-300">|</span>
+                            {date.toLocaleTimeString('es-ES', {
+                              hour: '2-digit',
+                              minute: '2-digit',
+                              hour12: false,
+                            })}
+                          </span>
+                        </div>
+                      );
+                    }}
+                    formatter={(value, name, item) => (
+                      <div className="flex flex-col gap-2 w-full">
+                        {/* Fila del Pes */}
+                        <div className="flex items-center justify-between w-full my-0.5">
+                          <span className="text-slate-500 text-xs font-medium">
+                            {tCharts('weightTitle')}
+                          </span>
+                          <span className="font-bold text-slate-900 text-sm">
+                            {value}
+                            <span className="ml-1 font-normal text-[10px] text-slate-400 uppercase">
+                              Kg
+                            </span>
+                          </span>
+                        </div>
+
+                        {/* Fila del Lloc (si existeix) */}
+                        {item.payload.weightLocation && (
+                          <div className="flex items-center justify-between w-full pt-1.5 border-t border-slate-50">
+                            <span className="text-slate-400 text-[10px] uppercase font-bold tracking-tight">
+                              {tFilter('location')}
+                            </span>
+                            <span className="text-slate-600 text-[11px] font-semibold italic">
+                              {item.payload.weightLocation}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  />
+                }
+              />
+              <Line type="monotone" dataKey="weight" stroke="var(--color-weight)" strokeWidth={3} dot={{ r: 4, fill: "var(--color-weight)", strokeWidth: 2, stroke: '#fff' }} />
             </LineChart>
-          </ResponsiveContainer>
+          </ChartContainer>
         )}
-      </div>
+      </CardContent>
 
       {/* --- SECCIÓN DE ESTADÍSTICAS --- */}
       {finalData.length > 0 && (
-        <div className="pt-6 border-t border-slate-100">
+        <CardFooter className="pt-6 border-t border-slate-100 block">
           <StatsSummary
             label={tCharts('weightTitle')}
             data={weightData}
@@ -240,8 +290,8 @@ export function WeightChart({ data: initialData }: { data: Metric[] }) {
             legendDotColor="#2563eb"
             showAvg={false}
           />
-        </div>
+        </CardFooter>
       )}
-    </div>
+    </Card>
   );
 }

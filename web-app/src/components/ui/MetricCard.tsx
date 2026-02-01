@@ -8,6 +8,8 @@ import { HealthCriteria, STATUS_COLORS, HealthStatus } from '@/lib/health-criter
 import { useMetricManager } from '@/hooks/useMetricManager';
 import { EditMetricModal } from '@/components/modals/EditMetricModal';
 import { DeleteMetricModal } from '@/components/modals/DeleteMetricModal';
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 interface MetricCardProps {
   data: Metric;
@@ -44,24 +46,28 @@ export function MetricCard({ data, isAdmin, onRefresh }: MetricCardProps) {
 
   return (
     <>
-      <div className={`bg-white rounded-xl shadow-sm border border-slate-100 p-5 ${cardStyles.border} border-l-[6px] flex flex-col gap-4 hover:shadow-md transition-shadow relative overflow-hidden`}>
+      <Card className={`rounded-xl shadow-sm border-slate-100 ${cardStyles.border} border-l-[6px] hover:shadow-md transition-shadow overflow-hidden bg-white`}>
         {/* CABECERA */}
-        <div className="flex justify-between items-start border-b border-slate-50 pb-3">
+        <CardHeader className="p-5 pb-3 border-b border-slate-50 flex-row justify-between items-start space-y-0">
           <div className="flex flex-col">
             <span className="text-sm font-bold text-slate-700 bg-slate-100 px-2 py-1 rounded-md w-fit">
               {dateObj.toLocaleDateString()} <span className="text-slate-400 mx-1">|</span> {dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </span>
           </div>
           {isAdmin && (
-            <div className="flex gap-3">
-              <button onClick={() => setIsEditModalOpen(true)} className="flex items-center gap-1 text-xs font-semibold text-blue-600 hover:text-blue-800 transition-colors p-1 hover:bg-blue-50 rounded"><Pencil size={14} /> {t('History.edit')}</button>
-              <button onClick={() => setIsDeleteModalOpen(true)} className="flex items-center gap-1 text-xs font-semibold text-red-500 hover:text-red-700 transition-colors p-1 hover:bg-red-50 rounded"><Trash2 size={14} /> {t('History.delete')}</button>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={() => setIsEditModalOpen(true)} className="h-8 text-xs font-semibold gap-1">
+                <Pencil size={14} /> {t('History.edit')}
+              </Button>
+              <Button variant="destructive" size="sm" onClick={() => setIsDeleteModalOpen(true)} className="h-8 text-xs font-semibold gap-1">
+                <Trash2 size={14} /> {t('History.delete')}
+              </Button>
             </div>
           )}
-        </div>
+        </CardHeader>
 
         {/* CUERPO */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-y-6 gap-x-2">
+        <CardContent className="p-5 grid grid-cols-2 sm:grid-cols-3 gap-y-6 gap-x-2">
           {data.bloodPressure && (
             <div className="flex flex-col">
               <span className="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-1 mb-1 tracking-wider"><Activity size={12} /> {t('Form.bpLabel')}</span>
@@ -97,16 +103,17 @@ export function MetricCard({ data, isAdmin, onRefresh }: MetricCardProps) {
               <div className="text-2xl font-bold text-slate-800 flex items-baseline gap-1">{data.ca125}</div>
             </div>
           )}
-        </div>
 
-        {/* FOOTER */}
-        {(data.measurementContext || data.notes) && (
-          <div className="bg-slate-50 p-3 rounded-lg mt-1 text-sm border border-slate-100/80">
-            {data.measurementContext && <div className="mb-1 text-purple-700 font-bold text-xs uppercase tracking-wide">{renderContext(data.measurementContext)}</div>}
-            {data.notes && <div className="text-slate-600 italic flex gap-2 items-start text-[13px] leading-relaxed"><FileText size={14} className="mt-1 opacity-40 flex-shrink-0 text-slate-500" /><span>{data.notes}</span></div>}
-          </div>
-        )}
-      </div>
+
+          {/* FOOTER */}
+          {(data.measurementContext || data.notes) && (
+            <div className="bg-slate-50 p-3 rounded-lg mt-1 text-sm border border-slate-100/80 col-span-full">
+              {data.measurementContext && <div className="mb-1 text-purple-700 font-bold text-xs uppercase tracking-wide">{renderContext(data.measurementContext)}</div>}
+              {data.notes && <div className="text-slate-600 italic flex gap-2 items-start text-[13px] leading-relaxed"><FileText size={14} className="mt-1 opacity-40 flex-shrink-0 text-slate-500" /><span>{data.notes}</span></div>}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       <DeleteMetricModal
         isOpen={isDeleteModalOpen}

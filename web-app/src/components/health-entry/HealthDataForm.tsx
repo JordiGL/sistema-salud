@@ -2,14 +2,39 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import * as z from 'zod';
 import {
     Heart, Scale, Save, RotateCcw,
     ChevronDown, ChevronUp, Plus, Loader2
 } from 'lucide-react';
 import { useMetricManager } from '@/hooks/useMetricManager';
-import { useHealthForm } from '@/hooks/useHealthForm';
 import { useHealthAnalysis } from '@/hooks/useHealthAnalysis';
 import { AIAnalysisButton } from '@/components/forms/AIAnalysisButton';
+import { metricSchema, MetricFormValues, MetricFormInput } from '@/lib/schemas';
+import { metricApi, ApiError } from '@/lib/api';
+import { toast } from 'sonner';
+
+import {
+    Form,
+    FormControl,
+    FormField,
+    FormItem,
+    FormLabel,
+    FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Button } from "@/components/ui/button";
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from "@/components/ui/select";
+import { Metric } from '@/types/metrics';
 
 interface HealthDataFormProps {
     onSuccess: () => void;
@@ -18,16 +43,21 @@ interface HealthDataFormProps {
 export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
     const t = useTranslations();
     const { contextOptions, locationOptions, translateOption } = useMetricManager();
+    const [isOpen, setIsOpen] = useState(false);
 
-    // Custom Hooks
-    const {
-        formData,
-        isSubmitting,
-        updateField,
-        updateFromAnalysis,
-        resetForm,
-        handleSubmit
-    } = useHealthForm({ onSuccess });
+    const form = useForm<MetricFormInput>({
+        resolver: zodResolver(metricSchema) as any,
+        defaultValues: {
+            bloodPressure: '',
+            pulse: '', // String inputs for easier handling of empty states
+            spo2: '',
+            ca125: '',
+            weight: '',
+            notes: '',
+            measurementContext: '',
+            weightLocation: ''
+        },
+    });
 
     const {
         isScanning,
@@ -36,28 +66,48 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
         triggerFileInput
     } = useHealthAnalysis();
 
-    const [isOpen, setIsOpen] = useState(false);
-
-    // Integració Hooks: Quan la càmera captura, actualitzem el formulari
+    // Integració AI
     const handleCameraCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
         const result = await analyzeImage(file);
         if (result) {
-            updateFromAnalysis(result);
+            // Actualizar formulario
+            if (result.bloodPressure) form.setValue('bloodPressure', result.bloodPressure);
+            if (result.pulse) form.setValue('pulse', result.pulse.toString() as any);
+            if (result.spo2) form.setValue('spo2', result.spo2.toString() as any);
+            if (result.weight) form.setValue('weight', result.weight.toString() as any);
+
+            const currentNotes = form.getValues('notes');
+            if (!currentNotes) {
+                form.setValue('notes', result.bloodPressure || result.weight || result.spo2 ? t('Form.aiAutoNote') : '');
+            }
+
             if (!isOpen) setIsOpen(true);
+        }
+    };
+
+    const onSubmit = async (data: MetricFormValues) => {
+        try {
+            await metricApi.create(data);
+            form.reset();
+            toast.success(t('HomePage.saveButton'));
+            onSuccess();
+        } catch (err: any) {
+            if (err instanceof ApiError && err.message === "UNAUTHORIZED") {
+                toast.error(t('HomePage.sessionExpired'));
+            } else {
+                toast.error(err.message || t('HomePage.errorSaving'));
+            }
         }
     };
 
     const handleResetClick = (e: React.MouseEvent) => {
         e.stopPropagation();
         e.preventDefault();
-        resetForm();
+        form.reset();
     };
-
-    const inputClasses = "w-full p-2 border border-slate-200 rounded-lg focus:ring-2 focus:ring-slate-500 focus:border-slate-500 outline-none transition-all shadow-sm text-slate-800 placeholder:text-slate-300";
-    const labelClasses = "block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1";
 
     return (
         <div className={`bg-white rounded-2xl shadow-sm border border-slate-200 mt-8 animate-in fade-in slide-in-from-bottom-4 duration-700 overflow-hidden transition-all ${isOpen ? 'ring-1 ring-slate-200' : ''}`}>
@@ -80,7 +130,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                 <div className="flex items-center gap-4">
                     <AIAnalysisButton
                         isScanning={isScanning}
-                        isSubmitting={isSubmitting}
+                        isSubmitting={form.formState.isSubmitting}
                         fileInputRef={fileInputRef}
                         onFileChange={handleCameraCapture}
                         onButtonClick={triggerFileInput}
@@ -95,85 +145,177 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
             {/* CUERPO DEL FORMULARIO */}
             {isOpen && (
                 <div className="p-6 animate-in slide-in-from-top-2 duration-300">
-                    <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                    <Form {...form}>
+                        <form onSubmit={form.handleSubmit(onSubmit as any)} className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-                        {/* SECCIÓN 1: DATOS FISIOLÓGICOS */}
-                        <div className="lg:col-span-8 p-5 rounded-xl border border-slate-200 bg-slate-50/30">
-                            <div className="flex items-center gap-2 mb-4 text-slate-700 font-bold border-b border-slate-200 pb-2">
-                                <Heart size={18} /> {t('Form.physiologicalData')}
-                            </div>
-
-                            <div className="mb-4">
-                                <label className={labelClasses}>{t('Form.contextLabel')}</label>
-
-                                {/* SELECTOR DINÁMICO DE CONTEXTO */}
-                                <select
-                                    className={`${inputClasses} bg-white`}
-                                    value={formData.measurementContext}
-                                    onChange={e => updateField('measurementContext', e.target.value)}
-                                >
-                                    <option value="">{t('Form.contextPlaceholder')}</option>
-                                    {contextOptions.map((opt) => (
-                                        <option key={opt.key} value={opt.key}>
-                                            {translateOption('ContextOptions', opt)}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                <div><label className={labelClasses}>{t('Form.bpLabel')}</label><input type="text" placeholder="120/80" className={`${inputClasses} text-center font-mono`} value={formData.bloodPressure} onChange={e => updateField('bloodPressure', e.target.value)} /></div>
-                                <div><label className={labelClasses}>{t('Form.pulseLabel')}</label><input type="number" placeholder="80" className={`${inputClasses} text-center font-mono`} value={formData.pulse} onChange={e => updateField('pulse', e.target.value)} /></div>
-                                <div><label className={labelClasses}>{t('Form.spo2Label')}</label><input type="number" placeholder="98" className={`${inputClasses} text-center font-mono`} value={formData.spo2} onChange={e => updateField('spo2', e.target.value)} /></div>
-                                <div><label className={labelClasses}>{t('Form.ca125Label')}</label><input type="number" placeholder="35.5" className={`${inputClasses} text-center font-mono`} value={formData.ca125} onChange={e => updateField('ca125', e.target.value)} /></div>
-                            </div>
-                        </div>
-
-                        {/* SECCIÓN 2: CONTROL DE PESO */}
-                        <div className="lg:col-span-4 p-5 rounded-xl border border-slate-200 bg-slate-50/30 flex flex-col h-full">
-                            <div className="flex items-center gap-2 mb-4 text-slate-700 font-bold border-b border-slate-200 pb-2">
-                                <Scale size={18} /> {t('Form.weightControl')}
-                            </div>
-                            <div className="space-y-4 grow">
-                                <div>
-                                    <label className={labelClasses}>{t('Form.locationLabel')}</label>
-
-                                    {/* SELECTOR DINÁMICO DE LUGAR */}
-                                    <select
-                                        className={`${inputClasses} bg-white`}
-                                        value={formData.weightLocation}
-                                        onChange={e => updateField('weightLocation', e.target.value)}
-                                    >
-                                        <option value="">{t('Form.locationPlaceholder')}</option>
-                                        {locationOptions.map((opt) => (
-                                            <option key={opt.key} value={opt.key}>
-                                                {translateOption('LocationOptions', opt)}
-                                            </option>
-                                        ))}
-                                    </select>
+                            {/* SECCIÓN 1: DATOS FISIOLÓGICOS */}
+                            <div className="lg:col-span-8 p-5 rounded-xl border border-slate-200 bg-slate-50/30">
+                                <div className="flex items-center gap-2 mb-4 text-slate-700 font-bold border-b border-slate-200 pb-2">
+                                    <Heart size={18} /> {t('Form.physiologicalData')}
                                 </div>
-                                <div><label className={labelClasses}>{t('Form.weightLabel')}</label><input type="number" placeholder="75.5" className={`${inputClasses} text-center font-mono text-lg`} value={formData.weight} onChange={e => updateField('weight', e.target.value)} /></div>
-                            </div>
-                        </div>
 
-                        {/* FILA INFERIOR */}
-                        <div className="lg:col-span-12 space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">{t('Form.notes')}</label>
-                                <textarea className="w-full p-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-slate-400 outline-none h-20 resize-none shadow-sm placeholder:text-slate-300 text-slate-700 transition-all" placeholder={t('Form.notesPlaceholder')} value={formData.notes} onChange={e => updateField('notes', e.target.value)} />
+                                <div className="mb-4">
+                                    <FormField
+                                        control={form.control}
+                                        name="measurementContext"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('Form.contextLabel')}</FormLabel>
+                                                <Select onValueChange={field.onChange} defaultValue={field.value ?? undefined} value={field.value || ""}>
+                                                    <FormControl>
+                                                        <SelectTrigger className="bg-white">
+                                                            <SelectValue placeholder={t('Form.contextPlaceholder')} />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        {contextOptions.map((opt) => (
+                                                            <SelectItem key={opt.key} value={opt.key}>
+                                                                {translateOption('ContextOptions', opt)}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    <FormField
+                                        control={form.control}
+                                        name="bloodPressure"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('Form.bpLabel')}</FormLabel>
+                                                <FormControl>
+                                                    <Input placeholder="120/80" className="text-center font-mono bg-white" {...field} value={field.value || ''} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="pulse"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('Form.pulseLabel')}</FormLabel>
+                                                <FormControl>
+                                                    <Input type="number" placeholder="80" className="text-center font-mono bg-white" {...field} value={field.value || ''} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="spo2"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('Form.spo2Label')}</FormLabel>
+                                                <FormControl>
+                                                    <Input type="number" placeholder="98" className="text-center font-mono bg-white" {...field} value={field.value || ''} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="ca125"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('Form.ca125Label')}</FormLabel>
+                                                <FormControl>
+                                                    <Input type="number" placeholder="35.5" className="text-center font-mono bg-white" {...field} value={field.value || ''} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
                             </div>
 
-                            <div className="flex gap-3">
-                                <button type="button" onClick={handleResetClick} className="px-6 py-4 rounded-xl font-bold text-slate-500 bg-white border border-slate-200 hover:bg-slate-50 hover:text-slate-700 hover:border-slate-300 transition-all flex items-center gap-2" title={t('Form.clearTitle')}>
-                                    <RotateCcw size={18} /> <span className="hidden sm:inline">{t('HomePage.clear') || 'Limpiar'}</span>
-                                </button>
-                                <button type="submit" disabled={isSubmitting} className="flex-1 bg-slate-900 text-white py-4 rounded-xl hover:bg-slate-800 font-bold text-lg shadow-lg hover:shadow-xl transition-all transform active:scale-[0.99] flex justify-center items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed">
-                                    {isSubmitting ? <Loader2 size={20} className="animate-spin" /> : <><Save size={20} /> {t('HomePage.saveButton')}</>}
-                                </button>
+                            {/* SECCIÓN 2: CONTROL DE PESO */}
+                            <div className="lg:col-span-4 p-5 rounded-xl border border-slate-200 bg-slate-50/30 flex flex-col h-full">
+                                <div className="flex items-center gap-2 mb-4 text-slate-700 font-bold border-b border-slate-200 pb-2">
+                                    <Scale size={18} /> {t('Form.weightControl')}
+                                </div>
+                                <div className="space-y-4 grow">
+                                    <FormField
+                                        control={form.control}
+                                        name="weightLocation"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('Form.locationLabel')}</FormLabel>
+                                                <Select onValueChange={field.onChange} defaultValue={field.value ?? undefined} value={field.value || ""}>
+                                                    <FormControl>
+                                                        <SelectTrigger className="bg-white">
+                                                            <SelectValue placeholder={t('Form.locationPlaceholder')} />
+                                                        </SelectTrigger>
+                                                    </FormControl>
+                                                    <SelectContent>
+                                                        {locationOptions.map((opt) => (
+                                                            <SelectItem key={opt.key} value={opt.key}>
+                                                                {translateOption('LocationOptions', opt)}
+                                                            </SelectItem>
+                                                        ))}
+                                                    </SelectContent>
+                                                </Select>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                    <FormField
+                                        control={form.control}
+                                        name="weight"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('Form.weightLabel')}</FormLabel>
+                                                <FormControl>
+                                                    <Input type="number" placeholder="75.5" className="text-center font-mono text-lg bg-white" {...field} value={field.value || ''} />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+                                </div>
                             </div>
-                        </div>
 
-                    </form>
+                            {/* FILA INFERIOR */}
+                            <div className="lg:col-span-12 space-y-4">
+                                <FormField
+                                    control={form.control}
+                                    name="notes"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel className="text-sm font-medium text-slate-700">{t('Form.notes')}</FormLabel>
+                                            <FormControl>
+                                                <Textarea
+                                                    placeholder={t('Form.notesPlaceholder')}
+                                                    className="resize-none h-20 bg-white"
+                                                    {...field}
+                                                    value={field.value || ''}
+                                                />
+                                            </FormControl>
+                                            <FormMessage />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                <div className="flex gap-3">
+                                    <Button type="button" variant="outline" onClick={handleResetClick} className="h-auto px-6 py-4 rounded-xl font-bold text-slate-500 border-slate-200 hover:text-slate-700 hover:border-slate-300" title={t('Form.clearTitle')}>
+                                        <RotateCcw size={18} /> <span className="hidden sm:inline">{t('HomePage.clear') || 'Limpiar'}</span>
+                                    </Button>
+                                    <Button type="submit" disabled={form.formState.isSubmitting} className="flex-1 h-auto py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl">
+                                        {form.formState.isSubmitting ? <Loader2 size={20} className="animate-spin" /> : <><Save size={20} /> {t('HomePage.saveButton')}</>}
+                                    </Button>
+                                </div>
+                            </div>
+
+                        </form>
+                    </Form>
                 </div>
             )}
         </div>

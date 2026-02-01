@@ -1,9 +1,31 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { X, Save, Pencil } from 'lucide-react';
+import { useEffect } from 'react';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { Save, Pencil } from 'lucide-react';
 import { useTranslations } from 'next-intl';
-import { metricApi, SelectOption } from '@/lib/api';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Button } from "@/components/ui/button";
+import { metricSchema, MetricFormInput, MetricFormValues } from '@/lib/schemas';
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { metricApi, SelectOption, ApiError } from '@/lib/api';
 import { Metric } from '@/types/metrics';
 import { toast } from 'sonner';
 
@@ -19,103 +41,208 @@ interface EditMetricModalProps {
 
 export function EditMetricModal({ isOpen, onClose, metric, onSuccess, contextOptions, locationOptions, translateOption }: EditMetricModalProps) {
   const t = useTranslations();
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Inicialitzem estat amb valors buits segurs
-  const [form, setForm] = useState({
-    bloodPressure: metric?.bloodPressure || '',
-    pulse: metric?.pulse || '',
-    spo2: metric?.spo2 || '',
-    ca125: metric?.ca125 || '',
-    weight: metric?.weight || '',
-    notes: metric?.notes || '',
-    measurementContext: metric?.measurementContext || '',
-    weightLocation: metric?.weightLocation || ''
+  const form = useForm<MetricFormInput>({
+    resolver: zodResolver(metricSchema) as any,
+    defaultValues: {
+      bloodPressure: '',
+      pulse: '',
+      spo2: '',
+      ca125: '',
+      weight: '',
+      notes: '',
+      measurementContext: '',
+      weightLocation: ''
+    }
   });
 
-  // Actualitzem quan canvia la mètrica
   useEffect(() => {
-    if (metric) {
-      setForm({
+    if (metric && isOpen) {
+      form.reset({
         bloodPressure: metric.bloodPressure || '',
-        pulse: metric.pulse || '',
-        spo2: metric.spo2 || '',
-        ca125: metric.ca125 || '',
-        weight: metric.weight || '',
+        pulse: metric.pulse?.toString() || '',
+        spo2: metric.spo2?.toString() || '',
+        ca125: metric.ca125?.toString() || '',
+        weight: metric.weight?.toString() || '',
         notes: metric.notes || '',
         measurementContext: metric.measurementContext || '',
         weightLocation: metric.weightLocation || ''
       });
     }
-  }, [metric]);
+  }, [metric, isOpen, form]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-
+  const handleSubmit = async (data: MetricFormValues) => {
     try {
-      // L'API s'encarrega de netejar els tipus
-      await metricApi.update(metric.id, form);
-      toast.success(t('History.save')); // Feedback visual
+      await metricApi.update(metric.id, data);
+      toast.success(t('History.save'));
       onSuccess();
       onClose();
     } catch (e: any) {
-      toast.error(e.message || t('HomePage.errorSaving'));
-    } finally {
-      setIsSubmitting(false);
+      if (e instanceof ApiError && e.message === "UNAUTHORIZED") {
+        toast.error(t('HomePage.sessionExpired'));
+      } else {
+        toast.error(e.message || t('HomePage.errorSaving'));
+      }
     }
   };
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 backdrop-blur-sm animate-in fade-in">
-      <div className="bg-white rounded-2xl p-6 max-w-md w-full shadow-2xl overflow-y-auto max-h-[90vh]">
-        <div className="flex justify-between items-center mb-6">
-          <h3 className="text-lg font-bold text-slate-800 flex items-center gap-2"><Pencil size={18} /> {t('History.editTitle')}</h3>
-          <button onClick={onClose} className="text-slate-400 hover:text-slate-600"><X size={20} /></button>
-        </div>
+    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
+      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2 text-slate-800">
+            <Pencil size={18} /> {t('History.editTitle')}
+          </DialogTitle>
+        </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <div><label className="text-xs font-bold text-slate-500 uppercase">{t('Form.bpLabel')}</label><input type="text" className="w-full p-2 border rounded-lg mt-1" value={form.bloodPressure} onChange={e => setForm({ ...form, bloodPressure: e.target.value })} /></div>
-            <div><label className="text-xs font-bold text-slate-500 uppercase">{t('Form.pulseLabel')}</label><input type="number" className="w-full p-2 border rounded-lg mt-1" value={form.pulse} onChange={e => setForm({ ...form, pulse: e.target.value })} /></div>
-            <div><label className="text-xs font-bold text-slate-500 uppercase">{t('Form.spo2Label')}</label><input type="number" className="w-full p-2 border rounded-lg mt-1" value={form.spo2} onChange={e => setForm({ ...form, spo2: e.target.value })} /></div>
-            <div><label className="text-xs font-bold text-slate-500 uppercase">{t('Form.ca125Label')}</label><input type="number" className="w-full p-2 border rounded-lg mt-1" value={form.ca125} onChange={e => setForm({ ...form, ca125: e.target.value })} /></div>
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(handleSubmit as any)} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <FormField
+                control={form.control}
+                name="bloodPressure"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-bold text-slate-500 uppercase">{t('Form.bpLabel')}</FormLabel>
+                    <FormControl>
+                      <Input className="bg-white" {...field} value={field.value || ''} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="pulse"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-bold text-slate-500 uppercase">{t('Form.pulseLabel')}</FormLabel>
+                    <FormControl>
+                      <Input type="number" className="bg-white" {...field} value={field.value || ''} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="spo2"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-bold text-slate-500 uppercase">{t('Form.spo2Label')}</FormLabel>
+                    <FormControl>
+                      <Input type="number" className="bg-white" {...field} value={field.value || ''} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="ca125"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-bold text-slate-500 uppercase">{t('Form.ca125Label')}</FormLabel>
+                    <FormControl>
+                      <Input type="number" className="bg-white" {...field} value={field.value || ''} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            {/* Context */}
-            <div>
-              <label className="text-xs font-bold text-slate-500 uppercase">{t('Form.contextLabel')}</label>
-              <select className="w-full p-2 border rounded-lg mt-1 text-sm bg-white" value={form.measurementContext} onChange={e => setForm({ ...form, measurementContext: e.target.value })}>
-                <option value="">-</option>
-                {contextOptions.map(opt => (
-                  <option key={opt.key} value={opt.key}>{translateOption('ContextOptions', opt)}</option>
-                ))}
-              </select>
+              {/* Context */}
+              <FormField
+                control={form.control}
+                name="measurementContext"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-bold text-slate-500 uppercase">{t('Form.contextLabel')}</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value ?? undefined} value={field.value || ""}>
+                      <FormControl>
+                        <SelectTrigger className="bg-white">
+                          <SelectValue placeholder="-" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="-">-</SelectItem>
+                        {contextOptions.map(opt => (
+                          <SelectItem key={opt.key} value={opt.key}>{translateOption('ContextOptions', opt)}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="weight"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-bold text-slate-500 uppercase">{t('Form.weightLabel')}</FormLabel>
+                    <FormControl>
+                      <Input type="number" className="bg-white" {...field} value={field.value || ''} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Location */}
+              <FormField
+                control={form.control}
+                name="weightLocation"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs font-bold text-slate-500 uppercase">{t('Form.locationLabel')}</FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value ?? undefined} value={field.value || ""}>
+                      <FormControl>
+                        <SelectTrigger className="bg-white">
+                          <SelectValue placeholder="-" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="-">-</SelectItem>
+                        {locationOptions.map(opt => (
+                          <SelectItem key={opt.key} value={opt.key}>{translateOption('LocationOptions', opt)}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
 
-            <div><label className="text-xs font-bold text-slate-500 uppercase">{t('Form.weightLabel')}</label><input type="number" className="w-full p-2 border rounded-lg mt-1" value={form.weight} onChange={e => setForm({ ...form, weight: e.target.value })} /></div>
+            <FormField
+              control={form.control}
+              name="notes"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-xs font-bold text-slate-500 uppercase">{t('Form.notes')}</FormLabel>
+                  <FormControl>
+                    <Textarea className="bg-white h-20 resize-none" {...field} value={field.value || ''} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-            {/* Location */}
-            <div>
-              <label className="text-xs font-bold text-slate-500 uppercase">{t('Form.locationLabel')}</label>
-              <select className="w-full p-2 border rounded-lg mt-1 text-sm bg-white" value={form.weightLocation} onChange={e => setForm({ ...form, weightLocation: e.target.value })}>
-                <option value="">-</option>
-                {locationOptions.map(opt => (
-                  <option key={opt.key} value={opt.key}>{translateOption('LocationOptions', opt)}</option>
-                ))}
-              </select>
+            <div className="flex gap-3 pt-2">
+              <Button type="button" variant="outline" onClick={onClose} className="flex-1 py-6 rounded-xl font-bold text-slate-600">
+                {t('History.cancel')}
+              </Button>
+              <Button type="submit" disabled={form.formState.isSubmitting} className="flex-1 py-6 rounded-xl font-bold flex gap-2">
+                <Save size={18} /> {t('History.save')}
+              </Button>
             </div>
-          </div>
-
-          <div><label className="text-xs font-bold text-slate-500 uppercase">{t('Form.notes')}</label><textarea className="w-full p-2 border rounded-lg mt-1 h-20 resize-none" value={form.notes} onChange={e => setForm({ ...form, notes: e.target.value })} /></div>
-
-          <div className="flex gap-3 pt-2">
-            <button type="button" onClick={onClose} className="flex-1 py-3 rounded-xl border border-slate-200 font-bold text-slate-600 hover:bg-slate-50 transition-colors">{t('History.cancel')}</button>
-            <button type="submit" disabled={isSubmitting} className="flex-1 py-3 rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-800 disabled:opacity-50 flex justify-center items-center gap-2 transition-colors"><Save size={18} /> {t('History.save')}</button>
-          </div>
-        </form>
-      </div>
-    </div>
+          </form>
+        </Form>
+      </DialogContent>
+    </Dialog>
   );
 }
