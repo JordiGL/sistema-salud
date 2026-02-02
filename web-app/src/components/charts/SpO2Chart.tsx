@@ -191,7 +191,7 @@ export function SpO2Chart({ data: initialData }: { data: Metric[] }) {
                   axisLine={false}
                   tickLine={false}
                 />
-                <YAxis domain={[80, 100]} tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} tickCount={6} />
+                <YAxis domain={['auto', 'auto']} tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} tickCount={6} />
                 <ChartTooltip
                   cursor={{ stroke: 'var(--border)', strokeWidth: 2 }}
                   content={

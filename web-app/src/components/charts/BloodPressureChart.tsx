@@ -207,7 +207,7 @@ export function BloodPressureChart({ data: initialData }: { data: Metric[] }) {
                   tickLine={false}
                 />
                 <YAxis
-                  domain={[40, 200]}
+                  domain={['auto', 'auto']}
                   tick={{ fontSize: 11, fill: '#94a3b8' }}
                   axisLine={false}
                   tickLine={false}
