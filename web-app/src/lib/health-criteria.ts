@@ -3,17 +3,17 @@ export type HealthStatus = "normal" | "warning" | "danger";
 export const STATUS_COLORS = {
   normal: {
     border: "border-l-emerald-500",
-    text: "text-slate-800",
-    icon: "text-slate-400",
+    text: "text-foreground",
+    icon: "text-muted-foreground",
   },
   warning: {
     border: "border-l-amber-400",
-    text: "text-amber-600",
+    text: "text-amber-600 dark:text-amber-400",
     icon: "text-amber-500",
   },
   danger: {
     border: "border-l-red-500",
-    text: "text-red-600",
+    text: "text-red-600 dark:text-red-400",
     icon: "text-red-500",
   },
 };

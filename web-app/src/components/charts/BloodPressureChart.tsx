@@ -117,7 +117,7 @@ export function BloodPressureChart({ data: initialData }: { data: Metric[] }) {
   }
 
   return (
-    <Card className="w-full relative overflow-hidden border-slate-100 shadow-sm rounded-3xl animate-in fade-in duration-500">
+    <Card className="w-full relative overflow-hidden border-border shadow-sm rounded-3xl animate-in fade-in duration-500 bg-card">
 
       {/* --- BARRA DE HERRAMIENTAS (HEADER) --- */}
       <CardHeader className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 p-6">
@@ -128,7 +128,7 @@ export function BloodPressureChart({ data: initialData }: { data: Metric[] }) {
             variant="outline"
             size="sm"
             onClick={() => downloadCSV(finalData, 'tension_arterial', t)}
-            className="gap-1.5 text-xs font-bold text-slate-500 bg-white border-slate-200 hover:bg-slate-50 hover:text-purple-600"
+            className="gap-1.5 text-xs font-bold text-muted-foreground bg-card border-border hover:bg-accent hover:text-purple-600"
             title="Descargar CSV"
           >
             <FileSpreadsheet size={14} /> <span>CSV</span>
@@ -137,7 +137,7 @@ export function BloodPressureChart({ data: initialData }: { data: Metric[] }) {
             variant="outline"
             size="sm"
             onClick={() => downloadXML(finalData, 'tension_arterial', t)}
-            className="gap-1.5 text-xs font-bold text-slate-500 bg-white border-slate-200 hover:bg-slate-50 hover:text-purple-600"
+            className="gap-1.5 text-xs font-bold text-muted-foreground bg-card border-border hover:bg-accent hover:text-purple-600"
             title="Descargar XML"
           >
             <FileCode size={14} /> <span>XML</span>
@@ -148,29 +148,29 @@ export function BloodPressureChart({ data: initialData }: { data: Metric[] }) {
         <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center overflow-x-auto pb-1 sm:pb-0">
 
           <Tabs value={dateRange} onValueChange={setDateRange} className="shrink-0">
-            <TabsList className="bg-slate-100 h-9 p-1 rounded-xl">
-              <TabsTrigger value="7d" className="text-[11px] h-7 rounded-lg data-[state=active]:bg-white data-[state=active]:text-purple-700 data-[state=active]:shadow-sm">{tFilter('7days')}</TabsTrigger>
-              <TabsTrigger value="30d" className="text-[11px] h-7 rounded-lg data-[state=active]:bg-white data-[state=active]:text-purple-700 data-[state=active]:shadow-sm">{tFilter('30days')}</TabsTrigger>
-              <TabsTrigger value="all" className="text-[11px] h-7 rounded-lg data-[state=active]:bg-white data-[state=active]:text-purple-700 data-[state=active]:shadow-sm">{tFilter('all')}</TabsTrigger>
+            <TabsList className="bg-muted h-9 p-1 rounded-xl">
+              <TabsTrigger value="7d" className="text-[11px] h-7 rounded-lg data-[state=active]:bg-background data-[state=active]:text-purple-700 data-[state=active]:shadow-sm">{tFilter('7days')}</TabsTrigger>
+              <TabsTrigger value="30d" className="text-[11px] h-7 rounded-lg data-[state=active]:bg-background data-[state=active]:text-purple-700 data-[state=active]:shadow-sm">{tFilter('30days')}</TabsTrigger>
+              <TabsTrigger value="all" className="text-[11px] h-7 rounded-lg data-[state=active]:bg-background data-[state=active]:text-purple-700 data-[state=active]:shadow-sm">{tFilter('all')}</TabsTrigger>
             </TabsList>
           </Tabs>
 
           <Tabs value={timeOfDay} onValueChange={setTimeOfDay} className="shrink-0">
-            <TabsList className="bg-slate-100 h-9 p-1 rounded-xl">
-              <TabsTrigger value="24h" className="text-[11px] h-7 rounded-lg uppercase data-[state=active]:bg-white data-[state=active]:text-purple-700 data-[state=active]:shadow-sm">{tFilter('24h')}</TabsTrigger>
-              <TabsTrigger value="am" className="text-[11px] h-7 rounded-lg uppercase data-[state=active]:bg-white data-[state=active]:text-purple-700 data-[state=active]:shadow-sm">{tFilter('am')}</TabsTrigger>
-              <TabsTrigger value="pm" className="text-[11px] h-7 rounded-lg uppercase data-[state=active]:bg-white data-[state=active]:text-purple-700 data-[state=active]:shadow-sm">{tFilter('pm')}</TabsTrigger>
+            <TabsList className="bg-muted h-9 p-1 rounded-xl">
+              <TabsTrigger value="24h" className="text-[11px] h-7 rounded-lg uppercase data-[state=active]:bg-background data-[state=active]:text-purple-700 data-[state=active]:shadow-sm">{tFilter('24h')}</TabsTrigger>
+              <TabsTrigger value="am" className="text-[11px] h-7 rounded-lg uppercase data-[state=active]:bg-background data-[state=active]:text-purple-700 data-[state=active]:shadow-sm">{tFilter('am')}</TabsTrigger>
+              <TabsTrigger value="pm" className="text-[11px] h-7 rounded-lg uppercase data-[state=active]:bg-background data-[state=active]:text-purple-700 data-[state=active]:shadow-sm">{tFilter('pm')}</TabsTrigger>
             </TabsList>
           </Tabs>
 
-          <div className="hidden sm:block w-px h-6 bg-slate-200 mx-1"></div>
+          <div className="hidden sm:block w-px h-6 bg-border mx-1"></div>
 
           <div className="flex items-center gap-2 shrink-0">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider hidden md:inline">
+            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider hidden md:inline">
               {tFilter('contexts')}
             </span>
             <Select value={contextFilter} onValueChange={setContextFilter}>
-              <SelectTrigger className="h-9 min-w-[100px] text-xs font-bold border-slate-200 bg-slate-50 hover:bg-slate-100 focus:ring-purple-100">
+              <SelectTrigger className="h-9 min-w-[100px] text-xs font-bold border-border bg-muted/40 hover:bg-muted focus:ring-purple-100">
                 <SelectValue placeholder={tFilter('allContexts')} />
               </SelectTrigger>
               <SelectContent>
@@ -187,11 +187,11 @@ export function BloodPressureChart({ data: initialData }: { data: Metric[] }) {
       {/* ÁREA DE GRÁFICA */}
       <CardContent>
         {finalData.length === 0 ? (
-          <div className="h-[400px] flex flex-col items-center justify-center text-gray-400 animate-in fade-in duration-500">
-            <div className="p-4 bg-slate-50 rounded-full mb-3">
-              <Activity size={32} className="opacity-20 text-slate-500" />
+          <div className="h-[400px] flex flex-col items-center justify-center text-muted-foreground animate-in fade-in duration-500">
+            <div className="p-4 bg-muted rounded-full mb-3">
+              <Activity size={32} className="opacity-20 text-muted-foreground" />
             </div>
-            <p className="font-medium text-sm text-slate-500">{tCharts('noData')}</p>
+            <p className="font-medium text-sm text-muted-foreground">{tCharts('noData')}</p>
           </div>
         ) : (
           <div className={loading ? "opacity-50 transition-opacity duration-300" : "opacity-100 transition-opacity duration-300"}>
@@ -214,21 +214,21 @@ export function BloodPressureChart({ data: initialData }: { data: Metric[] }) {
                   tickCount={6}
                 />
                 <ChartTooltip
-                  cursor={{ stroke: '#e2e8f0', strokeWidth: 2 }}
+                  cursor={{ stroke: 'var(--border)', strokeWidth: 2 }}
                   content={
                     <ChartTooltipContent
                       indicator="line"
-                      className="w-[200px] rounded-2xl border-none shadow-2xl bg-white/95 backdrop-blur-md p-3"
+                      className="w-[200px] rounded-2xl border border-border/10 shadow-xl bg-white/95 dark:bg-slate-950/90 backdrop-blur-md p-3 text-slate-900 dark:text-slate-50"
                       labelFormatter={(value) => {
                         const date = new Date(value);
                         return (
-                          <div className="flex flex-col border-b border-slate-100 pb-2 mb-2">
-                            <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                          <div className="flex flex-col border-b border-border pb-2 mb-2">
+                            <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">
                               {t('History.cols.date')}
                             </span>
-                            <span className="text-xs font-bold text-slate-700">
+                            <span className="text-xs font-bold text-slate-900 dark:text-slate-50">
                               {date.toLocaleDateString('es-ES', { day: 'numeric', month: 'numeric', year: 'numeric' })}
-                              <span className="mx-1 text-slate-300">|</span>
+                              <span className="mx-1 text-muted">|</span>
                               {date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false })}
                             </span>
                           </div>
@@ -243,13 +243,13 @@ export function BloodPressureChart({ data: initialData }: { data: Metric[] }) {
                         return (
                           <div className="flex items-center justify-between w-full my-0.5">
                             <div className="flex items-center gap-2">
-                              <span className="text-slate-500 text-xs font-medium">
+                              <span className="text-muted-foreground text-xs font-medium">
                                 {labelMap[name as string] || name}
                               </span>
                             </div>
-                            <span className="font-bold text-slate-900 text-sm">
+                            <span className="font-bold text-slate-900 dark:text-slate-50 text-sm">
                               {value}
-                              <span className="ml-1 font-normal text-[10px] text-slate-400 uppercase">
+                              <span className="ml-1 font-normal text-[10px] text-muted-foreground uppercase">
                                 mmHg
                               </span>
                             </span>
@@ -270,20 +270,20 @@ export function BloodPressureChart({ data: initialData }: { data: Metric[] }) {
 
       {/* --- SECCIÓN DE ESTADÍSTICAS --- */}
       {finalData.length > 0 && (
-        <CardFooter className="pt-6 border-t border-slate-100 block">
+        <CardFooter className="pt-6 border-t border-border block">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <StatsSummary
               label={tCharts('systolic')}
               data={systolicData}
-              colorClass="text-purple-600"
-              bgClass="bg-purple-50"
+              colorClass="text-purple-600 dark:text-purple-400"
+              bgClass="bg-purple-50 dark:bg-purple-900/20"
               legendDotColor="#9333ea"
             />
             <StatsSummary
               label={tCharts('diastolic')}
               data={diastolicData}
-              colorClass="text-purple-400"
-              bgClass="bg-purple-50/50"
+              colorClass="text-purple-400 dark:text-purple-300"
+              bgClass="bg-purple-50/50 dark:bg-purple-900/10"
               legendDotColor="#d8b4fe"
             />
           </div>

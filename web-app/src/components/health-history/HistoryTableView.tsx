@@ -35,13 +35,13 @@ export function HistoryTableView({ data, isAdmin, onRefresh }: HistoryTableViewP
 
   return (
     <>
-      <div className="md:hidden flex items-center justify-end gap-2 text-xs text-slate-400 mb-2 animate-pulse">
+      <div className="md:hidden flex items-center justify-end gap-2 text-xs text-muted-foreground mb-2 animate-pulse">
         <span>{t('History.scrollHint')}</span><MoveHorizontal size={16} />
       </div>
 
-      <div className="bg-white rounded-md border shadow-sm">
+      <div className="bg-card rounded-md border-border border shadow-sm">
         <Table>
-          <TableHeader className="bg-slate-50">
+          <TableHeader className="bg-muted/50">
             <TableRow>
               <TableHead className="min-w-[100px]">{t('History.cols.date')}</TableHead>
               <TableHead className="min-w-[100px]">{t('History.cols.context')}</TableHead>
@@ -81,53 +81,53 @@ export function HistoryTableView({ data, isAdmin, onRefresh }: HistoryTableViewP
               const rowStyles = STATUS_COLORS[overallStatus];
 
               return (
-                <TableRow key={row.id} className={`hover:bg-slate-50/80 transition-colors border-l-4 ${rowStyles.border}`}>
-                  <TableCell className="font-medium text-slate-700">
+                <TableRow key={row.id} className={`hover:bg-muted/50 transition-colors border-l-4 ${rowStyles.border}`}>
+                  <TableCell className="font-medium text-foreground">
                     <div className="flex flex-col">
                       <span>{dateObj.toLocaleDateString()}</span>
-                      <span className="text-xs text-slate-400 font-normal">{dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                      <span className="text-xs text-muted-foreground font-normal">{dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                     </div>
                   </TableCell>
 
                   <TableCell>
                     {row.measurementContext ? (
-                      <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full font-medium inline-block border border-slate-200">
+                      <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full font-medium inline-block border border-border">
                         {renderContext(row.measurementContext)}
                       </span>
-                    ) : <span className="text-slate-300">-</span>}
+                    ) : <span className="text-muted-foreground/30">-</span>}
                   </TableCell>
 
-                  <TableCell>{row.bloodPressure ? <span className="font-bold"><span className={STATUS_COLORS[sysStatus].text}>{sys}</span><span className="text-slate-300 mx-0.5">/</span><span className={STATUS_COLORS[diaStatus].text}>{dia}</span></span> : <span className="text-slate-300">-</span>}</TableCell>
-                  <TableCell className="font-bold">{row.pulse ? <span className={STATUS_COLORS[pulseStatus].text}>{row.pulse}</span> : <span className="text-slate-300">-</span>}</TableCell>
-                  <TableCell className="font-bold">{row.spo2 ? <span className={STATUS_COLORS[spo2Status].text}>{row.spo2}</span> : <span className="text-slate-300">-</span>}</TableCell>
-                  <TableCell className="border-l border-slate-100">{row.ca125 ? <span className="font-bold text-slate-700">{row.ca125}</span> : <span className="text-slate-300">-</span>}</TableCell>
-                  <TableCell className="border-l border-slate-100">{row.weight ? <span className="font-bold text-slate-700">{row.weight}</span> : <span className="text-slate-300">-</span>}</TableCell>
+                  <TableCell>{row.bloodPressure ? <span className="font-bold"><span className={STATUS_COLORS[sysStatus].text}>{sys}</span><span className="text-muted-foreground/40 mx-0.5">/</span><span className={STATUS_COLORS[diaStatus].text}>{dia}</span></span> : <span className="text-muted-foreground/30">-</span>}</TableCell>
+                  <TableCell className="font-bold">{row.pulse ? <span className={STATUS_COLORS[pulseStatus].text}>{row.pulse}</span> : <span className="text-muted-foreground/30">-</span>}</TableCell>
+                  <TableCell className="font-bold">{row.spo2 ? <span className={STATUS_COLORS[spo2Status].text}>{row.spo2}</span> : <span className="text-muted-foreground/30">-</span>}</TableCell>
+                  <TableCell className="border-l border-border">{row.ca125 ? <span className="font-bold text-foreground">{row.ca125}</span> : <span className="text-muted-foreground/30">-</span>}</TableCell>
+                  <TableCell className="border-l border-border">{row.weight ? <span className="font-bold text-foreground">{row.weight}</span> : <span className="text-muted-foreground/30">-</span>}</TableCell>
 
                   <TableCell>
                     {row.weightLocation ? (
-                      <span className="text-xs text-slate-500 bg-slate-100 px-2 py-1 rounded-full flex items-center gap-1 w-fit border border-slate-200">
+                      <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full flex items-center gap-1 w-fit border border-border">
                         <MapPin size={10} /> {renderLocation(row.weightLocation)}
                       </span>
-                    ) : <span className="text-slate-300">-</span>}
+                    ) : <span className="text-muted-foreground/30">-</span>}
                   </TableCell>
 
-                  <TableCell className="border-l border-slate-100">
+                  <TableCell className="border-l border-border">
                     {row.notes ? (
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => setNoteToView(row)}
-                        className="h-8 w-full justify-start p-1.5 hover:bg-purple-50"
+                        className="h-8 w-full justify-start p-1.5 hover:bg-purple-50 dark:hover:bg-purple-900/20"
                         title={row.notes}
                       >
-                        <FileText size={14} className="text-slate-400 hover:text-slate-800 transition-colors" />
+                        <FileText size={14} className="text-muted-foreground hover:text-foreground transition-colors" />
                       </Button>
-                    ) : <span className="text-slate-300">-</span>}
+                    ) : <span className="text-muted-foreground/30">-</span>}
                   </TableCell>
                   {isAdmin && (
-                    <TableCell className="border-l border-slate-100 text-right">
+                    <TableCell className="border-l border-border text-right">
                       <div className="flex justify-end gap-2">
-                        <Button variant="outline" size="icon" onClick={() => setMetricToEdit(row)} className="h-8 w-8 text-slate-500 hover:text-slate-800">
+                        <Button variant="outline" size="icon" onClick={() => setMetricToEdit(row)} className="h-8 w-8 text-muted-foreground hover:text-foreground">
                           <Pencil size={16} />
                         </Button>
                         <Button variant="destructive" size="icon" onClick={() => setMetricToDelete(row)} className="h-8 w-8">

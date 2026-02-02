@@ -90,9 +90,9 @@ export function EditMetricModal({ isOpen, onClose, metric, onSuccess, contextOpt
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto bg-card dark:bg-slate-950 border-border shadow-2xl">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-slate-800">
+          <DialogTitle className="flex items-center gap-2 text-foreground">
             <Pencil size={18} /> {t('History.editTitle')}
           </DialogTitle>
         </DialogHeader>
@@ -105,9 +105,9 @@ export function EditMetricModal({ isOpen, onClose, metric, onSuccess, contextOpt
                 name="bloodPressure"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-bold text-slate-500 uppercase">{t('Form.bpLabel')}</FormLabel>
+                    <FormLabel className="text-xs font-bold text-muted-foreground uppercase">{t('Form.bpLabel')}</FormLabel>
                     <FormControl>
-                      <Input className="bg-white" {...field} value={field.value || ''} />
+                      <Input className="bg-background dark:bg-slate-900/50 border-input text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -118,9 +118,9 @@ export function EditMetricModal({ isOpen, onClose, metric, onSuccess, contextOpt
                 name="pulse"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-bold text-slate-500 uppercase">{t('Form.pulseLabel')}</FormLabel>
+                    <FormLabel className="text-xs font-bold text-muted-foreground uppercase">{t('Form.pulseLabel')}</FormLabel>
                     <FormControl>
-                      <Input type="number" className="bg-white" {...field} value={field.value || ''} />
+                      <Input type="number" className="bg-background dark:bg-slate-900/50 border-input text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -131,9 +131,9 @@ export function EditMetricModal({ isOpen, onClose, metric, onSuccess, contextOpt
                 name="spo2"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-bold text-slate-500 uppercase">{t('Form.spo2Label')}</FormLabel>
+                    <FormLabel className="text-xs font-bold text-muted-foreground uppercase">{t('Form.spo2Label')}</FormLabel>
                     <FormControl>
-                      <Input type="number" className="bg-white" {...field} value={field.value || ''} />
+                      <Input type="number" className="bg-background dark:bg-slate-900/50 border-input text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -144,9 +144,9 @@ export function EditMetricModal({ isOpen, onClose, metric, onSuccess, contextOpt
                 name="ca125"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-bold text-slate-500 uppercase">{t('Form.ca125Label')}</FormLabel>
+                    <FormLabel className="text-xs font-bold text-muted-foreground uppercase">{t('Form.ca125Label')}</FormLabel>
                     <FormControl>
-                      <Input type="number" className="bg-white" {...field} value={field.value || ''} />
+                      <Input type="number" className="bg-background dark:bg-slate-900/50 border-input text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -159,10 +159,10 @@ export function EditMetricModal({ isOpen, onClose, metric, onSuccess, contextOpt
                 name="measurementContext"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-bold text-slate-500 uppercase">{t('Form.contextLabel')}</FormLabel>
+                    <FormLabel className="text-xs font-bold text-muted-foreground uppercase">{t('Form.contextLabel')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value ?? undefined} value={field.value || ""}>
                       <FormControl>
-                        <SelectTrigger className="bg-white">
+                        <SelectTrigger className="bg-background dark:bg-slate-900/50 border-input">
                           <SelectValue placeholder="-" />
                         </SelectTrigger>
                       </FormControl>
@@ -183,9 +183,9 @@ export function EditMetricModal({ isOpen, onClose, metric, onSuccess, contextOpt
                 name="weight"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-bold text-slate-500 uppercase">{t('Form.weightLabel')}</FormLabel>
+                    <FormLabel className="text-xs font-bold text-muted-foreground uppercase">{t('Form.weightLabel')}</FormLabel>
                     <FormControl>
-                      <Input type="number" className="bg-white" {...field} value={field.value || ''} />
+                      <Input type="number" className="bg-background dark:bg-slate-900/50 border-input text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -198,10 +198,10 @@ export function EditMetricModal({ isOpen, onClose, metric, onSuccess, contextOpt
                 name="weightLocation"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xs font-bold text-slate-500 uppercase">{t('Form.locationLabel')}</FormLabel>
+                    <FormLabel className="text-xs font-bold text-muted-foreground uppercase">{t('Form.locationLabel')}</FormLabel>
                     <Select onValueChange={field.onChange} defaultValue={field.value ?? undefined} value={field.value || ""}>
                       <FormControl>
-                        <SelectTrigger className="bg-white">
+                        <SelectTrigger className="bg-background dark:bg-slate-900/50 border-input">
                           <SelectValue placeholder="-" />
                         </SelectTrigger>
                       </FormControl>
@@ -223,9 +223,9 @@ export function EditMetricModal({ isOpen, onClose, metric, onSuccess, contextOpt
               name="notes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="text-xs font-bold text-slate-500 uppercase">{t('Form.notes')}</FormLabel>
+                  <FormLabel className="text-xs font-bold text-muted-foreground uppercase">{t('Form.notes')}</FormLabel>
                   <FormControl>
-                    <Textarea className="bg-white h-20 resize-none" {...field} value={field.value || ''} />
+                    <Textarea className="bg-background dark:bg-slate-900/50 border-input h-20 resize-none" {...field} value={field.value || ''} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -233,10 +233,10 @@ export function EditMetricModal({ isOpen, onClose, metric, onSuccess, contextOpt
             />
 
             <div className="flex gap-3 pt-2">
-              <Button type="button" variant="outline" onClick={onClose} className="flex-1 py-6 rounded-xl font-bold text-slate-600">
+              <Button type="button" variant="outline" onClick={onClose} className="flex-1 py-6 rounded-xl font-bold text-muted-foreground border-border hover:bg-accent hover:text-accent-foreground">
                 {t('History.cancel')}
               </Button>
-              <Button type="submit" disabled={form.formState.isSubmitting} className="flex-1 py-6 rounded-xl font-bold flex gap-2">
+              <Button type="submit" disabled={form.formState.isSubmitting} className="flex-1 py-6 rounded-xl font-bold flex gap-2 bg-primary text-primary-foreground dark:bg-indigo-600 dark:text-white dark:hover:bg-indigo-700 shadow-md transition-all">
                 <Save size={18} /> {t('History.save')}
               </Button>
             </div>

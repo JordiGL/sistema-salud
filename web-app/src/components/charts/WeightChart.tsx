@@ -110,7 +110,7 @@ export function WeightChart({ data: initialData }: { data: Metric[] }) {
   }
 
   return (
-    <Card className="w-full relative overflow-hidden border-slate-100 shadow-sm rounded-3xl animate-in fade-in duration-500">
+    <Card className="w-full relative overflow-hidden border-border shadow-sm rounded-3xl animate-in fade-in duration-500 bg-card">
 
       {/* --- HEADER --- */}
       <CardHeader className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 p-6">
@@ -119,7 +119,7 @@ export function WeightChart({ data: initialData }: { data: Metric[] }) {
             variant="outline"
             size="sm"
             onClick={() => downloadCSV(finalData, 'peso_data', t)}
-            className="gap-1.5 text-xs font-bold text-slate-500 bg-white border-slate-200 hover:bg-slate-50 hover:text-blue-600"
+            className="gap-1.5 text-xs font-bold text-muted-foreground bg-card border-border hover:bg-accent hover:text-blue-600"
           >
             <FileSpreadsheet size={14} /> <span>CSV</span>
           </Button>
@@ -127,7 +127,7 @@ export function WeightChart({ data: initialData }: { data: Metric[] }) {
             variant="outline"
             size="sm"
             onClick={() => downloadXML(finalData, 'peso_data', t)}
-            className="gap-1.5 text-xs font-bold text-slate-500 bg-white border-slate-200 hover:bg-slate-50 hover:text-blue-600"
+            className="gap-1.5 text-xs font-bold text-muted-foreground bg-card border-border hover:bg-accent hover:text-blue-600"
           >
             <FileCode size={14} /> <span>XML</span>
           </Button>
@@ -135,29 +135,29 @@ export function WeightChart({ data: initialData }: { data: Metric[] }) {
 
         <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center overflow-x-auto pb-1 sm:pb-0">
           <Tabs value={dateRange} onValueChange={setDateRange} className="shrink-0">
-            <TabsList className="bg-slate-100 h-9 p-1 rounded-xl">
-              <TabsTrigger value="7d" className="text-[11px] h-7 rounded-lg data-[state=active]:text-blue-600">{tFilter('7days')}</TabsTrigger>
-              <TabsTrigger value="30d" className="text-[11px] h-7 rounded-lg data-[state=active]:text-blue-600">{tFilter('30days')}</TabsTrigger>
-              <TabsTrigger value="all" className="text-[11px] h-7 rounded-lg data-[state=active]:text-blue-600">{tFilter('all')}</TabsTrigger>
+            <TabsList className="bg-muted h-9 p-1 rounded-xl">
+              <TabsTrigger value="7d" className="text-[11px] h-7 rounded-lg data-[state=active]:bg-background data-[state=active]:text-blue-600 data-[state=active]:shadow-sm">{tFilter('7days')}</TabsTrigger>
+              <TabsTrigger value="30d" className="text-[11px] h-7 rounded-lg data-[state=active]:bg-background data-[state=active]:text-blue-600 data-[state=active]:shadow-sm">{tFilter('30days')}</TabsTrigger>
+              <TabsTrigger value="all" className="text-[11px] h-7 rounded-lg data-[state=active]:bg-background data-[state=active]:text-blue-600 data-[state=active]:shadow-sm">{tFilter('all')}</TabsTrigger>
             </TabsList>
           </Tabs>
 
           <Tabs value={timeOfDay} onValueChange={setTimeOfDay} className="shrink-0">
-            <TabsList className="bg-slate-100 h-9 p-1 rounded-xl">
-              <TabsTrigger value="24h" className="text-[11px] h-7 rounded-lg data-[state=active]:text-blue-600 uppercase">{tFilter('24h')}</TabsTrigger>
-              <TabsTrigger value="am" className="text-[11px] h-7 rounded-lg data-[state=active]:text-blue-600 uppercase">{tFilter('am')}</TabsTrigger>
-              <TabsTrigger value="pm" className="text-[11px] h-7 rounded-lg data-[state=active]:text-blue-600 uppercase">{tFilter('pm')}</TabsTrigger>
+            <TabsList className="bg-muted h-9 p-1 rounded-xl">
+              <TabsTrigger value="24h" className="text-[11px] h-7 rounded-lg data-[state=active]:bg-background data-[state=active]:text-blue-600 uppercase data-[state=active]:shadow-sm">{tFilter('24h')}</TabsTrigger>
+              <TabsTrigger value="am" className="text-[11px] h-7 rounded-lg data-[state=active]:bg-background data-[state=active]:text-blue-600 uppercase data-[state=active]:shadow-sm">{tFilter('am')}</TabsTrigger>
+              <TabsTrigger value="pm" className="text-[11px] h-7 rounded-lg data-[state=active]:bg-background data-[state=active]:text-blue-600 uppercase data-[state=active]:shadow-sm">{tFilter('pm')}</TabsTrigger>
             </TabsList>
           </Tabs>
 
-          <div className="hidden sm:block w-px h-6 bg-slate-200 mx-1"></div>
+          <div className="hidden sm:block w-px h-6 bg-border mx-1"></div>
 
           <div className="flex items-center gap-2 shrink-0">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider hidden md:inline">
+            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider hidden md:inline">
               {tFilter('location')}
             </span>
             <Select value={locationFilter} onValueChange={setLocationFilter}>
-              <SelectTrigger className="h-9 min-w-[100px] text-xs font-bold border-slate-200 bg-slate-50 hover:bg-slate-100 focus:ring-blue-100">
+              <SelectTrigger className="h-9 min-w-[100px] text-xs font-bold border-border bg-muted/40 hover:bg-muted focus:ring-blue-100">
                 <SelectValue placeholder={tFilter('allContexts')} />
               </SelectTrigger>
               <SelectContent>
@@ -173,11 +173,11 @@ export function WeightChart({ data: initialData }: { data: Metric[] }) {
 
       <CardContent>
         {finalData.length === 0 ? (
-          <div className="h-[400px] flex flex-col items-center justify-center text-gray-400 animate-in fade-in duration-500">
-            <div className="p-4 bg-slate-50 rounded-full mb-3">
-              <Scale size={32} className="opacity-20 text-slate-500" />
+          <div className="h-[400px] flex flex-col items-center justify-center text-muted-foreground animate-in fade-in duration-500">
+            <div className="p-4 bg-muted rounded-full mb-3">
+              <Scale size={32} className="opacity-20 text-muted-foreground" />
             </div>
-            <p className="font-medium text-sm text-slate-500">{tCharts('noData')}</p>
+            <p className="font-medium text-sm text-muted-foreground">{tCharts('noData')}</p>
           </div>
         ) : (
           /* Transición fluida durante el filtrado */
@@ -201,23 +201,23 @@ export function WeightChart({ data: initialData }: { data: Metric[] }) {
                   tickCount={6}
                 />
                 <ChartTooltip
-                  cursor={{ stroke: '#e2e8f0', strokeWidth: 2 }}
+                  cursor={{ stroke: 'var(--border)', strokeWidth: 2 }}
                   content={
                     <ChartTooltipContent
                       indicator="dot"
-                      className="w-[200px] rounded-2xl border-none shadow-2xl bg-white/95 backdrop-blur-md p-3"
+                      className="w-[200px] rounded-2xl border border-border/10 shadow-xl bg-white/95 dark:bg-slate-950/90 backdrop-blur-md p-3 text-slate-900 dark:text-slate-50"
                       labelFormatter={(value, payload) => {
                         const rawDate = value || (payload && payload[0]?.payload?.createdAt);
                         if (!rawDate) return null;
                         const date = new Date(rawDate);
                         return (
-                          <div className="flex flex-col border-b border-slate-100 pb-2 mb-2">
-                            <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                          <div className="flex flex-col border-b border-border pb-2 mb-2">
+                            <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">
                               {t('History.cols.date')}
                             </span>
-                            <span className="text-xs font-bold text-slate-700">
+                            <span className="text-xs font-bold text-slate-900 dark:text-slate-50">
                               {date.toLocaleDateString('es-ES', { day: 'numeric', month: 'numeric', year: 'numeric' })}
-                              <span className="mx-1 text-slate-300">|</span>
+                              <span className="mx-1 text-muted">|</span>
                               {date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false })}
                             </span>
                           </div>
@@ -226,15 +226,15 @@ export function WeightChart({ data: initialData }: { data: Metric[] }) {
                       formatter={(value, name, item) => (
                         <div className="flex flex-col gap-2 w-full">
                           <div className="flex items-center justify-between w-full my-0.5">
-                            <span className="text-slate-500 text-xs font-medium">{tCharts('weightTitle')}</span>
-                            <span className="font-bold text-slate-900 text-sm">
-                              {value} <span className="ml-1 font-normal text-[10px] text-slate-400 uppercase">Kg</span>
+                            <span className="text-muted-foreground text-xs font-medium">{tCharts('weightTitle')}</span>
+                            <span className="font-bold text-slate-900 dark:text-slate-50 text-sm">
+                              {value} <span className="ml-1 font-normal text-[10px] text-muted-foreground uppercase">Kg</span>
                             </span>
                           </div>
                           {item.payload.weightLocation && (
-                            <div className="flex items-center justify-between w-full pt-1.5 border-t border-slate-50">
-                              <span className="text-slate-400 text-[10px] uppercase font-bold tracking-tight">{tFilter('location')}</span>
-                              <span className="text-slate-600 text-[11px] font-semibold italic">{item.payload.weightLocation}</span>
+                            <div className="flex items-center justify-between w-full pt-1.5 border-t border-border">
+                              <span className="text-muted-foreground text-[10px] uppercase font-bold tracking-tight">{tFilter('location')}</span>
+                              <span className="text-muted-foreground text-[11px] font-semibold italic">{item.payload.weightLocation}</span>
                             </div>
                           )}
                         </div>
@@ -257,12 +257,12 @@ export function WeightChart({ data: initialData }: { data: Metric[] }) {
       </CardContent>
 
       {finalData.length > 0 && (
-        <CardFooter className="pt-6 border-t border-slate-100 block">
+        <CardFooter className="pt-6 border-t border-border block">
           <StatsSummary
             label={tCharts('weightTitle')}
             data={weightData}
-            colorClass="text-blue-600"
-            bgClass="bg-blue-50"
+            colorClass="text-blue-600 dark:text-blue-400"
+            bgClass="bg-blue-50 dark:bg-blue-900/20"
             unit="Kg"
             legendDotColor="#2563eb"
             showAvg={false}

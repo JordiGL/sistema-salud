@@ -110,19 +110,19 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
     };
 
     return (
-        <div className={`bg-white rounded-2xl shadow-sm border border-slate-200 mt-8 animate-in fade-in slide-in-from-bottom-4 duration-700 overflow-hidden transition-all ${isOpen ? 'ring-1 ring-slate-200' : ''}`}>
+        <div className={`bg-card dark:bg-slate-950 rounded-2xl shadow-sm border border-border mt-8 animate-in fade-in slide-in-from-bottom-4 duration-700 overflow-hidden transition-all ${isOpen ? 'ring-1 ring-border' : ''}`}>
 
             {/* CABECERA */}
             <div
                 onClick={() => setIsOpen(!isOpen)}
-                className={`flex justify-between items-center p-4 cursor-pointer transition-colors select-none ${isOpen ? 'bg-slate-50 border-b border-slate-200' : 'bg-white hover:bg-slate-50'}`}
+                className={`flex justify-between items-center p-4 cursor-pointer transition-colors select-none ${isOpen ? 'bg-muted/50 border-b border-border' : 'bg-card hover:bg-muted/50'}`}
                 title={isOpen ? t('Form.toggleCollapse') : t('Form.toggleExpand')}
             >
                 <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-lg transition-colors ${isOpen ? 'bg-slate-200 text-slate-700' : 'bg-slate-100 text-slate-500'}`}>
+                    <div className={`p-2 rounded-lg transition-colors ${isOpen ? 'bg-muted text-foreground' : 'bg-muted/50 text-muted-foreground'}`}>
                         <Plus size={20} />
                     </div>
-                    <h2 className="text-lg font-bold text-slate-700">
+                    <h2 className="text-lg font-bold text-foreground">
                         {t('HomePage.newRecord')}
                     </h2>
                 </div>
@@ -136,7 +136,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                         onButtonClick={triggerFileInput}
                     />
 
-                    <div className="text-slate-400">
+                    <div className="text-muted-foreground">
                         {isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                     </div>
                 </div>
@@ -149,8 +149,8 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                         <form onSubmit={form.handleSubmit(onSubmit as any)} className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
                             {/* SECCIÓN 1: DATOS FISIOLÓGICOS */}
-                            <div className="lg:col-span-8 p-5 rounded-xl border border-slate-200 bg-slate-50/30">
-                                <div className="flex items-center gap-2 mb-4 text-slate-700 font-bold border-b border-slate-200 pb-2">
+                            <div className="lg:col-span-8 p-5 rounded-xl border border-border bg-muted/30">
+                                <div className="flex items-center gap-2 mb-4 text-foreground font-bold border-b border-border pb-2">
                                     <Heart size={18} /> {t('Form.physiologicalData')}
                                 </div>
 
@@ -160,10 +160,10 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                         name="measurementContext"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('Form.contextLabel')}</FormLabel>
+                                                <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.contextLabel')}</FormLabel>
                                                 <Select onValueChange={field.onChange} defaultValue={field.value ?? undefined} value={field.value || ""}>
                                                     <FormControl>
-                                                        <SelectTrigger className="bg-white">
+                                                        <SelectTrigger className="bg-background dark:bg-slate-900/50 border-border">
                                                             <SelectValue placeholder={t('Form.contextPlaceholder')} />
                                                         </SelectTrigger>
                                                     </FormControl>
@@ -187,9 +187,9 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                         name="bloodPressure"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('Form.bpLabel')}</FormLabel>
+                                                <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.bpLabel')}</FormLabel>
                                                 <FormControl>
-                                                    <Input placeholder="120/80" className="text-center font-mono bg-white" {...field} value={field.value || ''} />
+                                                    <Input placeholder="120/80" className="text-center font-mono bg-background dark:bg-slate-900/50 border-border text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -200,9 +200,9 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                         name="pulse"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('Form.pulseLabel')}</FormLabel>
+                                                <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.pulseLabel')}</FormLabel>
                                                 <FormControl>
-                                                    <Input type="number" placeholder="80" className="text-center font-mono bg-white" {...field} value={field.value || ''} />
+                                                    <Input type="number" placeholder="80" className="text-center font-mono bg-background dark:bg-slate-900/50 border-border text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -213,9 +213,9 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                         name="spo2"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('Form.spo2Label')}</FormLabel>
+                                                <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.spo2Label')}</FormLabel>
                                                 <FormControl>
-                                                    <Input type="number" placeholder="98" className="text-center font-mono bg-white" {...field} value={field.value || ''} />
+                                                    <Input type="number" placeholder="98" className="text-center font-mono bg-background dark:bg-slate-900/50 border-border text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -226,9 +226,9 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                         name="ca125"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('Form.ca125Label')}</FormLabel>
+                                                <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.ca125Label')}</FormLabel>
                                                 <FormControl>
-                                                    <Input type="number" placeholder="35.5" className="text-center font-mono bg-white" {...field} value={field.value || ''} />
+                                                    <Input type="number" placeholder="35.5" className="text-center font-mono bg-background dark:bg-slate-900/50 border-border text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -238,8 +238,8 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                             </div>
 
                             {/* SECCIÓN 2: CONTROL DE PESO */}
-                            <div className="lg:col-span-4 p-5 rounded-xl border border-slate-200 bg-slate-50/30 flex flex-col h-full">
-                                <div className="flex items-center gap-2 mb-4 text-slate-700 font-bold border-b border-slate-200 pb-2">
+                            <div className="lg:col-span-4 p-5 rounded-xl border border-border bg-muted/30 flex flex-col h-full">
+                                <div className="flex items-center gap-2 mb-4 text-foreground font-bold border-b border-border pb-2">
                                     <Scale size={18} /> {t('Form.weightControl')}
                                 </div>
                                 <div className="space-y-4 grow">
@@ -248,10 +248,10 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                         name="weightLocation"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('Form.locationLabel')}</FormLabel>
+                                                <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.locationLabel')}</FormLabel>
                                                 <Select onValueChange={field.onChange} defaultValue={field.value ?? undefined} value={field.value || ""}>
                                                     <FormControl>
-                                                        <SelectTrigger className="bg-white">
+                                                        <SelectTrigger className="bg-background dark:bg-slate-900/50 border-border">
                                                             <SelectValue placeholder={t('Form.locationPlaceholder')} />
                                                         </SelectTrigger>
                                                     </FormControl>
@@ -272,9 +272,9 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                         name="weight"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-xs font-bold text-slate-500 uppercase tracking-wider">{t('Form.weightLabel')}</FormLabel>
+                                                <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.weightLabel')}</FormLabel>
                                                 <FormControl>
-                                                    <Input type="number" placeholder="75.5" className="text-center font-mono text-lg bg-white" {...field} value={field.value || ''} />
+                                                    <Input type="number" placeholder="75.5" className="text-center font-mono text-lg bg-background dark:bg-slate-900/50 border-border text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
                                                 </FormControl>
                                                 <FormMessage />
                                             </FormItem>
@@ -290,11 +290,11 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                     name="notes"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-sm font-medium text-slate-700">{t('Form.notes')}</FormLabel>
+                                            <FormLabel className="text-sm font-medium text-foreground">{t('Form.notes')}</FormLabel>
                                             <FormControl>
                                                 <Textarea
                                                     placeholder={t('Form.notesPlaceholder')}
-                                                    className="resize-none h-20 bg-white"
+                                                    className="resize-none h-20 bg-background dark:bg-slate-900/50 border-border text-foreground placeholder:text-muted-foreground"
                                                     {...field}
                                                     value={field.value || ''}
                                                 />
@@ -305,10 +305,10 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                 />
 
                                 <div className="flex gap-3">
-                                    <Button type="button" variant="outline" onClick={handleResetClick} className="h-auto px-6 py-4 rounded-xl font-bold text-slate-500 border-slate-200 hover:text-slate-700 hover:border-slate-300" title={t('Form.clearTitle')}>
+                                    <Button type="button" variant="outline" onClick={handleResetClick} className="h-auto px-6 py-4 rounded-xl font-bold text-muted-foreground border-dashed border-border bg-background hover:bg-muted hover:text-foreground" title={t('Form.clearTitle')}>
                                         <RotateCcw size={18} /> <span className="hidden sm:inline">{t('HomePage.clear') || 'Limpiar'}</span>
                                     </Button>
-                                    <Button type="submit" disabled={form.formState.isSubmitting} className="flex-1 h-auto py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl">
+                                    <Button type="submit" disabled={form.formState.isSubmitting} className="flex-1 h-auto py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl bg-primary text-primary-foreground dark:bg-indigo-600 dark:text-white dark:hover:bg-indigo-700 transition-all">
                                         {form.formState.isSubmitting ? <Loader2 size={20} className="animate-spin" /> : <><Save size={20} /> {t('HomePage.saveButton')}</>}
                                     </Button>
                                 </div>

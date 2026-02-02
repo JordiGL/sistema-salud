@@ -27,11 +27,11 @@ export function StatsSummary({ data, colorClass, bgClass, unit = '', label, lege
           {/* Si pasamos un color, mostramos el punto */}
           {legendDotColor && (
             <span
-              className="w-3 h-3 rounded-full shadow-sm border border-white"
+              className="w-3 h-3 rounded-full shadow-sm border border-background"
               style={{ backgroundColor: legendDotColor }}
             />
           )}
-          <span className="text-xs font-bold uppercase text-slate-400 tracking-wider">
+          <span className="text-xs font-bold uppercase text-muted-foreground tracking-wider">
             {label}
           </span>
         </div>
@@ -40,38 +40,38 @@ export function StatsSummary({ data, colorClass, bgClass, unit = '', label, lege
       {/* TARJETAS DE ESTADÍSTICAS (Layout Flex) */}
       <div className="flex flex-wrap gap-2 md:gap-4">
         {/* Targeta MIN */}
-        <Card className="flex-1 min-w-[100px] border-slate-100 shadow-sm rounded-xl">
+        <Card className="flex-1 min-w-[100px] border-border shadow-sm rounded-xl">
           <CardContent className="p-3 flex flex-col items-center justify-center">
-            <span className="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-1">
+            <span className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-1">
               <ArrowDown size={12} /> {t('min')}
             </span>
             <span className={`text-xl font-bold`}>
-              {stats.min}<span className="text-xs text-slate-400 ml-0.5">{unit}</span>
+              {stats.min}<span className="text-xs text-muted-foreground ml-0.5">{unit}</span>
             </span>
           </CardContent>
         </Card>
 
         {/* Targeta MAX */}
-        <Card className="flex-1 min-w-[100px] border-slate-100 shadow-sm rounded-xl">
+        <Card className="flex-1 min-w-[100px] border-border shadow-sm rounded-xl">
           <CardContent className="p-3 flex flex-col items-center justify-center">
-            <span className="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-1">
+            <span className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-1">
               <ArrowUp size={12} /> {t('max')}
             </span>
             <span className={`text-xl font-bold`}>
-              {stats.max}<span className="text-xs text-slate-400 ml-0.5">{unit}</span>
+              {stats.max}<span className="text-xs text-muted-foreground ml-0.5">{unit}</span>
             </span>
           </CardContent>
         </Card>
 
         {/* Targeta AVG - Conditionally rendered */}
         {showAvg && (
-          <Card className="flex-1 min-w-[100px] border-slate-100 shadow-sm rounded-xl">
+          <Card className="flex-1 min-w-[100px] border-border shadow-sm rounded-xl">
             <CardContent className="p-3 flex flex-col items-center justify-center">
-              <span className="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-1">
+              <span className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-1">
                 <Activity size={12} /> {t('avg')}
               </span>
               <span className={`text-xl font-bold`}>
-                {stats.avg}<span className="text-xs text-slate-400 ml-0.5">{unit}</span>
+                {stats.avg}<span className="text-xs text-muted-foreground ml-0.5">{unit}</span>
               </span>
             </CardContent>
           </Card>

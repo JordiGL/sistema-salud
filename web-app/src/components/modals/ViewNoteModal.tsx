@@ -21,12 +21,12 @@ export function ViewNoteModal({ isOpen, onClose, note, date }: ViewNoteModalProp
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-md">
         <DialogHeader className="mb-4">
-          <DialogTitle className="flex items-center gap-2 text-slate-800 text-lg font-bold">
-            <FileText size={20} className="text-slate-800" />
+          <DialogTitle className="flex items-center gap-2 text-foreground text-lg font-bold">
+            <FileText size={20} className="text-foreground" />
             {t('Form.notes')}
           </DialogTitle>
           <DialogDescription asChild>
-            <div className="text-xs text-slate-400 flex items-center gap-1 font-medium mt-1">
+            <div className="text-xs text-muted-foreground flex items-center gap-1 font-medium mt-1">
               <Calendar size={12} />
               {date.toLocaleDateString()} - {date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </div>
@@ -34,18 +34,18 @@ export function ViewNoteModal({ isOpen, onClose, note, date }: ViewNoteModalProp
         </DialogHeader>
 
         {/* Contingut */}
-        <div className="bg-slate-50 p-4 rounded-xl border border-slate-100 text-slate-700 text-sm leading-relaxed max-h-[60vh] overflow-y-auto whitespace-pre-wrap mb-4">
+        <div className="bg-muted/30 p-4 rounded-xl border border-border text-foreground text-sm leading-relaxed max-h-[60vh] overflow-y-auto whitespace-pre-wrap mb-4">
           {note}
         </div>
 
         {/* Footer */}
         <div className="flex justify-end pt-2">
-          <button
+          <Button
             onClick={onClose}
-            className="px-8 py-3 rounded-xl bg-slate-900 text-white font-bold hover:bg-slate-800 transition-colors shadow-sm"
+            className="px-8 py-6 rounded-xl font-bold shadow-sm"
           >
             {t('History.close')}
-          </button>
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

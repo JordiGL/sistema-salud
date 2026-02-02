@@ -46,12 +46,12 @@ export function MetricCard({ data, isAdmin, onRefresh }: MetricCardProps) {
 
   return (
     <>
-      <Card className={`rounded-xl shadow-sm border-slate-100 ${cardStyles.border} border-l-[6px] hover:shadow-md transition-shadow overflow-hidden bg-white`}>
+      <Card className={`rounded-xl shadow-sm border-border ${cardStyles.border} border-l-[6px] hover:shadow-md transition-shadow overflow-hidden bg-card`}>
         {/* CABECERA */}
-        <CardHeader className="p-5 pb-3 border-b border-slate-50 flex-row justify-between items-start space-y-0">
+        <CardHeader className="p-5 pb-3 border-b border-border flex-row justify-between items-start space-y-0">
           <div className="flex flex-col">
-            <span className="text-sm font-bold text-slate-700 bg-slate-100 px-2 py-1 rounded-md w-fit">
-              {dateObj.toLocaleDateString()} <span className="text-slate-400 mx-1">|</span> {dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+            <span className="text-sm font-bold text-foreground bg-muted px-2 py-1 rounded-md w-fit">
+              {dateObj.toLocaleDateString()} <span className="text-muted-foreground mx-1">|</span> {dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </span>
           </div>
           {isAdmin && (
@@ -70,46 +70,46 @@ export function MetricCard({ data, isAdmin, onRefresh }: MetricCardProps) {
         <CardContent className="p-5 grid grid-cols-2 sm:grid-cols-3 gap-y-6 gap-x-2">
           {data.bloodPressure && (
             <div className="flex flex-col">
-              <span className="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-1 mb-1 tracking-wider"><Activity size={12} /> {t('Form.bpLabel')}</span>
+              <span className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-1 mb-1 tracking-wider"><Activity size={12} /> {t('Form.bpLabel')}</span>
               <div className="text-2xl font-bold flex items-baseline">
                 <span className={STATUS_COLORS[sysStatus].text}>{sys}</span>
-                <span className="text-slate-300 text-lg font-light mx-0.5">/</span>
+                <span className="text-muted-foreground text-lg font-light mx-0.5">/</span>
                 <span className={STATUS_COLORS[diaStatus].text}>{dia}</span>
               </div>
             </div>
           )}
           {data.pulse && (
             <div className="flex flex-col">
-              <span className="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-1 mb-1 tracking-wider"><Heart size={12} /> {t('Form.pulseLabel')}</span>
-              <div className={`text-2xl font-bold ${STATUS_COLORS[pulseStatus].text} flex items-baseline gap-1`}>{data.pulse} <span className="text-xs text-slate-400 font-bold">BPM</span></div>
+              <span className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-1 mb-1 tracking-wider"><Heart size={12} /> {t('Form.pulseLabel')}</span>
+              <div className={`text-2xl font-bold ${STATUS_COLORS[pulseStatus].text} flex items-baseline gap-1`}>{data.pulse} <span className="text-xs text-muted-foreground font-bold">BPM</span></div>
             </div>
           )}
           {data.spo2 && (
             <div className="flex flex-col">
-              <span className="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-1 mb-1 tracking-wider"><Droplets size={12} /> {t('Form.spo2Label')}</span>
-              <div className={`text-2xl font-bold ${STATUS_COLORS[spo2Status].text} flex items-baseline`}>{data.spo2}<span className="text-sm text-slate-400 font-bold">%</span></div>
+              <span className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-1 mb-1 tracking-wider"><Droplets size={12} /> {t('Form.spo2Label')}</span>
+              <div className={`text-2xl font-bold ${STATUS_COLORS[spo2Status].text} flex items-baseline`}>{data.spo2}<span className="text-sm text-muted-foreground font-bold">%</span></div>
             </div>
           )}
           {data.weight && (
             <div className="flex flex-col col-span-2 sm:col-span-1">
-              <span className="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-1 mb-1 tracking-wider"><Scale size={12} /> {t('Form.weightLabel')}</span>
-              <div className="text-2xl font-bold text-slate-800 flex items-baseline gap-1">{data.weight} <span className="text-xs text-slate-400 font-bold">kg</span></div>
-              {data.weightLocation && <div className="flex items-center gap-1 text-xs text-slate-500 mt-1 font-medium"><MapPin size={10} /> {renderLocation(data.weightLocation)}</div>}
+              <span className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-1 mb-1 tracking-wider"><Scale size={12} /> {t('Form.weightLabel')}</span>
+              <div className="text-2xl font-bold text-foreground flex items-baseline gap-1">{data.weight} <span className="text-xs text-muted-foreground font-bold">kg</span></div>
+              {data.weightLocation && <div className="flex items-center gap-1 text-xs text-muted-foreground mt-1 font-medium"><MapPin size={10} /> {renderLocation(data.weightLocation)}</div>}
             </div>
           )}
           {data.ca125 && (
             <div className="flex flex-col">
-              <span className="text-[10px] font-bold text-slate-400 uppercase flex items-center gap-1 mb-1 tracking-wider"><TestTube size={12} /> {t('Form.ca125Label')}</span>
-              <div className="text-2xl font-bold text-slate-800 flex items-baseline gap-1">{data.ca125}</div>
+              <span className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-1 mb-1 tracking-wider"><TestTube size={12} /> {t('Form.ca125Label')}</span>
+              <div className="text-2xl font-bold text-foreground flex items-baseline gap-1">{data.ca125}</div>
             </div>
           )}
 
 
           {/* FOOTER */}
           {(data.measurementContext || data.notes) && (
-            <div className="bg-slate-50 p-3 rounded-lg mt-1 text-sm border border-slate-100/80 col-span-full">
-              {data.measurementContext && <div className="mb-1 text-purple-700 font-bold text-xs uppercase tracking-wide">{renderContext(data.measurementContext)}</div>}
-              {data.notes && <div className="text-slate-600 italic flex gap-2 items-start text-[13px] leading-relaxed"><FileText size={14} className="mt-1 opacity-40 flex-shrink-0 text-slate-500" /><span>{data.notes}</span></div>}
+            <div className="bg-muted p-3 rounded-lg mt-1 text-sm border border-border col-span-full">
+              {data.measurementContext && <div className="mb-1 text-primary font-bold text-xs uppercase tracking-wide">{renderContext(data.measurementContext)}</div>}
+              {data.notes && <div className="text-muted-foreground italic flex gap-2 items-start text-[13px] leading-relaxed"><FileText size={14} className="mt-1 opacity-40 flex-shrink-0 text-muted-foreground" /><span>{data.notes}</span></div>}
             </div>
           )}
         </CardContent>

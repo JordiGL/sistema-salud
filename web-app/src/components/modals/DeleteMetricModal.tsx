@@ -40,8 +40,8 @@ export function DeleteMetricModal({ isOpen, onClose, metricId, onSuccess }: Dele
       <DialogContent className="max-w-sm">
         <DialogHeader>
           <div className="flex flex-col items-center text-center gap-4">
-            <div className="bg-red-100 p-3 rounded-full text-red-600"><AlertTriangle size={32} /></div>
-            <DialogTitle className="text-lg font-bold text-slate-800 text-center">{t('History.deleteTitle')}</DialogTitle>
+            <div className="bg-red-100 dark:bg-red-900/20 p-3 rounded-full text-red-600 dark:text-red-400"><AlertTriangle size={32} /></div>
+            <DialogTitle className="text-lg font-bold text-foreground text-center">{t('History.deleteTitle')}</DialogTitle>
           </div>
         </DialogHeader>
 
@@ -49,7 +49,7 @@ export function DeleteMetricModal({ isOpen, onClose, metricId, onSuccess }: Dele
           <Button
             variant="outline"
             onClick={onClose}
-            className="flex-1 py-6 rounded-xl font-bold text-slate-600"
+            className="flex-1 py-6 rounded-xl font-bold text-muted-foreground"
           >
             {t('History.cancel')}
           </Button>
