@@ -100,7 +100,7 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
         ) : (
           <Link
             href={`/${locale}${APP_ROUTES.LOGIN}`}
-            className="w-44 h-8 flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 transition-all text-xs font-bold mr-2"
+            className="w-44 h-8 flex items-center justify-center gap-2 rounded-full bg-primary dark:bg-indigo-600 text-primary-foreground dark:text-white shadow-sm hover:bg-primary/90 dark:hover:bg-indigo-700 transition-all text-xs font-bold mr-2"
           >
             <Activity size={14} /> {t('HomePage.adminAccess')}
           </Link>
