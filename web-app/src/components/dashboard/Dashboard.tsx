@@ -100,11 +100,9 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
         ) : (
           <Link
             href={`/${locale}${APP_ROUTES.LOGIN}`}
-            className="w-44 flex items-center p-1 bg-primary dark:bg-indigo-600 rounded-full shadow-sm border border-border mr-2 hover:shadow-md transition-all group"
+            className="w-44 h-8 flex items-center justify-center gap-2 rounded-full bg-primary text-primary-foreground shadow-sm hover:bg-primary/90 transition-all text-xs font-bold mr-2"
           >
-            <span className="w-full py-1 rounded-full hover:bg-accent bg-card text-primary-foreground dark:bg-indigo-600 dark:text-white group-hover:bg-primary/90 dark:group-hover:bg-indigo-700 text-xs font-bold flex items-center justify-center gap-2 transition-colors">
-              {t('HomePage.adminAccess')}
-            </span>
+            <Activity size={14} /> {t('HomePage.adminAccess')}
           </Link>
         )}
 
