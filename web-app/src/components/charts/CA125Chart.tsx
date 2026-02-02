@@ -1,7 +1,8 @@
 'use client';
 import { useState, useEffect, useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
-import { TestTube2, Loader2, FileSpreadsheet, FileCode } from 'lucide-react';
+import { TestTube2, FileSpreadsheet, FileCode } from 'lucide-react';
+import { ChartSkeleton } from './ChartSkeleton';
 import { useTranslations } from 'next-intl';
 import { metricApi } from '@/lib/api';
 import { Metric } from '@/types/metrics';
@@ -91,26 +92,22 @@ export function CA125Chart({ data: initialData }: { data: Metric[] }) {
     return result;
   }, [chartData, timeOfDay]);
 
-  // CALCULO DE DATOS PARA ESTADÍSTICAS (CA125)
   const ca125Data = useMemo(() =>
     finalData
       .map(d => d.ca125 || 0)
       .filter(n => n > 0),
     [finalData]);
 
+  // Si està carregant i no hi ha dades prèvies, mostrem el skeleton
+  if (loading && chartData.length === 0) {
+    return <ChartSkeleton />;
+  }
+
   return (
-    <Card className="w-full relative overflow-hidden border-slate-100 shadow-sm rounded-3xl">
-      {loading && (
-        <div className="absolute inset-0 bg-white/60 z-10 flex items-center justify-center backdrop-blur-[1px]">
-          <div className="bg-white p-3 rounded-full shadow-lg border border-orange-100">
-            <Loader2 className="animate-spin text-orange-600" size={24} />
-          </div>
-        </div>
-      )}
+    <Card className="w-full relative overflow-hidden border-slate-100 shadow-sm rounded-3xl animate-in fade-in duration-500">
 
       {/* --- BARRA DE HERRAMIENTAS (HEADER) --- */}
       <CardHeader className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 p-6">
-        {/* GRUPO IZQUIERDO: EXPORTAR */}
         <div className="flex gap-2">
           <Button
             variant="outline"
@@ -132,10 +129,7 @@ export function CA125Chart({ data: initialData }: { data: Metric[] }) {
           </Button>
         </div>
 
-        {/* GRUPO DERECHO: FILTROS */}
         <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center overflow-x-auto pb-1 sm:pb-0">
-
-          {/* Rango Fechas */}
           <Tabs value={dateRange} onValueChange={setDateRange} className="shrink-0">
             <TabsList className="bg-slate-100 h-9 p-1 rounded-xl">
               <TabsTrigger value="7d" className="text-[11px] h-7 rounded-lg data-[state=active]:bg-white data-[state=active]:text-orange-700 data-[state=active]:shadow-sm">{tFilter('7days')}</TabsTrigger>
@@ -144,7 +138,6 @@ export function CA125Chart({ data: initialData }: { data: Metric[] }) {
             </TabsList>
           </Tabs>
 
-          {/* Hora */}
           <Tabs value={timeOfDay} onValueChange={setTimeOfDay} className="shrink-0">
             <TabsList className="bg-slate-100 h-9 p-1 rounded-xl">
               <TabsTrigger value="24h" className="text-[11px] h-7 rounded-lg uppercase data-[state=active]:bg-white data-[state=active]:text-orange-700 data-[state=active]:shadow-sm">{tFilter('24h')}</TabsTrigger>
@@ -155,7 +148,6 @@ export function CA125Chart({ data: initialData }: { data: Metric[] }) {
 
           <div className="hidden sm:block w-px h-6 bg-slate-200 mx-1"></div>
 
-          {/* Contextos */}
           <div className="flex items-center gap-2 shrink-0">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider hidden md:inline">
               {tFilter('contexts')}
@@ -184,80 +176,69 @@ export function CA125Chart({ data: initialData }: { data: Metric[] }) {
             <p className="font-medium text-sm text-slate-500">{tCharts('noData')}</p>
           </div>
         ) : (
-          <ChartContainer config={chartConfig} className="w-full h-[400px]">
-            <LineChart data={finalData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} stroke="#94a3b8" />
-              <XAxis
-                dataKey="createdAt"
-                tick={(props) => <CustomXAxisTick {...props} hideTime={finalData.length > 30} />}
-                interval="preserveStartEnd"
-                minTickGap={50}
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis domain={['auto', 'auto']} tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} tickCount={6} />
-              <ChartTooltip
-                cursor={{ stroke: '#e2e8f0', strokeWidth: 2 }}
-                content={
-                  <ChartTooltipContent
-                    // Forcem indicator="dot" per evitar que el component amagui el label
-                    indicator="dot"
-                    className="w-[200px] rounded-2xl border-none shadow-2xl bg-white/95 backdrop-blur-md p-3"
-                    labelFormatter={(value, payload) => {
-                      // En Recharts, si el valor no ve pel labelFormatter directament, 
-                      // el busquem dins del payload del primer item
-                      const rawDate = value || (payload && payload[0]?.payload?.createdAt);
-                      if (!rawDate) return null;
-
-                      const date = new Date(rawDate);
-
-                      return (
-                        <div className="flex flex-col border-b border-slate-100 pb-2 mb-2">
-                          <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                            {t('History.cols.date')}
+          /* DIV DE OPACITAT AFEGIT PER A LA CÀRREGA FLUIDA */
+          <div className={loading ? "opacity-50 transition-opacity duration-300" : "opacity-100 transition-opacity duration-300"}>
+            <ChartContainer config={chartConfig} className="w-full h-[400px]">
+              <LineChart data={finalData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} stroke="#94a3b8" />
+                <XAxis
+                  dataKey="createdAt"
+                  tick={(props) => <CustomXAxisTick {...props} hideTime={finalData.length > 30} />}
+                  interval="preserveStartEnd"
+                  minTickGap={50}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis domain={['auto', 'auto']} tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} tickCount={6} />
+                <ChartTooltip
+                  cursor={{ stroke: '#e2e8f0', strokeWidth: 2 }}
+                  content={
+                    <ChartTooltipContent
+                      indicator="dot"
+                      className="w-[200px] rounded-2xl border-none shadow-2xl bg-white/95 backdrop-blur-md p-3"
+                      labelFormatter={(value, payload) => {
+                        const rawDate = value || (payload && payload[0]?.payload?.createdAt);
+                        if (!rawDate) return null;
+                        const date = new Date(rawDate);
+                        return (
+                          <div className="flex flex-col border-b border-slate-100 pb-2 mb-2">
+                            <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                              {t('History.cols.date')}
+                            </span>
+                            <span className="text-xs font-bold text-slate-700">
+                              {date.toLocaleDateString('es-ES', { day: 'numeric', month: 'numeric', year: 'numeric' })}
+                              <span className="mx-1 text-slate-300">|</span>
+                              {date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false })}
+                            </span>
+                          </div>
+                        );
+                      }}
+                      formatter={(value) => (
+                        <div className="flex items-center justify-between w-full my-0.5">
+                          <span className="text-slate-500 text-xs font-medium">
+                            {tCharts('ca125Title')}
                           </span>
-                          <span className="text-xs font-bold text-slate-700">
-                            {date.toLocaleDateString('es-ES', {
-                              day: 'numeric',
-                              month: 'numeric',
-                              year: 'numeric'
-                            })}
-                            <span className="mx-1 text-slate-300">|</span>
-                            {date.toLocaleTimeString('es-ES', {
-                              hour: '2-digit',
-                              minute: '2-digit',
-                              hour12: false
-                            })}
+                          <span className="font-bold text-slate-900 text-sm">
+                            {value}
+                            <span className="ml-1 font-normal text-[10px] text-slate-400 uppercase">
+                              U/ml
+                            </span>
                           </span>
                         </div>
-                      );
-                    }}
-                    formatter={(value) => (
-                      <div className="flex items-center justify-between w-full my-0.5">
-                        <span className="text-slate-500 text-xs font-medium">
-                          {tCharts('ca125Title')}
-                        </span>
-                        <span className="font-bold text-slate-900 text-sm">
-                          {value}
-                          <span className="ml-1 font-normal text-[10px] text-slate-400 uppercase">
-                            U/ml
-                          </span>
-                        </span>
-                      </div>
-                    )}
-                  />
-                }
-              />
-              <Line type="monotone" dataKey="ca125" stroke="var(--color-ca125)" strokeWidth={3} dot={{ r: 4, fill: "var(--color-ca125)", strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 6 }} />
-            </LineChart>
-          </ChartContainer>
+                      )}
+                    />
+                  }
+                />
+                <Line type="monotone" dataKey="ca125" stroke="var(--color-ca125)" strokeWidth={3} dot={{ r: 4, fill: "var(--color-ca125)", strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 6 }} />
+              </LineChart>
+            </ChartContainer>
+          </div>
         )}
       </CardContent>
 
       {/* --- SECCIÓN DE ESTADÍSTICAS --- */}
       {finalData.length > 0 && (
         <CardFooter className="pt-6 border-t border-slate-100 block">
-          {/* Estadísticas sin media para CA125 */}
           <StatsSummary
             label={tCharts('ca125Title')}
             data={ca125Data}
@@ -265,7 +246,7 @@ export function CA125Chart({ data: initialData }: { data: Metric[] }) {
             bgClass="bg-orange-50"
             unit="U/ml"
             legendDotColor="#f97316"
-            showAvg={false} // Hide average
+            showAvg={false}
           />
         </CardFooter>
       )}

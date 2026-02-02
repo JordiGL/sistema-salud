@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
-import { Scale, Loader2, FileSpreadsheet, FileCode } from 'lucide-react';
+import { Scale, FileSpreadsheet, FileCode } from 'lucide-react';
+import { ChartSkeleton } from './ChartSkeleton';
 import { useTranslations } from 'next-intl';
 import { metricApi } from '@/lib/api';
 import { Metric } from '@/types/metrics';
@@ -53,7 +54,7 @@ export function WeightChart({ data: initialData }: { data: Metric[] }) {
   const [locationFilter, setLocationFilter] = useState<string>('all');
   const [timeOfDay, setTimeOfDay] = useState<string>('24h');
 
-  // Obtener LUGARES únicos
+  // Obtener LUGARES únicos (usando initialData para estabilidad)
   const availableLocations = useMemo(() => {
     const locs = initialData
       .map(d => d.weightLocation)
@@ -96,33 +97,29 @@ export function WeightChart({ data: initialData }: { data: Metric[] }) {
     return result;
   }, [chartData, timeOfDay]);
 
-  // CALCULO DE DATOS PARA ESTADÍSTICAS (PESO)
+  // CALCULO DE DATOS PARA ESTADÍSTICAS
   const weightData = useMemo(() =>
     finalData
       .map(d => d.weight || 0)
       .filter(n => n > 0),
     [finalData]);
 
-  return (
-    <Card className="w-full relative overflow-hidden border-slate-100 shadow-sm rounded-3xl">
-      {loading && (
-        <div className="absolute inset-0 bg-white/60 z-10 flex items-center justify-center backdrop-blur-[1px]">
-          <div className="bg-white p-3 rounded-full shadow-lg border border-blue-100">
-            <Loader2 className="animate-spin text-blue-600" size={24} />
-          </div>
-        </div>
-      )}
+  // Skeleton solo en la carga inicial
+  if (loading && chartData.length === 0) {
+    return <ChartSkeleton />;
+  }
 
-      {/* --- BARRA DE HERRAMIENTAS (HEADER) --- */}
+  return (
+    <Card className="w-full relative overflow-hidden border-slate-100 shadow-sm rounded-3xl animate-in fade-in duration-500">
+
+      {/* --- HEADER --- */}
       <CardHeader className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 p-6">
-        {/* GRUPO IZQUIERDO: EXPORTAR */}
         <div className="flex gap-2">
           <Button
             variant="outline"
             size="sm"
             onClick={() => downloadCSV(finalData, 'peso_data', t)}
             className="gap-1.5 text-xs font-bold text-slate-500 bg-white border-slate-200 hover:bg-slate-50 hover:text-blue-600"
-            title="Descargar CSV"
           >
             <FileSpreadsheet size={14} /> <span>CSV</span>
           </Button>
@@ -131,36 +128,30 @@ export function WeightChart({ data: initialData }: { data: Metric[] }) {
             size="sm"
             onClick={() => downloadXML(finalData, 'peso_data', t)}
             className="gap-1.5 text-xs font-bold text-slate-500 bg-white border-slate-200 hover:bg-slate-50 hover:text-blue-600"
-            title="Descargar XML"
           >
             <FileCode size={14} /> <span>XML</span>
           </Button>
         </div>
 
-        {/* GRUPO DERECHO: FILTROS */}
         <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center overflow-x-auto pb-1 sm:pb-0">
-
-          {/* Rango Fechas */}
           <Tabs value={dateRange} onValueChange={setDateRange} className="shrink-0">
             <TabsList className="bg-slate-100 h-9 p-1 rounded-xl">
-              <TabsTrigger value="7d" className="text-[11px] h-7 rounded-lg data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm">{tFilter('7days')}</TabsTrigger>
-              <TabsTrigger value="30d" className="text-[11px] h-7 rounded-lg data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm">{tFilter('30days')}</TabsTrigger>
-              <TabsTrigger value="all" className="text-[11px] h-7 rounded-lg data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm">{tFilter('all')}</TabsTrigger>
+              <TabsTrigger value="7d" className="text-[11px] h-7 rounded-lg data-[state=active]:text-blue-600">{tFilter('7days')}</TabsTrigger>
+              <TabsTrigger value="30d" className="text-[11px] h-7 rounded-lg data-[state=active]:text-blue-600">{tFilter('30days')}</TabsTrigger>
+              <TabsTrigger value="all" className="text-[11px] h-7 rounded-lg data-[state=active]:text-blue-600">{tFilter('all')}</TabsTrigger>
             </TabsList>
           </Tabs>
 
-          {/* Hora */}
           <Tabs value={timeOfDay} onValueChange={setTimeOfDay} className="shrink-0">
             <TabsList className="bg-slate-100 h-9 p-1 rounded-xl">
-              <TabsTrigger value="24h" className="text-[11px] h-7 rounded-lg uppercase data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm">{tFilter('24h')}</TabsTrigger>
-              <TabsTrigger value="am" className="text-[11px] h-7 rounded-lg uppercase data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm">{tFilter('am')}</TabsTrigger>
-              <TabsTrigger value="pm" className="text-[11px] h-7 rounded-lg uppercase data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm">{tFilter('pm')}</TabsTrigger>
+              <TabsTrigger value="24h" className="text-[11px] h-7 rounded-lg data-[state=active]:text-blue-600 uppercase">{tFilter('24h')}</TabsTrigger>
+              <TabsTrigger value="am" className="text-[11px] h-7 rounded-lg data-[state=active]:text-blue-600 uppercase">{tFilter('am')}</TabsTrigger>
+              <TabsTrigger value="pm" className="text-[11px] h-7 rounded-lg data-[state=active]:text-blue-600 uppercase">{tFilter('pm')}</TabsTrigger>
             </TabsList>
           </Tabs>
 
           <div className="hidden sm:block w-px h-6 bg-slate-200 mx-1"></div>
 
-          {/* FILTRO DE LUGAR (LOCATION) */}
           <div className="flex items-center gap-2 shrink-0">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider hidden md:inline">
               {tFilter('location')}
@@ -189,96 +180,82 @@ export function WeightChart({ data: initialData }: { data: Metric[] }) {
             <p className="font-medium text-sm text-slate-500">{tCharts('noData')}</p>
           </div>
         ) : (
-          <ChartContainer config={chartConfig} className="w-full h-[400px]">
-            <LineChart data={finalData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} stroke="#94a3b8" />
-              <XAxis
-                dataKey="createdAt"
-                tick={(props) => <CustomXAxisTick {...props} hideTime={finalData.length > 30} />}
-                interval="preserveStartEnd"
-                minTickGap={50}
-                axisLine={false}
-                tickLine={false}
-              />
-
-              <YAxis
-                domain={[40, 'auto']}
-                tick={{ fontSize: 11, fill: '#94a3b8' }}
-                axisLine={false}
-                tickLine={false}
-                tickCount={6}
-              />
-
-              <ChartTooltip
-                cursor={{ stroke: '#e2e8f0', strokeWidth: 2 }}
-                content={
-                  <ChartTooltipContent
-                    indicator="dot"
-                    className="w-[200px] rounded-2xl border-none shadow-2xl bg-white/95 backdrop-blur-md p-3"
-                    labelFormatter={(value, payload) => {
-                      const rawDate = value || (payload && payload[0]?.payload?.createdAt);
-                      if (!rawDate) return null;
-                      const date = new Date(rawDate);
-
-                      return (
-                        <div className="flex flex-col border-b border-slate-100 pb-2 mb-2">
-                          <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                            {t('History.cols.date')}
-                          </span>
-                          <span className="text-xs font-bold text-slate-700">
-                            {date.toLocaleDateString('es-ES', {
-                              day: 'numeric',
-                              month: 'numeric',
-                              year: 'numeric',
-                            })}
-                            <span className="mx-1 text-slate-300">|</span>
-                            {date.toLocaleTimeString('es-ES', {
-                              hour: '2-digit',
-                              minute: '2-digit',
-                              hour12: false,
-                            })}
-                          </span>
-                        </div>
-                      );
-                    }}
-                    formatter={(value, name, item) => (
-                      <div className="flex flex-col gap-2 w-full">
-                        {/* Fila del Pes */}
-                        <div className="flex items-center justify-between w-full my-0.5">
-                          <span className="text-slate-500 text-xs font-medium">
-                            {tCharts('weightTitle')}
-                          </span>
-                          <span className="font-bold text-slate-900 text-sm">
-                            {value}
-                            <span className="ml-1 font-normal text-[10px] text-slate-400 uppercase">
-                              Kg
+          /* Transición fluida durante el filtrado */
+          <div className={loading ? "opacity-50 transition-opacity duration-300" : "opacity-100 transition-opacity duration-300"}>
+            <ChartContainer config={chartConfig} className="w-full h-[400px]">
+              <LineChart data={finalData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} stroke="#94a3b8" />
+                <XAxis
+                  dataKey="createdAt"
+                  tick={(props) => <CustomXAxisTick {...props} hideTime={finalData.length > 30} />}
+                  interval="preserveStartEnd"
+                  minTickGap={50}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis
+                  domain={[40, 'auto']}
+                  tick={{ fontSize: 11, fill: '#94a3b8' }}
+                  axisLine={false}
+                  tickLine={false}
+                  tickCount={6}
+                />
+                <ChartTooltip
+                  cursor={{ stroke: '#e2e8f0', strokeWidth: 2 }}
+                  content={
+                    <ChartTooltipContent
+                      indicator="dot"
+                      className="w-[200px] rounded-2xl border-none shadow-2xl bg-white/95 backdrop-blur-md p-3"
+                      labelFormatter={(value, payload) => {
+                        const rawDate = value || (payload && payload[0]?.payload?.createdAt);
+                        if (!rawDate) return null;
+                        const date = new Date(rawDate);
+                        return (
+                          <div className="flex flex-col border-b border-slate-100 pb-2 mb-2">
+                            <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                              {t('History.cols.date')}
                             </span>
-                          </span>
-                        </div>
-
-                        {/* Fila del Lloc (si existeix) */}
-                        {item.payload.weightLocation && (
-                          <div className="flex items-center justify-between w-full pt-1.5 border-t border-slate-50">
-                            <span className="text-slate-400 text-[10px] uppercase font-bold tracking-tight">
-                              {tFilter('location')}
-                            </span>
-                            <span className="text-slate-600 text-[11px] font-semibold italic">
-                              {item.payload.weightLocation}
+                            <span className="text-xs font-bold text-slate-700">
+                              {date.toLocaleDateString('es-ES', { day: 'numeric', month: 'numeric', year: 'numeric' })}
+                              <span className="mx-1 text-slate-300">|</span>
+                              {date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false })}
                             </span>
                           </div>
-                        )}
-                      </div>
-                    )}
-                  />
-                }
-              />
-              <Line type="monotone" dataKey="weight" stroke="var(--color-weight)" strokeWidth={3} dot={{ r: 4, fill: "var(--color-weight)", strokeWidth: 2, stroke: '#fff' }} />
-            </LineChart>
-          </ChartContainer>
+                        );
+                      }}
+                      formatter={(value, name, item) => (
+                        <div className="flex flex-col gap-2 w-full">
+                          <div className="flex items-center justify-between w-full my-0.5">
+                            <span className="text-slate-500 text-xs font-medium">{tCharts('weightTitle')}</span>
+                            <span className="font-bold text-slate-900 text-sm">
+                              {value} <span className="ml-1 font-normal text-[10px] text-slate-400 uppercase">Kg</span>
+                            </span>
+                          </div>
+                          {item.payload.weightLocation && (
+                            <div className="flex items-center justify-between w-full pt-1.5 border-t border-slate-50">
+                              <span className="text-slate-400 text-[10px] uppercase font-bold tracking-tight">{tFilter('location')}</span>
+                              <span className="text-slate-600 text-[11px] font-semibold italic">{item.payload.weightLocation}</span>
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    />
+                  }
+                />
+                <Line
+                  type="monotone"
+                  dataKey="weight"
+                  stroke="var(--color-weight)"
+                  strokeWidth={3}
+                  dot={{ r: 4, fill: "var(--color-weight)", strokeWidth: 2, stroke: '#fff' }}
+                  activeDot={{ r: 6 }}
+                />
+              </LineChart>
+            </ChartContainer>
+          </div>
         )}
       </CardContent>
 
-      {/* --- SECCIÓN DE ESTADÍSTICAS --- */}
       {finalData.length > 0 && (
         <CardFooter className="pt-6 border-t border-slate-100 block">
           <StatsSummary

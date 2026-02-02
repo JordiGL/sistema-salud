@@ -1,12 +1,13 @@
 'use client';
 import { useState, useEffect, useMemo } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
-import { Activity, Loader2, FileSpreadsheet, FileCode } from 'lucide-react';
+import { Activity, FileSpreadsheet, FileCode } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { metricApi } from '@/lib/api';
 import { Metric } from '@/types/metrics';
 import { StatsSummary } from '@/components/dashboard/StatsSummary';
 import { downloadCSV, downloadXML } from '@/lib/export-utils';
+import { ChartSkeleton } from './ChartSkeleton';
 
 import { Card, CardContent, CardHeader, CardFooter } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartConfig } from "@/components/ui/chart";
@@ -43,23 +44,20 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-// Props: 'initialData' se usa para la primera carga y para sacar la lista de contextos
 export function BloodPressureChart({ data: initialData }: { data: Metric[] }) {
   const t = useTranslations();
   const tCharts = useTranslations('Charts');
   const tFilter = useTranslations('Filters');
 
   // --- ESTADOS ---
-  const [chartData, setChartData] = useState<Metric[]>(initialData); // Datos actuales de la gráfica
-  const [loading, setLoading] = useState(false); // Estado de carga
+  const [chartData, setChartData] = useState<Metric[]>(initialData);
+  const [loading, setLoading] = useState(false);
 
   // Filtros
   const [dateRange, setDateRange] = useState<string>('all');
   const [contextFilter, setContextFilter] = useState<string>('all');
   const [timeOfDay, setTimeOfDay] = useState<string>('24h');
 
-  // 1. Contextos disponibles: Los calculamos de 'initialData' para que el dropdown 
-  //    siempre tenga todas las opciones, aunque filtremos los datos visuales.
   const availableContexts = useMemo(() => {
     const contexts = initialData
       .map(d => d.measurementContext)
@@ -67,10 +65,7 @@ export function BloodPressureChart({ data: initialData }: { data: Metric[] }) {
     return Array.from(new Set(contexts));
   }, [initialData]);
 
-  // 2. EFECTO: Server-Side Filtering
-  // Cada vez que cambia Rango o Contexto, pedimos datos nuevos a la API.
   useEffect(() => {
-    // Función asíncrona interna
     const loadFilteredData = async () => {
       setLoading(true);
       try {
@@ -78,7 +73,7 @@ export function BloodPressureChart({ data: initialData }: { data: Metric[] }) {
           range: dateRange as any,
           context: contextFilter
         });
-        setChartData(newData.reverse()); // Reverse si vienen desc
+        setChartData(newData.reverse());
       } catch (error) {
         console.error("Error filtrando:", error);
       } finally {
@@ -86,17 +81,12 @@ export function BloodPressureChart({ data: initialData }: { data: Metric[] }) {
       }
     };
 
-    // NOTA: Para que funcione fluido al pulsar botones, llamamos siempre:
     loadFilteredData();
-
   }, [dateRange, contextFilter]);
 
-  // 3. Lógica Cliente (AM/PM) + Limpieza
-  // Filtramos sobre 'chartData' (lo que nos trajo el servidor)
   const finalData = useMemo(() => {
     let result = chartData.filter(d => d.systolic_graph !== undefined && d.systolic_graph !== null);
 
-    // Filtro AM/PM (Local)
     if (timeOfDay !== '24h') {
       result = result.filter(d => {
         const dateObj = new Date(d.createdAt);
@@ -109,7 +99,6 @@ export function BloodPressureChart({ data: initialData }: { data: Metric[] }) {
     return result;
   }, [chartData, timeOfDay]);
 
-  // CALCULO DE DATOS PARA ESTADÍSTICAS (Basado en finalData filtrada)
   const systolicData = useMemo(() =>
     finalData
       .map(d => d.bloodPressure ? Number(d.bloodPressure.split('/')[0]) : 0)
@@ -122,18 +111,13 @@ export function BloodPressureChart({ data: initialData }: { data: Metric[] }) {
       .filter(n => n > 0),
     [finalData]);
 
+  // Si está cargando y no tenemos datos todavía, mostramos el Skeleton profesional
+  if (loading && chartData.length === 0) {
+    return <ChartSkeleton />;
+  }
 
   return (
-    <Card className="w-full relative overflow-hidden border-slate-100 shadow-sm rounded-3xl">
-
-      {/* INDICADOR DE CARGA (Overlay) */}
-      {loading && (
-        <div className="absolute inset-0 bg-white/60 z-10 flex items-center justify-center backdrop-blur-[1px]">
-          <div className="bg-white p-3 rounded-full shadow-lg border border-purple-100">
-            <Loader2 className="animate-spin text-purple-600" size={24} />
-          </div>
-        </div>
-      )}
+    <Card className="w-full relative overflow-hidden border-slate-100 shadow-sm rounded-3xl animate-in fade-in duration-500">
 
       {/* --- BARRA DE HERRAMIENTAS (HEADER) --- */}
       <CardHeader className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 p-6">
@@ -163,7 +147,6 @@ export function BloodPressureChart({ data: initialData }: { data: Metric[] }) {
         {/* GRUPO DERECHO: FILTROS */}
         <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center overflow-x-auto pb-1 sm:pb-0">
 
-          {/* Rango Fechas */}
           <Tabs value={dateRange} onValueChange={setDateRange} className="shrink-0">
             <TabsList className="bg-slate-100 h-9 p-1 rounded-xl">
               <TabsTrigger value="7d" className="text-[11px] h-7 rounded-lg data-[state=active]:bg-white data-[state=active]:text-purple-700 data-[state=active]:shadow-sm">{tFilter('7days')}</TabsTrigger>
@@ -172,7 +155,6 @@ export function BloodPressureChart({ data: initialData }: { data: Metric[] }) {
             </TabsList>
           </Tabs>
 
-          {/* Hora */}
           <Tabs value={timeOfDay} onValueChange={setTimeOfDay} className="shrink-0">
             <TabsList className="bg-slate-100 h-9 p-1 rounded-xl">
               <TabsTrigger value="24h" className="text-[11px] h-7 rounded-lg uppercase data-[state=active]:bg-white data-[state=active]:text-purple-700 data-[state=active]:shadow-sm">{tFilter('24h')}</TabsTrigger>
@@ -183,7 +165,6 @@ export function BloodPressureChart({ data: initialData }: { data: Metric[] }) {
 
           <div className="hidden sm:block w-px h-6 bg-slate-200 mx-1"></div>
 
-          {/* Contextos */}
           <div className="flex items-center gap-2 shrink-0">
             <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider hidden md:inline">
               {tFilter('contexts')}
@@ -213,76 +194,77 @@ export function BloodPressureChart({ data: initialData }: { data: Metric[] }) {
             <p className="font-medium text-sm text-slate-500">{tCharts('noData')}</p>
           </div>
         ) : (
-          <ChartContainer config={chartConfig} className="w-full h-[400px]">
-            <LineChart data={finalData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} stroke="#94a3b8" />
-              <XAxis
-                dataKey="createdAt"
-                tick={(props) => <CustomXAxisTick {...props} hideTime={finalData.length > 30} />}
-                interval="preserveStartEnd"
-                minTickGap={50}
-                axisLine={false}
-                tickLine={false}
-              />
-              <YAxis
-                domain={[40, 200]}
-                tick={{ fontSize: 11, fill: '#94a3b8' }}
-                axisLine={false}
-                tickLine={false}
-                tickCount={6}
-              />
-              <ChartTooltip
-                cursor={{ stroke: '#e2e8f0', strokeWidth: 2 }}
-                content={
-                  <ChartTooltipContent
-                    indicator="line"
-                    className="w-[200px] rounded-2xl border-none shadow-2xl bg-white/95 backdrop-blur-md p-3"
-                    labelFormatter={(value) => {
-                      const date = new Date(value);
-                      return (
-                        <div className="flex flex-col border-b border-slate-100 pb-2 mb-2">
-                          <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
-                            {t('History.cols.date')} {/* "Data" o podrías usar un t('History.record') si existiera */}
-                          </span>
-                          <span className="text-xs font-bold text-slate-700">
-                            {date.toLocaleDateString('es-ES', { day: 'numeric', month: 'numeric', year: 'numeric' })}
-                            <span className="mx-1 text-slate-300">|</span>
-                            {date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false })}
-                          </span>
-                        </div>
-                      );
-                    }}
-                    formatter={(value, name) => {
-                      // Mapeo dinámico de traducciones para las métricas
-                      const labelMap: Record<string, string> = {
-                        systolic_graph: tCharts('systolic'),
-                        diastolic_graph: tCharts('diastolic'),
-                      };
-
-                      return (
-                        <div className="flex items-center justify-between w-full my-0.5">
-                          <div className="flex items-center gap-2">
-                            <span className="text-slate-500 text-xs font-medium">
-                              {labelMap[name as string] || name}
+          <div className={loading ? "opacity-50 transition-opacity duration-300" : "opacity-100 transition-opacity duration-300"}>
+            <ChartContainer config={chartConfig} className="w-full h-[400px]">
+              <LineChart data={finalData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} stroke="#94a3b8" />
+                <XAxis
+                  dataKey="createdAt"
+                  tick={(props) => <CustomXAxisTick {...props} hideTime={finalData.length > 30} />}
+                  interval="preserveStartEnd"
+                  minTickGap={50}
+                  axisLine={false}
+                  tickLine={false}
+                />
+                <YAxis
+                  domain={[40, 200]}
+                  tick={{ fontSize: 11, fill: '#94a3b8' }}
+                  axisLine={false}
+                  tickLine={false}
+                  tickCount={6}
+                />
+                <ChartTooltip
+                  cursor={{ stroke: '#e2e8f0', strokeWidth: 2 }}
+                  content={
+                    <ChartTooltipContent
+                      indicator="line"
+                      className="w-[200px] rounded-2xl border-none shadow-2xl bg-white/95 backdrop-blur-md p-3"
+                      labelFormatter={(value) => {
+                        const date = new Date(value);
+                        return (
+                          <div className="flex flex-col border-b border-slate-100 pb-2 mb-2">
+                            <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                              {t('History.cols.date')}
+                            </span>
+                            <span className="text-xs font-bold text-slate-700">
+                              {date.toLocaleDateString('es-ES', { day: 'numeric', month: 'numeric', year: 'numeric' })}
+                              <span className="mx-1 text-slate-300">|</span>
+                              {date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false })}
                             </span>
                           </div>
-                          <span className="font-bold text-slate-900 text-sm">
-                            {value}
-                            <span className="ml-1 font-normal text-[10px] text-slate-400 uppercase">
-                              mmHg
-                            </span>
-                          </span>
-                        </div>
-                      );
-                    }}
-                  />
-                }
-              />
+                        );
+                      }}
+                      formatter={(value, name) => {
+                        const labelMap: Record<string, string> = {
+                          systolic_graph: tCharts('systolic'),
+                          diastolic_graph: tCharts('diastolic'),
+                        };
 
-              <Line type="monotone" dataKey="systolic_graph" stroke="var(--color-systolic)" strokeWidth={3} dot={{ r: 4, fill: "var(--color-systolic)", strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 6 }} />
-              <Line type="monotone" dataKey="diastolic_graph" stroke="var(--color-diastolic)" strokeWidth={3} dot={{ r: 4, fill: "var(--color-diastolic)", strokeWidth: 2, stroke: '#fff' }} />
-            </LineChart>
-          </ChartContainer>
+                        return (
+                          <div className="flex items-center justify-between w-full my-0.5">
+                            <div className="flex items-center gap-2">
+                              <span className="text-slate-500 text-xs font-medium">
+                                {labelMap[name as string] || name}
+                              </span>
+                            </div>
+                            <span className="font-bold text-slate-900 text-sm">
+                              {value}
+                              <span className="ml-1 font-normal text-[10px] text-slate-400 uppercase">
+                                mmHg
+                              </span>
+                            </span>
+                          </div>
+                        );
+                      }}
+                    />
+                  }
+                />
+
+                <Line type="monotone" dataKey="systolic_graph" stroke="var(--color-systolic)" strokeWidth={3} dot={{ r: 4, fill: "var(--color-systolic)", strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 6 }} />
+                <Line type="monotone" dataKey="diastolic_graph" stroke="var(--color-diastolic)" strokeWidth={3} dot={{ r: 4, fill: "var(--color-diastolic)", strokeWidth: 2, stroke: '#fff' }} />
+              </LineChart>
+            </ChartContainer>
+          </div>
         )}
       </CardContent>
 
