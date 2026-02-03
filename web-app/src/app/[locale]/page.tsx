@@ -8,6 +8,9 @@ interface PageProps {
 }
 
 export default async function Home({ params, searchParams }: PageProps) {
+  // Artificial delay for branding experience (Loading.tsx)
+  await new Promise((resolve) => setTimeout(resolve, 2500));
+
   const metrics: Metric[] = await metricApi.getAll();
 
   return (
