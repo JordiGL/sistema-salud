@@ -23,9 +23,10 @@ interface HistoryTableViewProps {
   data: Metric[];
   isAdmin: boolean;
   onRefresh: () => void;
+  embedded?: boolean;
 }
 
-export function HistoryTableView({ data, isAdmin, onRefresh }: HistoryTableViewProps) {
+export function HistoryTableView({ data, isAdmin, onRefresh, embedded = false }: HistoryTableViewProps) {
   const t = useTranslations();
   const { renderContext, renderLocation, contextOptions, locationOptions, translateOption } = useMetricManager();
 
@@ -33,15 +34,18 @@ export function HistoryTableView({ data, isAdmin, onRefresh }: HistoryTableViewP
   const [metricToEdit, setMetricToEdit] = useState<Metric | null>(null);
   const [noteToView, setNoteToView] = useState<Metric | null>(null);
 
+  const containerClass = embedded
+    ? "bg-transparent"
+    : "bg-card rounded-md border-border border shadow-sm";
+
   return (
     <>
-      <div className="md:hidden flex items-center justify-end gap-2 text-xs text-muted-foreground mb-2 animate-pulse">
-        <span>{t('History.scrollHint')}</span><MoveHorizontal size={16} />
-      </div>
-
-      <div className="bg-card rounded-md border-border border shadow-sm">
+      <div className={containerClass}>
+        <div className="md:hidden flex items-center justify-center gap-2 p-2 bg-muted/20 text-xs font-semibold text-muted-foreground border-b border-border">
+          <MoveHorizontal size={14} className="animate-pulse" /> <span>{t('History.scrollHint')}</span> <MoveHorizontal size={14} className="animate-pulse" />
+        </div>
         <Table>
-          <TableHeader className="bg-muted/50">
+          <TableHeader>
             <TableRow>
               <TableHead className="min-w-[100px]">{t('History.cols.date')}</TableHead>
               <TableHead className="min-w-[100px]">{t('History.cols.context')}</TableHead>

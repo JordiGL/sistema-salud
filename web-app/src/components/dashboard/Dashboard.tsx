@@ -7,7 +7,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import {
   Activity, Heart, Scale, Droplets, TestTube,
   Globe, LayoutList, LogOut, LayoutGrid, List,
-  FileSpreadsheet, FileCode, ShieldCheck
+  Table, Code, ShieldCheck
 } from 'lucide-react';
 
 // Imports de la nova API i Constants
@@ -148,73 +148,99 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
         <div className="min-h-100">
 
           {activeTab === 'history' && (
-            <div className="animate-in fade-in slide-in-from-bottom-2 duration-500 space-y-4">
+            <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
 
-              {/* --- BARRA D'EINES UNIFICADA --- */}
-              <div className="flex justify-end items-center mb-4 px-1">
-                <div className="bg-card p-1 rounded-xl border border-border flex items-center shadow-sm">
+              {/* Contenidor Integrat */}
+              <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden flex flex-col">
 
-                  {/* Grup 1: Exportació */}
-                  <Button
-                    variant="ghost"
-                    onClick={() => downloadCSV(metrics, 'historial_salud', t)}
-                    className="gap-1.5 h-auto px-3 py-2 text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg"
-                    title={t('Dashboard.downloadCSV')}
-                  >
-                    <FileSpreadsheet size={16} /> <span>CSV</span>
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onClick={() => downloadXML(metrics, 'historial_salud', t)}
-                    className="gap-1.5 h-auto px-3 py-2 text-xs font-bold text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg"
-                    title={t('Dashboard.downloadXML')}
-                  >
-                    <FileCode size={16} /> <span>XML</span>
-                  </Button>
+                {/* HEADER DE LA SECCIÓ (Integrat) */}
+                <div className="p-4 border-b border-border bg-muted/30 flex flex-row justify-between items-center gap-4">
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs font-bold text-primary bg-primary/10 px-2.5 py-1 rounded-full border border-primary/20">
+                      {metrics.length}
+                    </span>
+                    <h3 className="hidden sm:block font-bold text-lg">{t('Tabs.history')}</h3>
+                  </div>
 
-                  {/* Separador Vertical */}
-                  <div className="w-px h-6 bg-border mx-2"></div>
+                  {/* Controls */}
+                  <div className="flex items-center gap-3">
+                    {/* Export Group */}
+                    <div className="flex items-center bg-background rounded-lg border border-border p-1 shadow-sm">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => downloadCSV(metrics, 'historial_salud', t)}
+                        className="h-8 px-2 text-muted-foreground hover:text-foreground"
+                        title={t('Dashboard.downloadCSV')}
+                      >
+                        <Table size={16} className="mr-1" /> <span className="text-xs font-bold">CSV</span>
+                      </Button>
+                      <div className="w-px h-4 bg-border mx-1"></div>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => downloadXML(metrics, 'historial_salud', t)}
+                        className="h-8 px-2 text-muted-foreground hover:text-foreground"
+                        title={t('Dashboard.downloadXML')}
+                      >
+                        <Code size={16} className="mr-1" /> <span className="text-xs font-bold">XML</span>
+                      </Button>
+                    </div>
 
-                  {/* Grup 2: Vistes */}
-                  <Button
-                    variant="ghost"
-                    onClick={() => setViewMode('grid')}
-                    className={`h-auto p-2 rounded-lg ${viewMode === 'grid' ? 'bg-muted text-foreground shadow-inner' : 'text-muted-foreground hover:text-foreground'}`}
-                    title={t('History.cardView')}
-                  >
-                    <LayoutGrid size={18} />
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    onClick={() => setViewMode('table')}
-                    className={`h-auto p-2 rounded-lg ${viewMode === 'table' ? 'bg-muted text-foreground shadow-inner' : 'text-muted-foreground hover:text-foreground'}`}
-                    title={t('History.tableView')}
-                  >
-                    <List size={18} />
-                  </Button>
+                    {/* View Toggle */}
+                    <div className="flex items-center bg-background rounded-lg border border-border p-1 shadow-sm">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setViewMode('grid')}
+                        className={`h-8 w-8 rounded-md transition-all ${viewMode === 'grid' ? 'bg-primary/10 text-primary shadow-sm' : 'text-muted-foreground hover:bg-muted'}`}
+                        title={t('History.cardView')}
+                      >
+                        <LayoutGrid size={16} />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setViewMode('table')}
+                        className={`h-8 w-8 rounded-md transition-all ${viewMode === 'table' ? 'bg-primary/10 text-primary shadow-sm' : 'text-muted-foreground hover:bg-muted'}`}
+                        title={t('History.tableView')}
+                      >
+                        <List size={16} />
+                      </Button>
+                    </div>
+                  </div>
                 </div>
+
+                {/* BODY */}
+                <div className={`min-h-[300px] ${viewMode === 'grid' ? 'p-6 bg-muted/10' : 'p-0'}`}>
+                  {metrics.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-20 text-muted-foreground">
+                      <div className="p-4 rounded-full bg-muted mb-4 opacity-50">
+                        <LayoutList size={32} />
+                      </div>
+                      <p className="font-medium">{t('Dashboard.noRecords')}</p>
+                    </div>
+                  ) : (
+                    <>
+                      {viewMode === 'grid' ? (
+                        <HistoryGridView
+                          data={metrics}
+                          isAdmin={isAdmin}
+                          onRefresh={refreshData}
+                        />
+                      ) : (
+                        <HistoryTableView
+                          data={metrics}
+                          isAdmin={isAdmin}
+                          onRefresh={refreshData}
+                          embedded={true}
+                        />
+                      )}
+                    </>
+                  )}
+                </div>
+
               </div>
-
-              {metrics.length === 0 && (
-                <div className="col-span-full text-center py-20 text-muted-foreground">
-                  <p>{t('Dashboard.noRecords')}</p>
-                </div>
-              )}
-
-              {/* Contingut */}
-              {viewMode === 'grid' ? (
-                <HistoryGridView
-                  data={metrics}
-                  isAdmin={isAdmin}
-                  onRefresh={refreshData}
-                />
-              ) : (
-                <HistoryTableView
-                  data={metrics}
-                  isAdmin={isAdmin}
-                  onRefresh={refreshData}
-                />
-              )}
             </div>
           )}
 

@@ -50,17 +50,17 @@ export function MetricCard({ data, isAdmin, onRefresh }: MetricCardProps) {
         {/* CABECERA */}
         <CardHeader className="p-5 pb-3 border-b border-border flex-row justify-between items-start space-y-0">
           <div className="flex flex-col">
-            <span className="text-sm font-bold text-foreground bg-muted px-2 py-1 rounded-md w-fit">
+            <span className="h-8 flex items-center text-xs sm:text-sm font-bold text-foreground bg-muted px-2 rounded-md w-fit">
               {dateObj.toLocaleDateString()} <span className="text-muted-foreground mx-1">|</span> {dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </span>
           </div>
           {isAdmin && (
             <div className="flex gap-2">
               <Button variant="outline" size="sm" onClick={() => setIsEditModalOpen(true)} className="h-8 text-xs font-semibold gap-1">
-                <Pencil size={14} /> {t('History.edit')}
+                <Pencil size={14} /> <span className="hidden sm:inline">{t('History.edit')}</span>
               </Button>
               <Button variant="destructive" size="sm" onClick={() => setIsDeleteModalOpen(true)} className="h-8 text-xs font-semibold gap-1">
-                <Trash2 size={14} /> {t('History.delete')}
+                <Trash2 size={14} /> <span className="hidden sm:inline">{t('History.delete')}</span>
               </Button>
             </div>
           )}
