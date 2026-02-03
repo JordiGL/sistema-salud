@@ -29,6 +29,7 @@
     "toggleCollapse": "Contraer",
     "toggleExpand": "Desplegar para añadir datos",
     "clearTitle": "Limpiar formulario",
+    "autoSave": "Guardado automático",
     "physiologicalData": "Datos Fisiológicos",
     "weightControl": "Control de Peso",
     "notes": "Notas Adicionales",
@@ -138,7 +139,12 @@
     "errorSaving": "Error al guardar. Revisa los datos.",
     "aiScanning": "Analizando...",
     "aiErrorRead": "No se pudo leer la imagen. Prueba con más luz.",
-    "bpValidationError": "La tensión sistólica debe ser mayor que la diastólica."
+    "bpValidationError": "La tensión sistólica debe ser mayor que la diastólica.",
+    "aiAutoSaveSuccess": "Registro guardado automáticamente (IA)",
+    "undo": "Deshacer",
+    "undoSuccess": "Registro deshecho correctamente",
+    "errorUndo": "Error al deshacer el registro",
+    "autoSaveFailedValidation": "El autoguardado falló la validación. Revisa los datos."
   },
   "Export": {
     "date": "Fecha",

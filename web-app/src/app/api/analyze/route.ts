@@ -46,7 +46,7 @@ export async function POST(req: Request) {
       
       Return a RAW JSON object with the following schema:
       {
-        "bloodPressure": string | null, // Format "SYS/DIA" (e.g., "120/80"). Use null if not a BP monitor.
+        "bloodPressure": string | null, // Format "SYS/DIA" (e.g., "120/80"). Use null if not a BP monitor or values are unclear.
         "pulse": number | null,         // Heart rate in BPM.
         "spo2": number | null,          // Oxygen saturation %.
         "weight": number | null,        // Weight in kg.
@@ -54,10 +54,11 @@ export async function POST(req: Request) {
       }
 
       Rules:
-      - If a value is not clearly visible or the image is blurry, return null for that field.
-      - Do not guess or hallucinate values.
+      - STRICTNESS: If a value is not clearly visible, blurry, or ambiguous, return null. DO NOT GUESS.
+      - If the image is not a medical device or contains no readable numbers at all, return all nulls.
       - For Blood Pressure, look for two numbers usually displayed together (SYS/DIA).
       - Ignore units (kg, mmHg, bpm) in the output numbers.
+      - Your priority is ACCURACY over completeness. Better to return null than a wrong number.
     `;
 
     // 6. Generate Content

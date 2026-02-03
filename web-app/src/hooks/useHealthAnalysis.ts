@@ -15,7 +15,7 @@ export function useHealthAnalysis() {
     const [isScanning, setIsScanning] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const analyzeImage = async (file: File): Promise<AnalysisResult | null> => {
+    const analyzeImage = async (file: File, options?: { skipSuccessToast?: boolean }): Promise<AnalysisResult | null> => {
         setIsScanning(true);
         const toastId = toast.loading(t('Toast.aiScanning')); // Feedback visual immediat
 
@@ -32,7 +32,13 @@ export function useHealthAnalysis() {
             if (!response.ok) throw new Error(t('Form.aiErrorAnalysis'));
 
             const data = await response.json();
-            toast.success(t('Toast.analysisSuccess'), { id: toastId }); // Actualitza el toast
+
+            if (options?.skipSuccessToast) {
+                toast.dismiss(toastId);
+            } else {
+                toast.success(t('Toast.analysisSuccess'), { id: toastId }); // Actualitza el toast
+            }
+
             return data;
         } catch (error) {
             console.error(error);

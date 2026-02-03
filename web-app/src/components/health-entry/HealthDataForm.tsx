@@ -7,7 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import {
     Heart, Scale, Save, RotateCcw,
-    ChevronDown, ChevronUp, Plus, Loader2
+    ChevronDown, ChevronUp, Plus, Loader2, Zap
 } from 'lucide-react';
 import { useMetricManager } from '@/hooks/useMetricManager';
 import { useHealthAnalysis } from '@/hooks/useHealthAnalysis';
@@ -27,6 +27,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
+import { Toggle } from "@/components/ui/toggle";
 import {
     Select,
     SelectContent,
@@ -44,6 +45,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
     const t = useTranslations();
     const { contextOptions, locationOptions, translateOption } = useMetricManager();
     const [isOpen, setIsOpen] = useState(false);
+    const [autoSave, setAutoSave] = useState(false);
 
     const form = useForm<MetricFormInput>({
         resolver: zodResolver(metricSchema) as any,
@@ -67,32 +69,35 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
     } = useHealthAnalysis();
 
     // Integració AI
-    const handleCameraCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
-        const result = await analyzeImage(file);
-        if (result) {
-            // Actualizar formulario
-            if (result.bloodPressure) form.setValue('bloodPressure', result.bloodPressure);
-            if (result.pulse) form.setValue('pulse', result.pulse.toString() as any);
-            if (result.spo2) form.setValue('spo2', result.spo2.toString() as any);
-            if (result.weight) form.setValue('weight', result.weight.toString() as any);
-
-            const currentNotes = form.getValues('notes');
-            if (!currentNotes) {
-                form.setValue('notes', result.bloodPressure || result.weight || result.spo2 ? t('Form.aiAutoNote') : '');
-            }
-
-            if (!isOpen) setIsOpen(true);
+    const handleUndo = async (id: string, data: any) => {
+        try {
+            await metricApi.delete(id);
+            toast.info(t('Toast.undoSuccess') || "Desfet correctament");
+            // Restore values
+            form.reset(data);
+            onSuccess();
+        } catch (err) {
+            toast.error(t('Toast.errorUndo') || "Error al desfer");
         }
     };
 
-    const onSubmit = async (data: MetricFormValues) => {
+    const saveMetric = async (data: any, isAuto: boolean = false) => {
         try {
-            await metricApi.create(data);
+            const newMetric = await metricApi.create(data);
             form.reset();
-            toast.success(t('Toast.saveSuccess'));
+
+            if (isAuto) {
+                toast.success(t('Toast.aiAutoSaveSuccess') || "AI analysis successful: Record saved automatically", {
+                    action: {
+                        label: t('Toast.undo') || "Undo",
+                        onClick: () => handleUndo(newMetric.id, data),
+                    },
+                    duration: 5000,
+                });
+            } else {
+                toast.success(t('Toast.saveSuccess'));
+            }
+
             onSuccess();
         } catch (err: any) {
             if (err instanceof ApiError && err.message === "UNAUTHORIZED") {
@@ -102,6 +107,43 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
             }
         }
     };
+
+    const handleCameraCapture = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Pass skipSuccessToast if autoSave is enabled so we can show the custom auto-save toast instead
+        const result = await analyzeImage(file, { skipSuccessToast: autoSave });
+
+        if (result) {
+            // Actualizar formulario
+            if (result.bloodPressure) form.setValue('bloodPressure', result.bloodPressure);
+            if (result.pulse) form.setValue('pulse', result.pulse.toString());
+            if (result.spo2) form.setValue('spo2', result.spo2.toString());
+            if (result.weight) form.setValue('weight', result.weight.toString());
+
+            const currentNotes = form.getValues('notes');
+            if (!currentNotes) {
+                form.setValue('notes', result.bloodPressure || result.weight || result.spo2 ? t('Form.aiAutoNote') : '');
+            }
+
+            if (!isOpen && !autoSave) setIsOpen(true);
+
+            // Auto-save logic
+            if (autoSave) {
+                // Wait for form updates to settle (optional, but good practice)
+                // Trigger validation
+                const isValid = await form.trigger();
+                if (isValid) {
+                    await saveMetric(form.getValues(), true);
+                } else {
+                    toast.warning(t('Toast.autoSaveFailedValidation') || "Auto-save failed validation");
+                }
+            }
+        }
+    };
+
+    const onSubmit = (data: MetricFormValues) => saveMetric(data, false);
 
     const handleResetClick = (e: React.MouseEvent) => {
         e.stopPropagation();
@@ -122,12 +164,30 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                     <div className={`p-2 rounded-lg transition-colors ${isOpen ? 'bg-muted text-foreground' : 'bg-muted/50 text-muted-foreground'}`}>
                         <Plus size={20} />
                     </div>
-                    <h2 className="text-lg font-bold text-foreground">
+                    <h2 className="hidden sm:block text-lg font-bold text-foreground">
                         {t('HomePage.newRecord')}
                     </h2>
                 </div>
 
                 <div className="flex items-center gap-4">
+                    <div onClick={(e) => e.stopPropagation()}>
+                        <Toggle
+                            pressed={autoSave}
+                            onPressedChange={setAutoSave}
+                            variant="outline"
+                            size="sm"
+                            aria-label={t('Form.autoSave')}
+                            title={autoSave ? t('Form.autoSave') : "Activar Auto-Save"}
+                            className={`
+                                gap-2 transition-all border-dashed
+                                data-[state=on]:bg-primary/10 data-[state=on]:text-primary data-[state=on]:border-primary data-[state=on]:border-solid
+                                hover:bg-muted font-medium
+                            `}
+                        >
+                            <Zap size={16} className={autoSave ? "fill-current" : ""} />
+                        </Toggle>
+                    </div>
+
                     <AIAnalysisButton
                         isScanning={isScanning}
                         isSubmitting={form.formState.isSubmitting}

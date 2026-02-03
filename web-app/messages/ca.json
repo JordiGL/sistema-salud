@@ -29,6 +29,7 @@
     "toggleCollapse": "Contraure",
     "toggleExpand": "Desplegar per afegir dades",
     "clearTitle": "Netejar formulari",
+    "autoSave": "Guardat automàtic",
     "physiologicalData": "Dades Fisiològiques",
     "weightControl": "Control de Pes",
     "notes": "Notes",
@@ -138,7 +139,12 @@
     "errorSaving": "Error al desar. Revisa les dades.",
     "aiScanning": "Analitzant...",
     "aiErrorRead": "No s'ha pogut llegir la imatge. Prova amb més llum.",
-    "bpValidationError": "La tensió sistòlica ha de ser major que la diastòlica."
+    "bpValidationError": "La tensió sistòlica ha de ser major que la diastòlica.",
+    "aiAutoSaveSuccess": "Registre guardat automàticament (IA)",
+    "undo": "Desfer",
+    "undoSuccess": "Registre desfet correctament",
+    "errorUndo": "Error al desfer el registre",
+    "autoSaveFailedValidation": "L'autodesat ha fallat la validació. Revisa les dades."
   },
   "Export": {
     "date": "Data",
