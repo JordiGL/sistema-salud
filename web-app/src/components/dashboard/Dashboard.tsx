@@ -90,12 +90,12 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
       <div className="absolute top-6 right-6 flex items-center gap-2 z-10">
         {isAdmin ? (
           <Button
-            variant="outline"
+            variant="ghost"
             onClick={handleLogout}
-            className="w-44 h-8 rounded-full justify-center gap-2 mr-2 border-border shadow-sm hover:bg-accent bg-card text-card-foreground text-xs font-bold"
+            className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-900 dark:bg-slate-800 text-white dark:text-slate-100 dark:border dark:border-slate-700 shadow-sm hover:opacity-90 dark:hover:bg-slate-700 transition-all mr-2"
             title={t('Dashboard.logout')}
           >
-            <LogOut size={14} /> {t('HomePage.adminExit')}
+            <LogOut size={16} />
           </Button>
         ) : (
           <Link

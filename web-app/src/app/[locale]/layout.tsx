@@ -14,6 +14,8 @@ export const metadata: Metadata = {
 };
 
 // CAMBIO IMPORTANTE: Definimos params como Promise
+import { cookies } from 'next/headers';
+
 export default async function RootLayout({
   children,
   params
@@ -24,16 +26,14 @@ export default async function RootLayout({
   const { locale } = await params;
   const messages = await getMessages();
 
+  const cookieStore = await cookies();
+  const theme = cookieStore.get("theme")?.value || "light";
+
   return (
-    <html lang={locale} suppressHydrationWarning>
+    <html lang={locale} className={theme} suppressHydrationWarning>
       <body className={inter.className}>
         <NextIntlClientProvider messages={messages}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="light"
-            enableSystem
-            disableTransitionOnChange
-          >
+          <ThemeProvider defaultTheme={theme}>
             {children}
             <Toaster position="top-center" richColors />
           </ThemeProvider>
