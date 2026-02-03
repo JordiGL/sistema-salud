@@ -177,7 +177,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                             variant="outline"
                             size="sm"
                             aria-label={t('Form.autoSave')}
-                            title={autoSave ? t('Form.autoSave') : "Activar Auto-Save"}
+                            title={autoSave ? t('Form.autoSave') : t('Form.enableAutoSave')}
                             className={`
                                 gap-2 transition-all border-dashed
                                 data-[state=on]:bg-primary/10 data-[state=on]:text-primary data-[state=on]:border-primary data-[state=on]:border-solid

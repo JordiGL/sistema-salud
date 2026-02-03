@@ -30,6 +30,7 @@
     "toggleExpand": "Desplegar para añadir datos",
     "clearTitle": "Limpiar formulario",
     "autoSave": "Guardado automático",
+    "enableAutoSave": "Activar Guardado automático",
     "physiologicalData": "Datos Fisiológicos",
     "weightControl": "Control de Peso",
     "notes": "Notas Adicionales",

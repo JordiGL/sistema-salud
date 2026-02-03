@@ -30,6 +30,7 @@
     "toggleExpand": "Desplegar per afegir dades",
     "clearTitle": "Netejar formulari",
     "autoSave": "Guardat automàtic",
+    "enableAutoSave": "Activar Guardat automàtic",
     "physiologicalData": "Dades Fisiològiques",
     "weightControl": "Control de Pes",
     "notes": "Notes",
