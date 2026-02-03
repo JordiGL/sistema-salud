@@ -92,7 +92,7 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
           <Button
             variant="ghost"
             onClick={handleLogout}
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-900 dark:bg-slate-800 text-white dark:text-slate-100 dark:border dark:border-slate-700 shadow-sm hover:opacity-90 dark:hover:bg-slate-700 transition-all mr-2"
+            className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-900 dark:bg-slate-800 text-white dark:text-slate-100 dark:border dark:border-slate-700 shadow-sm hover:opacity-90 dark:hover:bg-slate-700 transition-all"
             title={t('Dashboard.logout')}
           >
             <LogOut size={16} />
@@ -100,7 +100,7 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
         ) : (
           <Link
             href={`/${locale}${APP_ROUTES.LOGIN}`}
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-900 dark:bg-slate-800 text-white dark:text-slate-100 dark:border dark:border-slate-700 shadow-sm hover:opacity-90 dark:hover:bg-slate-700 transition-all mr-2"
+            className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-900 dark:bg-slate-800 text-white dark:text-slate-100 dark:border dark:border-slate-700 shadow-sm hover:opacity-90 dark:hover:bg-slate-700 transition-all"
             title={t('HomePage.adminAccess')}
           >
             <ShieldCheck size={16} />

@@ -152,7 +152,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
     };
 
     return (
-        <div className={`bg-card dark:bg-slate-950 rounded-2xl shadow-sm border border-border mt-8 animate-in fade-in slide-in-from-bottom-4 duration-700 overflow-hidden transition-all ${isOpen ? 'ring-1 ring-border' : ''}`}>
+        <div className={`bg-card dark:bg-slate-950 rounded-2xl shadow-sm border border-border animate-in fade-in slide-in-from-bottom-4 duration-700 overflow-hidden transition-all ${isOpen ? 'ring-1 ring-border' : ''}`}>
 
             {/* CABECERA */}
             <div
