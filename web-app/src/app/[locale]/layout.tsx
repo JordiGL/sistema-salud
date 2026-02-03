@@ -11,6 +11,22 @@ const inter = Inter({ subsets: ["latin"] });
 export const metadata: Metadata = {
   title: "Vital.ai",
   description: "App de seguimiento",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "Vital.ai",
+  },
+  manifest: "/manifest.webmanifest",
+};
+
+export const viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#020617" },
+  ],
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 // CAMBIO IMPORTANTE: Definimos params como Promise
