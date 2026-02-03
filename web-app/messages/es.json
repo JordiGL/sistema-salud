@@ -125,6 +125,21 @@
     "allContexts": "Todos",
     "location": "Lugar"
   },
+  "Toast": {
+    "saveSuccess": "Registro guardado correctamente",
+    "updateSuccess": "Registro actualizado correctamente",
+    "deleteSuccess": "Registro eliminado correctamente",
+    "genericError": "Error desconocido",
+    "deleteError": "No se pudo eliminar el registro",
+    "analysisSuccess": "Imagen analizada correctamente",
+    "loginSuccess": "Sesión iniciada correctamente",
+    "loginError": "Credenciales incorrectas",
+    "sessionExpired": "Tu sesión ha caducado.",
+    "errorSaving": "Error al guardar. Revisa los datos.",
+    "aiScanning": "Analizando...",
+    "aiErrorRead": "No se pudo leer la imagen. Prueba con más luz.",
+    "bpValidationError": "La tensión sistólica debe ser mayor que la diastólica."
+  },
   "Export": {
     "date": "Fecha",
     "context": "Contexto",

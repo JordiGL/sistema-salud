@@ -125,6 +125,21 @@
     "allContexts": "Tots",
     "location": "Lloc"
   },
+  "Toast": {
+    "saveSuccess": "Registre guardat correctament",
+    "updateSuccess": "Registre actualitzat correctament",
+    "deleteSuccess": "Registre eliminat correctament",
+    "genericError": "Error desconegut",
+    "deleteError": "No s'ha pogut eliminar el registre",
+    "analysisSuccess": "Imatge analitzada correctament",
+    "loginSuccess": "Sessió iniciada correctament",
+    "loginError": "Credencials incorrectes",
+    "sessionExpired": "La teva sessió ha caducat.",
+    "errorSaving": "Error al desar. Revisa les dades.",
+    "aiScanning": "Analitzant...",
+    "aiErrorRead": "No s'ha pogut llegir la imatge. Prova amb més llum.",
+    "bpValidationError": "La tensió sistòlica ha de ser major que la diastòlica."
+  },
   "Export": {
     "date": "Data",
     "context": "Context",

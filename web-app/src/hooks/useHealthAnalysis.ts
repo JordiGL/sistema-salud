@@ -17,7 +17,7 @@ export function useHealthAnalysis() {
 
     const analyzeImage = async (file: File): Promise<AnalysisResult | null> => {
         setIsScanning(true);
-        const toastId = toast.loading(t('Form.aiScanning')); // Feedback visual immediat
+        const toastId = toast.loading(t('Toast.aiScanning')); // Feedback visual immediat
 
         try {
             const uploadData = new FormData();
@@ -32,11 +32,11 @@ export function useHealthAnalysis() {
             if (!response.ok) throw new Error(t('Form.aiErrorAnalysis'));
 
             const data = await response.json();
-            toast.success(t('Form.aiAutoNote'), { id: toastId }); // Actualitza el toast
+            toast.success(t('Toast.analysisSuccess'), { id: toastId }); // Actualitza el toast
             return data;
         } catch (error) {
             console.error(error);
-            toast.error(t('Form.aiErrorRead'), { id: toastId });
+            toast.error(t('Toast.aiErrorRead'), { id: toastId });
             return null;
         } finally {
             setIsScanning(false);

@@ -64,7 +64,7 @@ export function useHealthForm({ onSuccess }: UseHealthFormProps) {
                 const sys = Number(parts[0]);
                 const dia = Number(parts[1]);
                 if (!isNaN(sys) && !isNaN(dia) && sys < dia) {
-                    toast.error(t('Form.Errors.invalidBP'));
+                    toast.error(t('Toast.bpValidationError'));
                     setIsSubmitting(false);
                     return;
                 }
@@ -74,13 +74,13 @@ export function useHealthForm({ onSuccess }: UseHealthFormProps) {
         try {
             await metricApi.create(formData);
             resetForm();
-            toast.success(t('HomePage.saveButton')); // Feedback positiu reutilitzant clau o text generic
+            toast.success(t('Toast.saveSuccess')); // Feedback positiu reutilitzant clau o text generic
             onSuccess();
         } catch (err: any) {
             if (err instanceof ApiError && err.message === "UNAUTHORIZED") {
-                toast.error(t('HomePage.sessionExpired'));
+                toast.error(t('Toast.sessionExpired'));
             } else {
-                toast.error(err.message || t('HomePage.errorSaving'));
+                toast.error(err.message || t('Toast.errorSaving'));
             }
         } finally {
             setIsSubmitting(false);

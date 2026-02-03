@@ -92,13 +92,13 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
         try {
             await metricApi.create(data);
             form.reset();
-            toast.success(t('HomePage.saveButton'));
+            toast.success(t('Toast.saveSuccess'));
             onSuccess();
         } catch (err: any) {
             if (err instanceof ApiError && err.message === "UNAUTHORIZED") {
-                toast.error(t('HomePage.sessionExpired'));
+                toast.error(t('Toast.sessionExpired'));
             } else {
-                toast.error(err.message || t('HomePage.errorSaving'));
+                toast.error(err.message || t('Toast.errorSaving'));
             }
         }
     };

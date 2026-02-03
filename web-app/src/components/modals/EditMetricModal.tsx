@@ -74,14 +74,14 @@ export function EditMetricModal({ isOpen, onClose, metric, onSuccess, contextOpt
   const handleSubmit = async (data: MetricFormValues) => {
     try {
       await metricApi.update(metric.id, data);
-      toast.success(t('History.save'));
+      toast.success(t('Toast.updateSuccess'));
       onSuccess();
       onClose();
     } catch (e: any) {
       if (e instanceof ApiError && e.message === "UNAUTHORIZED") {
-        toast.error(t('HomePage.sessionExpired'));
+        toast.error(t('Toast.sessionExpired'));
       } else {
-        toast.error(e.message || t('HomePage.errorSaving'));
+        toast.error(e.message || t('Toast.errorSaving'));
       }
     }
   };

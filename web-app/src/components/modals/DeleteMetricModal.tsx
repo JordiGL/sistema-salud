@@ -23,11 +23,11 @@ export function DeleteMetricModal({ isOpen, onClose, metricId, onSuccess }: Dele
     setIsSubmitting(true);
     try {
       await metricApi.delete(metricId);
-      toast.success(t('History.delete'));
+      toast.success(t('Toast.deleteSuccess'));
       onSuccess();
       onClose();
     } catch (e: any) {
-      toast.error(e.message || t('HomePage.errorSaving'));
+      toast.error(e.message || t('Toast.deleteError'));
     } finally {
       setIsSubmitting(false);
     }
