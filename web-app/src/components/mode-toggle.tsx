@@ -17,7 +17,7 @@ export function ModeToggle() {
             variant="ghost"
             size="icon"
             onClick={toggleTheme}
-            className="rounded-full shadow-sm border border-border w-8 h-8 flex items-center justify-center transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-900 dark:bg-slate-800 text-white dark:text-slate-100 dark:border dark:border-slate-700 shadow-sm hover:opacity-90 dark:hover:bg-slate-700 transition-all mr-2"
         >
             <Sun className="h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
 

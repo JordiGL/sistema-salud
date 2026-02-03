@@ -308,7 +308,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                     <Button type="button" variant="outline" onClick={handleResetClick} className="h-auto px-6 py-4 rounded-xl font-bold text-muted-foreground border-dashed border-border bg-background hover:bg-muted hover:text-foreground" title={t('Form.clearTitle')}>
                                         <RotateCcw size={18} /> <span className="hidden sm:inline">{t('HomePage.clear') || 'Limpiar'}</span>
                                     </Button>
-                                    <Button type="submit" disabled={form.formState.isSubmitting} className="flex-1 h-auto py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl bg-primary text-primary-foreground dark:bg-indigo-600 dark:text-white dark:hover:bg-indigo-700 transition-all">
+                                    <Button type="submit" disabled={form.formState.isSubmitting} className="flex-1 h-auto py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl bg-primary text-primary-foreground dark:bg-slate-800 dark:text-slate-100 dark:border dark:border-slate-700 dark:hover:bg-slate-700 transition-all">
                                         {form.formState.isSubmitting ? <Loader2 size={20} className="animate-spin" /> : <><Save size={20} /> {t('HomePage.saveButton')}</>}
                                     </Button>
                                 </div>

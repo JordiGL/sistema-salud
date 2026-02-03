@@ -5,15 +5,16 @@ import { Card, CardContent } from "@/components/ui/card";
 
 interface StatsSummaryProps {
   data: number[];
-  colorClass?: string; // Made optional as you removed it from JSX, but keeping for compatibility if needed elsewhere
-  bgClass?: string;    // Made optional
+  colorClass?: string;
+  bgClass?: string;
   unit?: string;
   label?: string;
   legendDotColor?: string;
-  showAvg?: boolean;   // New prop to control showing average
+  legendDotClassName?: string;
+  showAvg?: boolean;
 }
 
-export function StatsSummary({ data, colorClass, bgClass, unit = '', label, legendDotColor, showAvg = true }: StatsSummaryProps) {
+export function StatsSummary({ data, colorClass, bgClass, unit = '', label, legendDotColor, legendDotClassName, showAvg = true }: StatsSummaryProps) {
   const t = useTranslations('Charts.stats');
   const stats = calculateStats(data);
 
@@ -25,10 +26,10 @@ export function StatsSummary({ data, colorClass, bgClass, unit = '', label, lege
       {label && (
         <div className="flex items-center gap-2 mb-1">
           {/* Si pasamos un color, mostramos el punto */}
-          {legendDotColor && (
+          {(legendDotColor || legendDotClassName) && (
             <span
-              className="w-3 h-3 rounded-full shadow-sm border border-background"
-              style={{ backgroundColor: legendDotColor }}
+              className={`w-3 h-3 rounded-full shadow-sm border border-background ${legendDotClassName || ''}`}
+              style={legendDotColor ? { backgroundColor: legendDotColor } : undefined}
             />
           )}
           <span className="text-xs font-bold uppercase text-muted-foreground tracking-wider">
@@ -43,7 +44,7 @@ export function StatsSummary({ data, colorClass, bgClass, unit = '', label, lege
         <Card className="flex-1 min-w-[100px] border-border shadow-sm rounded-xl">
           <CardContent className="p-3 flex flex-col items-center justify-center">
             <span className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-1">
-              <ArrowDown size={12} /> {t('min')}
+              <ArrowDown size={12} className={colorClass} /> {t('min')}
             </span>
             <span className={`text-xl font-bold`}>
               {stats.min}<span className="text-xs text-muted-foreground ml-0.5">{unit}</span>
@@ -55,7 +56,7 @@ export function StatsSummary({ data, colorClass, bgClass, unit = '', label, lege
         <Card className="flex-1 min-w-[100px] border-border shadow-sm rounded-xl">
           <CardContent className="p-3 flex flex-col items-center justify-center">
             <span className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-1">
-              <ArrowUp size={12} /> {t('max')}
+              <ArrowUp size={12} className={colorClass} /> {t('max')}
             </span>
             <span className={`text-xl font-bold`}>
               {stats.max}<span className="text-xs text-muted-foreground ml-0.5">{unit}</span>
@@ -68,7 +69,7 @@ export function StatsSummary({ data, colorClass, bgClass, unit = '', label, lege
           <Card className="flex-1 min-w-[100px] border-border shadow-sm rounded-xl">
             <CardContent className="p-3 flex flex-col items-center justify-center">
               <span className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-1">
-                <Activity size={12} /> {t('avg')}
+                <Activity size={12} className={colorClass} /> {t('avg')}
               </span>
               <span className={`text-xl font-bold`}>
                 {stats.avg}<span className="text-xs text-muted-foreground ml-0.5">{unit}</span>

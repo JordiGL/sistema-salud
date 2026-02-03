@@ -14,6 +14,7 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartConfig } from "
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { useTheme } from 'next-themes';
 
 const CustomXAxisTick = ({ x, y, payload, hideTime }: any) => {
   const date = new Date(payload.value);
@@ -36,15 +37,22 @@ const CustomXAxisTick = ({ x, y, payload, hideTime }: any) => {
 const chartConfig = {
   systolic: {
     label: "Sistólica",
-    color: "#9333ea",
+    theme: {
+      light: "#475569",
+      dark: "#4c8edfff",
+    },
   },
   diastolic: {
     label: "Diastólica",
-    color: "#d8b4fe",
+    theme: {
+      light: "#94a3b8",
+      dark: "#64748b",
+    },
   },
 } satisfies ChartConfig;
 
 export function BloodPressureChart({ data: initialData }: { data: Metric[] }) {
+  const { theme } = useTheme();
   const t = useTranslations();
   const tCharts = useTranslations('Charts');
   const tFilter = useTranslations('Filters');
@@ -128,7 +136,7 @@ export function BloodPressureChart({ data: initialData }: { data: Metric[] }) {
             variant="outline"
             size="sm"
             onClick={() => downloadCSV(finalData, 'tension_arterial', t)}
-            className="gap-1.5 text-xs font-bold text-muted-foreground bg-card border-border hover:bg-accent hover:text-purple-600"
+            className="gap-1.5 text-xs font-bold text-muted-foreground bg-card border-border hover:bg-muted hover:text-foreground"
             title="Descargar CSV"
           >
             <FileSpreadsheet size={14} /> <span>CSV</span>
@@ -137,7 +145,7 @@ export function BloodPressureChart({ data: initialData }: { data: Metric[] }) {
             variant="outline"
             size="sm"
             onClick={() => downloadXML(finalData, 'tension_arterial', t)}
-            className="gap-1.5 text-xs font-bold text-muted-foreground bg-card border-border hover:bg-accent hover:text-purple-600"
+            className="gap-1.5 text-xs font-bold text-muted-foreground bg-card border-border hover:bg-muted hover:text-foreground"
             title="Descargar XML"
           >
             <FileCode size={14} /> <span>XML</span>
@@ -149,17 +157,17 @@ export function BloodPressureChart({ data: initialData }: { data: Metric[] }) {
 
           <Tabs value={dateRange} onValueChange={setDateRange} className="shrink-0">
             <TabsList className="bg-muted h-9 p-1 rounded-xl">
-              <TabsTrigger value="7d" className="text-[11px] h-7 rounded-lg data-[state=active]:bg-background data-[state=active]:text-purple-700 data-[state=active]:shadow-sm">{tFilter('7days')}</TabsTrigger>
-              <TabsTrigger value="30d" className="text-[11px] h-7 rounded-lg data-[state=active]:bg-background data-[state=active]:text-purple-700 data-[state=active]:shadow-sm">{tFilter('30days')}</TabsTrigger>
-              <TabsTrigger value="all" className="text-[11px] h-7 rounded-lg data-[state=active]:bg-background data-[state=active]:text-purple-700 data-[state=active]:shadow-sm">{tFilter('all')}</TabsTrigger>
+              <TabsTrigger value="7d" className="text-[11px] h-7 rounded-lg data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">{tFilter('7days')}</TabsTrigger>
+              <TabsTrigger value="30d" className="text-[11px] h-7 rounded-lg data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">{tFilter('30days')}</TabsTrigger>
+              <TabsTrigger value="all" className="text-[11px] h-7 rounded-lg data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">{tFilter('all')}</TabsTrigger>
             </TabsList>
           </Tabs>
 
           <Tabs value={timeOfDay} onValueChange={setTimeOfDay} className="shrink-0">
             <TabsList className="bg-muted h-9 p-1 rounded-xl">
-              <TabsTrigger value="24h" className="text-[11px] h-7 rounded-lg uppercase data-[state=active]:bg-background data-[state=active]:text-purple-700 data-[state=active]:shadow-sm">{tFilter('24h')}</TabsTrigger>
-              <TabsTrigger value="am" className="text-[11px] h-7 rounded-lg uppercase data-[state=active]:bg-background data-[state=active]:text-purple-700 data-[state=active]:shadow-sm">{tFilter('am')}</TabsTrigger>
-              <TabsTrigger value="pm" className="text-[11px] h-7 rounded-lg uppercase data-[state=active]:bg-background data-[state=active]:text-purple-700 data-[state=active]:shadow-sm">{tFilter('pm')}</TabsTrigger>
+              <TabsTrigger value="24h" className="text-[11px] h-7 rounded-lg uppercase data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">{tFilter('24h')}</TabsTrigger>
+              <TabsTrigger value="am" className="text-[11px] h-7 rounded-lg uppercase data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">{tFilter('am')}</TabsTrigger>
+              <TabsTrigger value="pm" className="text-[11px] h-7 rounded-lg uppercase data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">{tFilter('pm')}</TabsTrigger>
             </TabsList>
           </Tabs>
 
@@ -170,7 +178,7 @@ export function BloodPressureChart({ data: initialData }: { data: Metric[] }) {
               {tFilter('contexts')}
             </span>
             <Select value={contextFilter} onValueChange={setContextFilter}>
-              <SelectTrigger className="h-9 min-w-[100px] text-xs font-bold border-border bg-muted/40 hover:bg-muted focus:ring-purple-100">
+              <SelectTrigger className="h-9 min-w-[100px] text-xs font-bold border-border bg-muted/40 hover:bg-muted focus:ring-slate-200">
                 <SelectValue placeholder={tFilter('allContexts')} />
               </SelectTrigger>
               <SelectContent>
@@ -275,16 +283,16 @@ export function BloodPressureChart({ data: initialData }: { data: Metric[] }) {
             <StatsSummary
               label={tCharts('systolic')}
               data={systolicData}
-              colorClass="text-purple-600 dark:text-purple-400"
-              bgClass="bg-purple-50 dark:bg-purple-900/20"
-              legendDotColor="#9333ea"
+              colorClass="text-slate-900 dark:text-slate-300"
+              bgClass="bg-slate-100 dark:bg-slate-800"
+              legendDotColor={theme === 'dark' ? chartConfig.systolic.theme.dark : chartConfig.systolic.theme.light}
             />
             <StatsSummary
               label={tCharts('diastolic')}
               data={diastolicData}
-              colorClass="text-purple-400 dark:text-purple-300"
-              bgClass="bg-purple-50/50 dark:bg-purple-900/10"
-              legendDotColor="#d8b4fe"
+              colorClass="text-slate-400 dark:text-slate-500"
+              bgClass="bg-slate-50 dark:bg-slate-900/50"
+              legendDotColor={theme === 'dark' ? chartConfig.diastolic.theme.dark : chartConfig.diastolic.theme.light}
             />
           </div>
         </CardFooter>

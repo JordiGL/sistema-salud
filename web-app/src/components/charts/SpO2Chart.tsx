@@ -36,7 +36,7 @@ const CustomXAxisTick = ({ x, y, payload, hideTime }: any) => {
 const chartConfig = {
   spo2: {
     label: "SpO2 (%)",
-    color: "#0d9488",
+    color: "#475569",
   },
 } satisfies ChartConfig;
 
@@ -114,7 +114,7 @@ export function SpO2Chart({ data: initialData }: { data: Metric[] }) {
             variant="outline"
             size="sm"
             onClick={() => downloadCSV(finalData, 'spo2_data', t)}
-            className="gap-1.5 text-xs font-bold text-muted-foreground bg-card border-border hover:bg-accent hover:text-teal-600"
+            className="gap-1.5 text-xs font-bold text-muted-foreground bg-card border-border hover:bg-muted hover:text-foreground"
             title="Descargar CSV"
           >
             <FileSpreadsheet size={14} /> <span>CSV</span>
@@ -123,7 +123,7 @@ export function SpO2Chart({ data: initialData }: { data: Metric[] }) {
             variant="outline"
             size="sm"
             onClick={() => downloadXML(finalData, 'spo2_data', t)}
-            className="gap-1.5 text-xs font-bold text-muted-foreground bg-card border-border hover:bg-accent hover:text-teal-600"
+            className="gap-1.5 text-xs font-bold text-muted-foreground bg-card border-border hover:bg-muted hover:text-foreground"
             title="Descargar XML"
           >
             <FileCode size={14} /> <span>XML</span>
@@ -134,17 +134,17 @@ export function SpO2Chart({ data: initialData }: { data: Metric[] }) {
         <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center overflow-x-auto pb-1 sm:pb-0">
           <Tabs value={dateRange} onValueChange={setDateRange} className="shrink-0">
             <TabsList className="bg-muted h-9 p-1 rounded-xl">
-              <TabsTrigger value="7d" className="text-[11px] h-7 rounded-lg data-[state=active]:bg-background data-[state=active]:text-teal-700 data-[state=active]:shadow-sm">{tFilter('7days')}</TabsTrigger>
-              <TabsTrigger value="30d" className="text-[11px] h-7 rounded-lg data-[state=active]:bg-background data-[state=active]:text-teal-700 data-[state=active]:shadow-sm">{tFilter('30days')}</TabsTrigger>
-              <TabsTrigger value="all" className="text-[11px] h-7 rounded-lg data-[state=active]:bg-background data-[state=active]:text-teal-700 data-[state=active]:shadow-sm">{tFilter('all')}</TabsTrigger>
+              <TabsTrigger value="7d" className="text-[11px] h-7 rounded-lg data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">{tFilter('7days')}</TabsTrigger>
+              <TabsTrigger value="30d" className="text-[11px] h-7 rounded-lg data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">{tFilter('30days')}</TabsTrigger>
+              <TabsTrigger value="all" className="text-[11px] h-7 rounded-lg data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">{tFilter('all')}</TabsTrigger>
             </TabsList>
           </Tabs>
 
           <Tabs value={timeOfDay} onValueChange={setTimeOfDay} className="shrink-0">
             <TabsList className="bg-muted h-9 p-1 rounded-xl">
-              <TabsTrigger value="24h" className="text-[11px] h-7 rounded-lg uppercase data-[state=active]:bg-background data-[state=active]:text-teal-700 data-[state=active]:shadow-sm">{tFilter('24h')}</TabsTrigger>
-              <TabsTrigger value="am" className="text-[11px] h-7 rounded-lg uppercase data-[state=active]:bg-background data-[state=active]:text-teal-700 data-[state=active]:shadow-sm">{tFilter('am')}</TabsTrigger>
-              <TabsTrigger value="pm" className="text-[11px] h-7 rounded-lg uppercase data-[state=active]:bg-background data-[state=active]:text-teal-700 data-[state=active]:shadow-sm">{tFilter('pm')}</TabsTrigger>
+              <TabsTrigger value="24h" className="text-[11px] h-7 rounded-lg uppercase data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">{tFilter('24h')}</TabsTrigger>
+              <TabsTrigger value="am" className="text-[11px] h-7 rounded-lg uppercase data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">{tFilter('am')}</TabsTrigger>
+              <TabsTrigger value="pm" className="text-[11px] h-7 rounded-lg uppercase data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">{tFilter('pm')}</TabsTrigger>
             </TabsList>
           </Tabs>
 
@@ -155,7 +155,7 @@ export function SpO2Chart({ data: initialData }: { data: Metric[] }) {
               {tFilter('contexts')}
             </span>
             <Select value={contextFilter} onValueChange={setContextFilter}>
-              <SelectTrigger className="h-9 min-w-[100px] text-xs font-bold border-border bg-muted/40 hover:bg-muted focus:ring-teal-100">
+              <SelectTrigger className="h-9 min-w-[100px] text-xs font-bold border-border bg-muted/40 hover:bg-muted focus:ring-slate-200">
                 <SelectValue placeholder={tFilter('allContexts')} />
               </SelectTrigger>
               <SelectContent>
@@ -250,10 +250,10 @@ export function SpO2Chart({ data: initialData }: { data: Metric[] }) {
           <StatsSummary
             label={tCharts('spo2Title')}
             data={spo2Data}
-            colorClass="text-teal-700 dark:text-teal-400"
-            bgClass="bg-teal-50 dark:bg-teal-900/20"
+            colorClass="text-slate-600 dark:text-slate-400"
+            bgClass="bg-slate-100 dark:bg-slate-900/50"
             unit="%"
-            legendDotColor="#0d9488"
+            legendDotColor="#475569"
           />
         </CardFooter>
       )}

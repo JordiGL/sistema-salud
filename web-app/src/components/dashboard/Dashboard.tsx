@@ -7,7 +7,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import {
   Activity, Heart, Scale, Droplets, TestTube,
   Globe, LayoutList, LogOut, LayoutGrid, List,
-  FileSpreadsheet, FileCode
+  FileSpreadsheet, FileCode, ShieldCheck
 } from 'lucide-react';
 
 // Imports de la nova API i Constants
@@ -75,12 +75,12 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
   }
 
   const tabs = [
-    { id: 'history', label: t('Tabs.history'), icon: LayoutList, color: 'text-foreground', border: 'border-foreground' },
-    { id: 'bp', label: t('Tabs.bp'), icon: Activity, color: 'text-purple-600 dark:text-purple-400', border: 'border-purple-600 dark:border-purple-400' },
-    { id: 'pulse', label: t('Tabs.pulse'), icon: Heart, color: 'text-red-500 dark:text-red-400', border: 'border-red-500 dark:border-red-400' },
-    { id: 'weight', label: t('Tabs.weight'), icon: Scale, color: 'text-blue-600 dark:text-blue-400', border: 'border-blue-600 dark:border-blue-400' },
-    { id: 'spo2', label: t('Tabs.spo2'), icon: Droplets, color: 'text-teal-600 dark:text-teal-400', border: 'border-teal-600 dark:border-teal-400' },
-    { id: 'ca125', label: t('Tabs.ca125'), icon: TestTube, color: 'text-orange-600 dark:text-orange-400', border: 'border-orange-600 dark:border-orange-400' },
+    { id: 'history', label: t('Tabs.history'), icon: LayoutList },
+    { id: 'bp', label: t('Tabs.bp'), icon: Activity },
+    { id: 'pulse', label: t('Tabs.pulse'), icon: Heart },
+    { id: 'weight', label: t('Tabs.weight'), icon: Scale },
+    { id: 'spo2', label: t('Tabs.spo2'), icon: Droplets },
+    { id: 'ca125', label: t('Tabs.ca125'), icon: TestTube },
   ];
 
   return (
@@ -100,16 +100,17 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
         ) : (
           <Link
             href={`/${locale}${APP_ROUTES.LOGIN}`}
-            className="w-44 h-8 flex items-center justify-center gap-2 rounded-full bg-primary dark:bg-indigo-600 text-primary-foreground dark:text-white shadow-sm hover:bg-primary/90 dark:hover:bg-indigo-700 transition-all text-xs font-bold mr-2"
+            className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-900 dark:bg-slate-800 text-white dark:text-slate-100 dark:border dark:border-slate-700 shadow-sm hover:opacity-90 dark:hover:bg-slate-700 transition-all mr-2"
+            title={t('HomePage.adminAccess')}
           >
-            <Activity size={14} /> {t('HomePage.adminAccess')}
+            <ShieldCheck size={16} />
           </Link>
         )}
 
-        <div className="flex h-8 items-center gap-2 bg-card p-1 rounded-full shadow-sm border border-border">
+        <div className="flex h-8.5 items-center gap-2 bg-card p-1 rounded-full shadow-sm border border-border">
           <Globe size={14} className="ml-2 text-muted-foreground" />
-          <Link href="/es" className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${locale === 'es' ? 'bg-primary text-primary-foreground dark:bg-indigo-600 dark:text-white shadow-md' : 'text-muted-foreground bg-muted/30 dark:bg-slate-800/50 hover:bg-accent hover:text-foreground'}`}>ES</Link>
-          <Link href="/ca" className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${locale === 'ca' ? 'bg-primary text-primary-foreground dark:bg-indigo-600 dark:text-white shadow-md' : 'text-muted-foreground bg-muted/30 dark:bg-slate-800/50 hover:bg-accent hover:text-foreground'}`}>CA</Link>
+          <Link href="/es" className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${locale === 'es' ? 'bg-slate-900 text-white dark:bg-slate-800 dark:text-slate-100 dark:border dark:border-slate-700 shadow-sm' : 'text-muted-foreground bg-muted/30 hover:bg-muted hover:text-foreground'}`}>ES</Link>
+          <Link href="/ca" className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${locale === 'ca' ? 'bg-slate-900 text-white dark:bg-slate-800 dark:text-slate-100 dark:border dark:border-slate-700 shadow-sm' : 'text-muted-foreground bg-muted/30 hover:bg-muted hover:text-foreground'}`}>CA</Link>
         </div>
 
         <ModeToggle />
@@ -134,7 +135,7 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
                 key={tab.id}
                 variant={isActive ? "secondary" : "ghost"}
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`flex-1 md:flex-none justify-center gap-2 h-auto py-3 rounded-lg text-sm font-bold transition-all ${isActive ? `bg-accent ${tab.color} shadow-inner` : 'text-muted-foreground hover:bg-accent hover:text-foreground'}`}
+                className={`flex-1 md:flex-none justify-center gap-2 h-auto py-3 rounded-lg text-sm font-bold transition-all ${isActive ? 'bg-muted text-foreground shadow-sm ring-1 ring-border' : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'}`}
               >
                 <Icon size={18} />
                 {tab.label}
