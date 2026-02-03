@@ -1,6 +1,6 @@
 {
   "HomePage": {
-    "title": "Monitor de Salud",
+    "title": "Vital.ai",
     "newRecord": "Nuevo Registro",
     "saveButton": "Guardar Registro",
     "errorSaving": "Error al guardar. Revisa los datos.",
