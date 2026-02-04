@@ -5,6 +5,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { Toaster } from 'sonner';
 import { ThemeProvider } from "@/components/theme-provider";
+import { SplashScreen } from "@/components/splash-screen";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -50,6 +51,7 @@ export default async function RootLayout({
       <body className={inter.className}>
         <NextIntlClientProvider messages={messages}>
           <ThemeProvider defaultTheme={theme}>
+            <SplashScreen />
             {children}
             <Toaster
               position="top-center"
