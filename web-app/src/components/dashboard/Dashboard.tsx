@@ -28,6 +28,7 @@ import { HealthDataForm } from '@/components/health-entry/HealthDataForm';
 import { Button } from "@/components/ui/button";
 
 import { ModeToggle } from "@/components/mode-toggle";
+import { InstallPrompt } from "@/components/install-prompt";
 
 interface DashboardProps {
   initialMetrics: Metric[];
@@ -113,6 +114,7 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
           <Link href="/ca" className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${locale === 'ca' ? 'bg-slate-900 text-white dark:bg-slate-800 dark:text-slate-100 dark:border dark:border-slate-700 shadow-sm' : 'text-muted-foreground bg-muted/30 hover:bg-muted hover:text-foreground'}`}>CA</Link>
         </div>
 
+        <InstallPrompt />
         <ModeToggle />
       </div>
 
