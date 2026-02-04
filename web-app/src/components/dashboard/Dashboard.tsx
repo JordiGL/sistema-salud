@@ -114,8 +114,8 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
           <Link href="/ca" className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${locale === 'ca' ? 'bg-slate-900 text-white dark:bg-slate-800 dark:text-slate-100 dark:border dark:border-slate-700 shadow-sm' : 'text-muted-foreground bg-muted/30 hover:bg-muted hover:text-foreground'}`}>CA</Link>
         </div>
 
-        <InstallPrompt />
         <ModeToggle />
+        <InstallPrompt />
       </div>
 
       <div className="max-w-5xl mx-auto space-y-8 pt-12">
