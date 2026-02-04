@@ -14,6 +14,8 @@ export function InstallPrompt() {
     // Safest bet is to make it look good with an icon and maybe no text or a simple text.
     // Let's us an icon button for distinctiveness, similar to the theme toggle.
 
+    const t = useTranslations();
+
     if (!isInstallable) return null;
 
     return (
@@ -21,11 +23,11 @@ export function InstallPrompt() {
             variant="ghost"
             size="icon"
             onClick={promptInstall}
-            className="h-9 w-9 bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
-            title="Install App"
+            className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-900 dark:bg-slate-800 text-white dark:text-slate-100 dark:border dark:border-slate-700 shadow-sm hover:opacity-90 dark:hover:bg-slate-700 transition-all"
+            title={t('Dashboard.installApp')}
         >
-            <Download className="h-[1.2rem] w-[1.2rem]" />
-            <span className="sr-only">Install App</span>
+            <Download size={16} />
+            <span className="sr-only">{t('Dashboard.installApp')}</span>
         </Button>
     );
 }

@@ -14,7 +14,8 @@
     "logout": "Tancar Sessió",
     "downloadCSV": "Descarregar CSV",
     "downloadXML": "Descarregar XML",
-    "noRecords": "No hi ha registres encara."
+    "noRecords": "No hi ha registres encara.",
+    "installApp": "Instal·lar Aplicació"
   },
   "Login": {
     "title": "Accés Admin",
