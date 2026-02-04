@@ -106,16 +106,16 @@
     }
   },
   "ContextOptions": {
-    "exercise": "🏃 Post-Exercici",
-    "drainage": "💧 Post-Drenatge",
-    "chemo": "🏥 Post-Quimioteràpia",
-    "stress": "⚡ Moment d'estrès"
+    "exercise": "Post-Exercici",
+    "drainage": "Post-Drenatge",
+    "chemo": "Post-Quimioteràpia",
+    "stress": "Moment d'estrès"
   },
   "LocationOptions": {
-    "home": "🏠 Casa",
-    "pharmacy": "🏥 Farmàcia",
-    "cap": "🩺 CAP",
-    "ico": "🏢 ICO"
+    "home": "Casa",
+    "pharmacy": "Farmàcia",
+    "cap": "CAP",
+    "ico": "ICO"
   },
   "Filters": {
     "7days": "7 DIES",
