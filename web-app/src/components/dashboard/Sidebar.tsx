@@ -51,8 +51,8 @@ export function Sidebar({ isAdmin, activeTab, setActiveTab, onLogout }: SidebarP
     return (
         <Sheet open={open} onOpenChange={setOpen}>
             <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="">
-                    <Menu className="h-6 w-6" />
+                <Button variant="outline" size="icon" className="shrink-0">
+                    <Menu className="h-5 w-5" />
                     <span className="sr-only">Toggle Menu</span>
                 </Button>
             </SheetTrigger>

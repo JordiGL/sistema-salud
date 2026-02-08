@@ -103,7 +103,8 @@
       "note": "Nota",
       "actions": "Acciones",
       "ca125": "CA125"
-    }
+    },
+    "records": "Registros"
   },
   "ContextOptions": {
     "exercise": "Post-Ejercicio",

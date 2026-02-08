@@ -22,8 +22,8 @@ const config = {
                 border: "hsl(var(--border))",
                 input: "hsl(var(--input))",
                 ring: "hsl(var(--ring))",
-                background: "hsl(var(--background))",
-                foreground: "hsl(var(--foreground))",
+                background: "var(--background)",
+                foreground: "var(--foreground)",
                 primary: {
                     DEFAULT: "hsl(var(--primary))",
                     foreground: "hsl(var(--primary-foreground))",
@@ -45,12 +45,24 @@ const config = {
                     foreground: "hsl(var(--accent-foreground))",
                 },
                 popover: {
-                    DEFAULT: "hsl(var(--popover))",
-                    foreground: "hsl(var(--popover-foreground))",
+                    DEFAULT: "var(--popover)",
+                    foreground: "var(--popover-foreground)",
                 },
                 card: {
-                    DEFAULT: "hsl(var(--card))",
-                    foreground: "hsl(var(--card-foreground))",
+                    DEFAULT: "var(--card)",
+                    foreground: "var(--card-foreground)",
+                },
+                vital: {
+                    main: "var(--vital-main)",
+                    ai: "var(--vital-ai)",
+                    success: "#10b981", // emerald-500
+                    warning: "#f59e0b", // amber-500
+                    danger: "#ef4444", // red-500
+                },
+                chart: {
+                    systolic: "var(--chart-systolic)",
+                    diastolic: "var(--chart-diastolic)",
+                    metric: "var(--chart-metric)",
                 },
             },
             borderRadius: {

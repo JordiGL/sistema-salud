@@ -88,7 +88,7 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
     <div className="min-h-screen bg-background font-sans text-foreground">
 
       {/* --- STICKY HEADER --- */}
-      <header className="sticky top-0 z-30 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky top-0 z-30 w-full border-b border-border/40 bg-card/80 backdrop-blur lg:bg-transparent lg:backdrop-blur-none lg:border-none">
         <div className="flex h-14 items-center px-4 gap-4">
           <Sidebar
             isAdmin={isAdmin}
@@ -127,13 +127,13 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
                     <span className="text-xs font-bold text-primary bg-primary/10 px-2.5 py-1 rounded-full border border-primary/20">
                       {metrics.length}
                     </span>
-                    <h3 className="hidden sm:block font-bold text-sm text-muted-foreground uppercase tracking-wider">Registros</h3>
+                    <h3 className="hidden sm:block font-bold text-sm uppercase tracking-wider">{t('History.records')}</h3>
                   </div>
 
                   {/* Controls */}
                   <div className="flex items-center gap-3">
                     {/* Export Group */}
-                    <div className="flex items-center bg-background rounded-lg border border-border p-1 shadow-sm">
+                    <div className="flex items-center bg-card rounded-lg border border-border p-1 shadow-sm">
                       <Button
                         variant="ghost"
                         size="sm"
@@ -156,7 +156,7 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
                     </div>
 
                     {/* View Toggle */}
-                    <div className="flex items-center bg-background rounded-lg border border-border p-1 shadow-sm">
+                    <div className="flex items-center bg-card rounded-lg border border-border p-1 shadow-sm">
                       <Button
                         variant="ghost"
                         size="icon"

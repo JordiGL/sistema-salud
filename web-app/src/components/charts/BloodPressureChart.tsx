@@ -268,8 +268,8 @@ export function BloodPressureChart({ data: initialData }: { data: Metric[] }) {
                   }
                 />
 
-                <Line type="monotone" dataKey="systolic_graph" stroke="var(--color-systolic)" strokeWidth={3} dot={{ r: 4, fill: "var(--color-systolic)", strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 6 }} />
-                <Line type="monotone" dataKey="diastolic_graph" stroke="var(--color-diastolic)" strokeWidth={3} dot={{ r: 4, fill: "var(--color-diastolic)", strokeWidth: 2, stroke: '#fff' }} />
+                <Line type="monotone" dataKey="systolic_graph" stroke="var(--chart-systolic)" strokeWidth={3} dot={{ r: 4, fill: "var(--chart-systolic)", strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 6 }} />
+                <Line type="monotone" dataKey="diastolic_graph" stroke="var(--chart-diastolic)" strokeWidth={3} dot={{ r: 4, fill: "var(--chart-diastolic)", strokeWidth: 2, stroke: '#fff' }} />
               </LineChart>
             </ChartContainer>
           </div>
@@ -285,14 +285,14 @@ export function BloodPressureChart({ data: initialData }: { data: Metric[] }) {
               data={systolicData}
               colorClass="text-slate-900 dark:text-slate-300"
               bgClass="bg-slate-100 dark:bg-slate-800"
-              legendDotColor={theme === 'dark' ? chartConfig.systolic.theme.dark : chartConfig.systolic.theme.light}
+              legendDotColor="var(--chart-systolic)"
             />
             <StatsSummary
               label={tCharts('diastolic')}
               data={diastolicData}
               colorClass="text-slate-400 dark:text-slate-500"
               bgClass="bg-slate-50 dark:bg-slate-900/50"
-              legendDotColor={theme === 'dark' ? chartConfig.diastolic.theme.dark : chartConfig.diastolic.theme.light}
+              legendDotColor="var(--chart-diastolic)"
             />
           </div>
         </CardFooter>
