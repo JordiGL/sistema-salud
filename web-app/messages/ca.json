@@ -20,7 +20,7 @@
   "Login": {
     "title": "Accés Admin",
     "subtitle": "Introdueix les teves credencials per gestionar registres.",
-    "emailPlaceholder": "correu@exemple.com",
+    "usernamePlaceholder": "Nom d'usuari...",
     "passwordPlaceholder": "Contrasenya...",
     "errorCredentials": "Credencials incorrectes",
     "success": "Sessió iniciada correctament",
@@ -147,6 +147,16 @@
     "undoSuccess": "Registre desfet correctament",
     "errorUndo": "Error al desfer el registre",
     "autoSaveFailedValidation": "L'autodesat ha fallat la validació. Revisa les dades."
+  },
+  "Sidebar": {
+    "guestUser": "Usuari Convidat",
+    "menu": "MENÚ",
+    "aiInsights": "Insights IA",
+    "aiDescription": "Analitza tendències de salut amb la nostra integració avançada de Gemini IA.",
+    "exploreInsights": "Explorar Insights",
+    "login": "Iniciar Sessió",
+    "lang": "Idioma",
+    "theme": "Tema"
   },
   "Export": {
     "date": "Data",

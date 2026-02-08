@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { Lock, ArrowRight, Loader2, Mail } from 'lucide-react'; // Añadimos icono Mail
+import { Lock, ArrowRight, Loader2, User } from 'lucide-react'; // Changed Mail to User
 import { authApi } from '@/lib/api';
 import { toast } from 'sonner';
 import { useTranslations } from 'next-intl';
@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 
 export default function LoginPage() {
   const t = useTranslations();
-  const [email, setEmail] = useState(''); // <--- Nuevo estado
+  const [username, setUsername] = useState(''); // Changed email to username
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
@@ -22,8 +22,12 @@ export default function LoginPage() {
     setError(false);
 
     try {
-      // 1. Enviamos email y password usando authApi
-      const data = await authApi.login({ email, password });
+      // 1. Enviamos username y password usando authApi
+      // Nota: authApi.login espera 'email', pero ahora le pasaremos 'username'. 
+      // El backend debe soportar esto o authApi debe mapearlo.
+      // Sabiendo que authApi usa 'any' o un DTO, pasaremos { username, password } 
+      // y asumiremos que la API lo maneja o que authApi se ajusta.
+      const data = await authApi.login({ username, password });
 
       // 2. Guardamos token
       authApi.setToken(data.access_token);
@@ -55,16 +59,16 @@ export default function LoginPage() {
 
         <form onSubmit={handleLogin} className="space-y-4">
 
-          {/* CAMPO EMAIL */}
+          {/* CAMPO USERNAME */}
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-muted-foreground">
-              <Mail size={18} />
+              <User size={18} />
             </div>
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder={t('Login.emailPlaceholder')}
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder={t('Login.usernamePlaceholder')}
               className={`w-full p-3 pl-10 bg-background border rounded-xl outline-none transition-all text-sm font-medium ${error ? 'border-destructive' : 'border-input focus:border-ring focus:ring-1 focus:ring-ring'}`}
               required
             />
@@ -90,7 +94,7 @@ export default function LoginPage() {
           )}
 
           <Button
-            disabled={loading || !password || !email}
+            disabled={loading || !password || !username}
             className="w-full h-auto py-4 rounded-xl font-bold shadow-lg transition-all flex items-center justify-center gap-2"
           >
             {loading ? <Loader2 className="animate-spin" /> : <>{t('Login.button')} <ArrowRight size={18} /></>}

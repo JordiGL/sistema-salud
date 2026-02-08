@@ -157,10 +157,13 @@ export interface LoginResponse {
 }
 
 export const authApi = {
-  login: (credentials: { email: string; password: string }) =>
+  login: (credentials: { username: string; password: string }) =>
     httpClient<LoginResponse>(API_ROUTES.AUTH_LOGIN, {
       method: "POST",
-      body: JSON.stringify(credentials),
+      body: JSON.stringify({
+        email: credentials.username,
+        password: credentials.password,
+      }),
     }),
 
   getToken: () => {

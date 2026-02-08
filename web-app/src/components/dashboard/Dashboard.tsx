@@ -5,9 +5,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import {
-  Activity, Heart, Scale, Droplets, TestTube,
-  Globe, LayoutList, LogOut, LayoutGrid, List,
-  Table, Code, ShieldCheck
+  LayoutList, LayoutGrid, List,
+  Table, Code
 } from 'lucide-react';
 
 // Imports de la nova API i Constants
@@ -27,8 +26,7 @@ import { HistoryTableView } from '@/components/health-history/HistoryTableView';
 import { HealthDataForm } from '@/components/health-entry/HealthDataForm';
 import { Button } from "@/components/ui/button";
 
-import { ModeToggle } from "@/components/mode-toggle";
-import { InstallPrompt } from "@/components/install-prompt";
+import { Sidebar } from '@/components/dashboard/Sidebar';
 
 interface DashboardProps {
   initialMetrics: Metric[];
@@ -40,7 +38,6 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
   const router = useRouter();
 
   // --- ESTATS ---
-  // Inicialitzem amb les dades del servidor -> Adéu loading inicial!
   const [metrics, setMetrics] = useState<Metric[]>(initialMetrics);
   const [isAdmin, setIsAdmin] = useState(false);
 
@@ -65,60 +62,48 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
     router.refresh();
   }
 
-  // Funció per refrescar dades sense recarregar la pàgina
   async function refreshData() {
     try {
-      const data = await metricApi.getAll(); // Usem la nova API
+      const data = await metricApi.getAll();
       setMetrics(data);
     } catch (error) {
       console.error("Error refrescant dades:", error);
     }
   }
 
-  const tabs = [
-    { id: 'history', label: t('Tabs.history'), icon: LayoutList },
-    { id: 'bp', label: t('Tabs.bp'), icon: Activity },
-    { id: 'pulse', label: t('Tabs.pulse'), icon: Heart },
-    { id: 'weight', label: t('Tabs.weight'), icon: Scale },
-    { id: 'spo2', label: t('Tabs.spo2'), icon: Droplets },
-    { id: 'ca125', label: t('Tabs.ca125'), icon: TestTube },
-  ];
+  // --- HEADER TITLE ---
+  const getPageTitle = () => {
+    switch (activeTab) {
+      case 'history': return t('Tabs.history');
+      case 'bp': return t('Charts.bpTitle');
+      case 'pulse': return t('Charts.pulseTitle');
+      case 'weight': return t('Charts.weightTitle');
+      case 'spo2': return t('Charts.spo2Title');
+      case 'ca125': return t('Charts.ca125Title');
+      default: return 'Vital.ai';
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8 font-sans text-foreground relative">
+    <div className="min-h-screen bg-background font-sans text-foreground">
 
-      {/* --- CAPÇALERA SUPERIOR --- */}
-      <div className="absolute top-6 right-6 flex items-center gap-2 z-10">
-        {isAdmin ? (
-          <Button
-            variant="ghost"
-            onClick={handleLogout}
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-900 dark:bg-slate-800 text-white dark:text-slate-100 dark:border dark:border-slate-700 shadow-sm hover:opacity-90 dark:hover:bg-slate-700 transition-all"
-            title={t('Dashboard.logout')}
-          >
-            <LogOut size={16} />
-          </Button>
-        ) : (
-          <Link
-            href={`/${locale}${APP_ROUTES.LOGIN}`}
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-900 dark:bg-slate-800 text-white dark:text-slate-100 dark:border dark:border-slate-700 shadow-sm hover:opacity-90 dark:hover:bg-slate-700 transition-all"
-            title={t('HomePage.adminAccess')}
-          >
-            <ShieldCheck size={16} />
-          </Link>
-        )}
-
-        <div className="flex h-8.5 items-center gap-2 bg-card p-1 rounded-full shadow-sm border border-border">
-          <Globe size={14} className="ml-2 text-muted-foreground" />
-          <Link href="/es" className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${locale === 'es' ? 'bg-slate-900 text-white dark:bg-slate-800 dark:text-slate-100 dark:border dark:border-slate-700 shadow-sm' : 'text-muted-foreground bg-muted/30 hover:bg-muted hover:text-foreground'}`}>ES</Link>
-          <Link href="/ca" className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${locale === 'ca' ? 'bg-slate-900 text-white dark:bg-slate-800 dark:text-slate-100 dark:border dark:border-slate-700 shadow-sm' : 'text-muted-foreground bg-muted/30 hover:bg-muted hover:text-foreground'}`}>CA</Link>
+      {/* --- STICKY HEADER --- */}
+      <header className="sticky top-0 z-30 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="flex h-14 items-center px-4 gap-4">
+          <Sidebar
+            isAdmin={isAdmin}
+            activeTab={activeTab}
+            setActiveTab={setActiveTab}
+            onLogout={handleLogout}
+          />
+          <div className="flex-1 flex items-center justify-between">
+            <h1 className="font-bold text-lg tracking-tight">{getPageTitle()}</h1>
+            {/* Optional: Add quick actions here if needed */}
+          </div>
         </div>
+      </header>
 
-        <ModeToggle />
-        <InstallPrompt />
-      </div>
-
-      <div className="max-w-5xl mx-auto space-y-8 pt-12">
+      <div className="max-w-5xl mx-auto p-4 md:p-8 space-y-8">
 
         {/* --- FORMULARI --- */}
         {isAdmin && (
@@ -127,27 +112,8 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
           </div>
         )}
 
-        {/* --- NAVEGACIÓ (TABS) --- */}
-        <div className="flex flex-wrap gap-2 md:gap-4 p-1 bg-card rounded-xl border border-border shadow-sm overflow-x-auto">
-          {tabs.map((tab) => {
-            const isActive = activeTab === tab.id;
-            const Icon = tab.icon;
-            return (
-              <Button
-                key={tab.id}
-                variant={isActive ? "secondary" : "ghost"}
-                onClick={() => setActiveTab(tab.id as any)}
-                className={`flex-1 md:flex-none justify-center gap-2 h-auto py-3 rounded-lg text-sm font-bold transition-all ${isActive ? 'bg-muted text-foreground shadow-sm ring-1 ring-border' : 'text-muted-foreground hover:bg-muted/50 hover:text-foreground'}`}
-              >
-                <Icon size={18} />
-                {tab.label}
-              </Button>
-            );
-          })}
-        </div>
-
         {/* --- ÀREA DE CONTINGUT --- */}
-        <div className="min-h-100">
+        <div className="min-h-[500px]">
 
           {activeTab === 'history' && (
             <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
@@ -155,13 +121,13 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
               {/* Contenidor Integrat */}
               <div className="bg-card border border-border rounded-xl shadow-sm overflow-hidden flex flex-col">
 
-                {/* HEADER DE LA SECCIÓ (Integrat) */}
+                {/* HEADER DE LA SECCIÓ DE HISTORIAL */}
                 <div className="p-4 border-b border-border bg-muted/30 flex flex-row justify-between items-center gap-4">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-bold text-primary bg-primary/10 px-2.5 py-1 rounded-full border border-primary/20">
                       {metrics.length}
                     </span>
-                    <h3 className="hidden sm:block font-bold text-lg">{t('Tabs.history')}</h3>
+                    <h3 className="hidden sm:block font-bold text-sm text-muted-foreground uppercase tracking-wider">Registros</h3>
                   </div>
 
                   {/* Controls */}

@@ -20,7 +20,7 @@
   "Login": {
     "title": "Acceso Admin",
     "subtitle": "Introduce tus credenciales para gestionar registros.",
-    "emailPlaceholder": "correo@ejemplo.com",
+    "usernamePlaceholder": "Nombre de usuario...",
     "passwordPlaceholder": "Contraseña...",
     "errorCredentials": "Credenciales incorrectas",
     "success": "Sesión iniciada correctamente",
@@ -147,6 +147,16 @@
     "undoSuccess": "Registro deshecho correctamente",
     "errorUndo": "Error al deshacer el registro",
     "autoSaveFailedValidation": "El autoguardado falló la validación. Revisa los datos."
+  },
+  "Sidebar": {
+    "guestUser": "Usuario Invitado",
+    "menu": "MENU",
+    "aiInsights": "Insights IA",
+    "aiDescription": "Analiza tendencias de salud con nuestra integración avanzada de Gemini IA.",
+    "exploreInsights": "Explorar Insights",
+    "login": "Iniciar Sesión",
+    "lang": "Idioma",
+    "theme": "Tema"
   },
   "Export": {
     "date": "Fecha",
