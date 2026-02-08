@@ -157,7 +157,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
             {/* CABECERA */}
             <div
                 onClick={() => setIsOpen(!isOpen)}
-                className={`flex justify-between items-center p-4 cursor-pointer transition-colors select-none ${isOpen ? 'bg-muted/50 border-b border-border' : 'bg-card hover:bg-muted/50'}`}
+                className={`flex justify-between items-center p-4 cursor-pointer transition-colors select-none ${isOpen ? 'bg-muted/50 border-b border-border' : 'bg-card hover:bg-hover'}`}
                 title={isOpen ? t('Form.toggleCollapse') : t('Form.toggleExpand')}
             >
                 <div className="flex items-center gap-3">
@@ -181,7 +181,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                             className={`
                                 gap-2 transition-all border-dashed
                                 data-[state=on]:bg-primary/10 data-[state=on]:text-primary data-[state=on]:border-primary data-[state=on]:border-solid
-                                hover:bg-muted font-medium
+                                hover:bg-hover font-medium
                             `}
                         >
                             <Zap size={16} className={autoSave ? "fill-current" : ""} />
@@ -365,7 +365,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                 />
 
                                 <div className="flex gap-3">
-                                    <Button type="button" variant="outline" onClick={handleResetClick} className="h-auto px-6 py-4 rounded-xl font-bold text-muted-foreground border-dashed border-border bg-background hover:bg-muted hover:text-foreground" title={t('Form.clearTitle')}>
+                                    <Button type="button" variant="outline" onClick={handleResetClick} className="h-auto px-6 py-4 rounded-xl font-bold text-muted-foreground border-dashed border-border bg-background hover:bg-hover hover:text-foreground" title={t('Form.clearTitle')}>
                                         <RotateCcw size={18} /> <span className="hidden sm:inline">{t('HomePage.clear') || 'Limpiar'}</span>
                                     </Button>
                                     <Button type="submit" disabled={form.formState.isSubmitting} className="flex-1 h-auto py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl bg-primary text-primary-foreground dark:bg-slate-800 dark:text-slate-100 dark:border dark:border-slate-700 dark:hover:bg-slate-700 transition-all">

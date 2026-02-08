@@ -85,7 +85,7 @@ export function HistoryTableView({ data, isAdmin, onRefresh, embedded = false }:
               const rowStyles = STATUS_COLORS[overallStatus];
 
               return (
-                <TableRow key={row.id} className={`hover:bg-muted/50 transition-colors border-l-4 ${rowStyles.border}`}>
+                <TableRow key={row.id} className={`hover:bg-hover transition-colors border-l-4 ${rowStyles.border}`}>
                   <TableCell className="font-medium text-foreground">
                     <div className="flex flex-col">
                       <span>{dateObj.toLocaleDateString()}</span>
@@ -121,7 +121,7 @@ export function HistoryTableView({ data, isAdmin, onRefresh, embedded = false }:
                         variant="ghost"
                         size="sm"
                         onClick={() => setNoteToView(row)}
-                        className="h-8 w-full justify-start p-1.5 hover:bg-purple-50 dark:hover:bg-purple-900/20"
+                        className="h-8 w-full justify-start p-1.5 hover:bg-hover"
                         title={row.notes}
                       >
                         <FileText size={14} className="text-muted-foreground hover:text-foreground transition-colors" />

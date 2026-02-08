@@ -42,6 +42,10 @@
     --chart-systolic: #475569;
     --chart-diastolic: #94a3b8;
     --chart-metric: #475569;
+
+    /* CENTRALIZED HOVER */
+    --hover: #f1f5f9;
+    /* Slate 100 */
   }
 
   .dark {
@@ -51,7 +55,7 @@
     --card: hsl(from var(--vital-main) h s calc(l * 0.6));
     --card-foreground: hsl(210 40% 98%);
 
-    --popover: 222.2 84% 4.9%;
+    --popover: var(--card);
     --popover-foreground: hsl(210 40% 98%);
 
     --primary: 210 40% 98%;
@@ -80,6 +84,10 @@
     --chart-systolic: rgb(185, 185, 185);
     --chart-diastolic: #571d1d;
     --chart-metric: #94a3b8;
+
+    /* CENTRALIZED HOVER */
+    --hover: #1e293b;
+    /* Slate 800 */
   }
 }
 

@@ -161,7 +161,7 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
                         variant="ghost"
                         size="icon"
                         onClick={() => setViewMode('grid')}
-                        className={`h-8 w-8 rounded-md transition-all ${viewMode === 'grid' ? 'bg-primary/10 text-primary shadow-sm' : 'text-muted-foreground hover:bg-muted'}`}
+                        className={`h-8 w-8 rounded-md transition-all ${viewMode === 'grid' ? 'bg-primary/10 text-primary shadow-sm' : 'text-muted-foreground hover:bg-hover'}`}
                         title={t('History.cardView')}
                       >
                         <LayoutGrid size={16} />
@@ -170,7 +170,7 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
                         variant="ghost"
                         size="icon"
                         onClick={() => setViewMode('table')}
-                        className={`h-8 w-8 rounded-md transition-all ${viewMode === 'table' ? 'bg-primary/10 text-primary shadow-sm' : 'text-muted-foreground hover:bg-muted'}`}
+                        className={`h-8 w-8 rounded-md transition-all ${viewMode === 'table' ? 'bg-primary/10 text-primary shadow-sm' : 'text-muted-foreground hover:bg-hover'}`}
                         title={t('History.tableView')}
                       >
                         <List size={16} />

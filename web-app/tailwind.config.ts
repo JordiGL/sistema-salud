@@ -64,6 +64,7 @@ const config = {
                     diastolic: "var(--chart-diastolic)",
                     metric: "var(--chart-metric)",
                 },
+                hover: "var(--hover)",
             },
             borderRadius: {
                 lg: "var(--radius)",

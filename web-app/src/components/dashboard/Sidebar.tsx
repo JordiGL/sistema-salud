@@ -110,7 +110,7 @@ export function Sidebar({ isAdmin, activeTab, setActiveTab, onLogout }: SidebarP
                                     variant="ghost"
                                     className={`w-full justify-start gap-4 h-11 px-4 rounded-lg transition-all duration-200 ${isActive
                                         ? "bg-secondary/80 text-foreground font-semibold shadow-sm ring-1 ring-border/50"
-                                        : "text-muted-foreground hover:text-foreground hover:bg-secondary/40"
+                                        : "text-muted-foreground hover:text-foreground hover:bg-hover"
                                         }`}
                                     onClick={() => handleTabClick(tab.id)}
                                 >
@@ -152,8 +152,8 @@ export function Sidebar({ isAdmin, activeTab, setActiveTab, onLogout }: SidebarP
                         {/* Language */}
                         <div className="flex h-8.5 items-center gap-2 bg-background p-1 rounded-full shadow-sm border border-border">
                             <Globe size={14} className="ml-2 text-muted-foreground" />
-                            <Link href="/es" className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${locale === 'es' ? 'bg-slate-900 text-white dark:bg-slate-800 dark:text-slate-100 dark:border dark:border-slate-700 shadow-sm' : 'text-muted-foreground bg-muted/30 hover:bg-muted hover:text-foreground'}`}>ES</Link>
-                            <Link href="/ca" className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${locale === 'ca' ? 'bg-slate-900 text-white dark:bg-slate-800 dark:text-slate-100 dark:border dark:border-slate-700 shadow-sm' : 'text-muted-foreground bg-muted/30 hover:bg-muted hover:text-foreground'}`}>CA</Link>
+                            <Link href="/es" className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${locale === 'es' ? 'bg-slate-900 text-white dark:bg-slate-800 dark:text-slate-100 dark:border dark:border-slate-700 shadow-sm' : 'text-muted-foreground bg-muted/30 hover:bg-hover hover:text-foreground'}`}>ES</Link>
+                            <Link href="/ca" className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${locale === 'ca' ? 'bg-slate-900 text-white dark:bg-slate-800 dark:text-slate-100 dark:border dark:border-slate-700 shadow-sm' : 'text-muted-foreground bg-muted/30 hover:bg-hover hover:text-foreground'}`}>CA</Link>
                         </div>
 
                         {/* Theme & Auth */}
@@ -183,7 +183,7 @@ export function Sidebar({ isAdmin, activeTab, setActiveTab, onLogout }: SidebarP
                                     <Button
                                         variant="outline"
                                         size="icon"
-                                        className="w-9 h-9 rounded-full border border-border bg-background shadow-sm hover:bg-muted transition-all text-muted-foreground hover:text-foreground"
+                                        className="w-9 h-9 rounded-full border border-border bg-background shadow-sm hover:bg-hover transition-all text-muted-foreground hover:text-foreground"
                                     >
                                         <ShieldCheck size={16} />
                                         <span className="sr-only">{t('Sidebar.login')}</span>

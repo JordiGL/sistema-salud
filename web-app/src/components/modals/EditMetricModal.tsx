@@ -233,7 +233,7 @@ export function EditMetricModal({ isOpen, onClose, metric, onSuccess, contextOpt
             />
 
             <div className="flex gap-3 pt-2">
-              <Button type="button" variant="outline" onClick={onClose} className="flex-1 py-6 rounded-xl font-bold text-muted-foreground border-border hover:bg-accent hover:text-accent-foreground">
+              <Button type="button" variant="outline" onClick={onClose} className="flex-1 py-6 rounded-xl font-bold text-muted-foreground border-border hover:bg-hover hover:text-accent-foreground">
                 {t('History.cancel')}
               </Button>
               <Button type="submit" disabled={form.formState.isSubmitting} className="flex-1 py-6 rounded-xl font-bold flex gap-2 bg-primary text-primary-foreground dark:bg-slate-800 dark:text-slate-100 dark:border dark:border-slate-700 dark:hover:bg-slate-700 shadow-md transition-all">
