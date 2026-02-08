@@ -4,90 +4,101 @@
 
 @layer base {
   :root {
+    /* Base HSL: 222 (Vital Blue) */
     --background: hsl(0 0% 100%);
-    --foreground: hsl(217 33% 17%);
+    --foreground: hsl(222 57% 16%);
+    /* Matches vital-main */
 
     --card: hsl(0 0% 100%);
-    --card-foreground: hsl(217 33% 17%);
+    --card-foreground: hsl(222 57% 16%);
 
     --popover: hsl(0 0% 100%);
-    --popover-foreground: hsl(217 33% 17%);
+    --popover-foreground: hsl(222 57% 16%);
 
-    --primary: 222.2 47.4% 11.2%;
+    --primary: 222 57% 16%;
+    /* vital-main */
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 222 40% 96.1%;
+    --secondary-foreground: 222 57% 16%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 222 40% 96.1%;
+    --muted-foreground: 222 20% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 222 40% 96.1%;
+    --accent-foreground: 222 57% 16%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 222 20% 90%;
+    --input: 222 20% 90%;
+    --ring: 222 57% 16%;
 
     --radius: 0.5rem;
 
     /* BRAND COLORS */
-    --vital-main: #122041;
+    --vital-main: #0f172a;
     --vital-ai: #4f46e5;
 
     /* CHART COLORS */
-    --chart-systolic: #475569;
-    --chart-diastolic: #94a3b8;
+    --chart-systolic: #1e293b;
+    --chart-diastolic: #64748b;
     --chart-metric: #475569;
 
     /* CENTRALIZED HOVER */
-    --hover: #f1f5f9;
-    /* Slate 100 */
+    --hover: hsl(222 40% 96.1%);
+    /* Consistent with secondary/muted */
   }
 
   .dark {
     --background: var(--vital-main);
-    --foreground: hsl(210 40% 98%);
+    /* #122041 */
+    --foreground: hsl(222 30% 85%);
+    /* Softer, blueish gray */
 
+    /* Card derived from main, darker */
     --card: hsl(from var(--vital-main) h s calc(l * 0.6));
-    --card-foreground: hsl(210 40% 98%);
+    --card-foreground: hsl(222 30% 85%);
 
     --popover: var(--card);
-    --popover-foreground: hsl(210 40% 98%);
+    --popover-foreground: hsl(222 30% 85%);
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 222 57% 55%;
+    /* Brand Blue */
+    --primary-foreground: 0 0% 100%;
+    /* White */
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    /* Slightly lighter than BG to stand out, or transparent */
+    --secondary: 222 40% 25%;
+    --secondary-foreground: 222 30% 85%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 222 40% 25%;
+    --muted-foreground: 222 20% 60%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 222 40% 25%;
+    --accent-foreground: 222 30% 85%;
 
     --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 222 30% 85%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --border: 222 40% 25%;
+    --input: 222 40% 25%;
+    --ring: 222 40% 50%;
 
     /* BRAND COLORS DARK override */
     --vital-ai: #818cf8;
 
     /* CHART COLORS DARK override */
-    --chart-systolic: rgb(185, 185, 185);
-    --chart-diastolic: #571d1d;
-    --chart-metric: #94a3b8;
+    --chart-systolic: #60a5fa;
+    /* Blue-400 for visibility */
+    --chart-diastolic: #94a3b8;
+    /* Slate-400 */
+    --chart-metric: #cbd5e1;
 
     /* CENTRALIZED HOVER */
-    --hover: #1e293b;
-    /* Slate 800 */
+    --hover: hsl(222 40% 25%);
+    /* Matching secondary/muted for consistency */
   }
 }
 

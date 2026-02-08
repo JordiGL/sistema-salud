@@ -157,11 +157,11 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
             {/* CABECERA */}
             <div
                 onClick={() => setIsOpen(!isOpen)}
-                className={`flex justify-between items-center p-4 cursor-pointer transition-colors select-none ${isOpen ? 'bg-muted/50 border-b border-border' : 'bg-card hover:bg-hover'}`}
+                className={`flex justify-between items-center p-4 cursor-pointer transition-colors select-none ${isOpen ? 'bg-muted/50 border-b border-border' : 'bg-card'}`}
                 title={isOpen ? t('Form.toggleCollapse') : t('Form.toggleExpand')}
             >
                 <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-lg transition-colors ${isOpen ? 'bg-muted text-foreground' : 'bg-muted/50 text-muted-foreground'}`}>
+                    <div className={`p-2 rounded-lg transition-colors ${isOpen ? 'bg-muted text-foreground' : 'bg-muted/50 text-muted-foreground hover:bg-hover hover:text-foreground'}`}>
                         <Plus size={20} />
                     </div>
                     <h2 className="hidden sm:block text-lg font-bold text-foreground">

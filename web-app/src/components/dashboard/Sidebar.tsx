@@ -68,7 +68,7 @@ export function Sidebar({ isAdmin, activeTab, setActiveTab, onLogout }: SidebarP
           everything into it. 
        */}
 
-            <SheetContent side="left" className="w-[300px] sm:w-[350px] flex flex-col gap-0 p-0">
+            <SheetContent side="left" className="w-[300px] sm:w-[350px] flex flex-col gap-0 p-0 bg-card">
 
                 {/* HEADER */}
                 <SheetHeader className="p-6 border-b border-border">
