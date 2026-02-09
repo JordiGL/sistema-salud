@@ -24,9 +24,10 @@ interface HistoryTableViewProps {
   isAdmin: boolean;
   onRefresh: () => void;
   embedded?: boolean;
+  visibleColumns?: string[];
 }
 
-export function HistoryTableView({ data, isAdmin, onRefresh, embedded = false }: HistoryTableViewProps) {
+export function HistoryTableView({ data, isAdmin, onRefresh, embedded = false, visibleColumns }: HistoryTableViewProps) {
   const t = useTranslations();
   const { renderContext, renderLocation, contextOptions, locationOptions, translateOption } = useMetricManager();
 
@@ -38,6 +39,11 @@ export function HistoryTableView({ data, isAdmin, onRefresh, embedded = false }:
     key: 'createdAt',
     direction: 'desc',
   });
+
+  const isColumnVisible = (key: string) => {
+    if (!visibleColumns) return true;
+    return visibleColumns.includes(key);
+  };
 
   const handleSort = (key: keyof Metric) => {
     setSortConfig((current) => ({
@@ -105,80 +111,98 @@ export function HistoryTableView({ data, isAdmin, onRefresh, embedded = false }:
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead
-                className="min-w-[100px] cursor-pointer hover:bg-muted/50 transition-colors group select-none"
-                onClick={() => handleSort('createdAt')}
-              >
-                <div className="flex items-center">
-                  {t('History.cols.date')}
-                  <SortIcon columnKey="createdAt" />
-                </div>
-              </TableHead>
-              <TableHead
-                className="min-w-[100px] cursor-pointer hover:bg-muted/50 transition-colors group select-none"
-                onClick={() => handleSort('measurementContext')}
-              >
-                <div className="flex items-center">
-                  {t('History.cols.context')}
-                  <SortIcon columnKey="measurementContext" />
-                </div>
-              </TableHead>
-              <TableHead
-                className="min-w-[100px] cursor-pointer hover:bg-muted/50 transition-colors group select-none"
-                onClick={() => handleSort('bloodPressure')}
-              >
-                <div className="flex items-center">
-                  {t('History.cols.bp')}
-                  <SortIcon columnKey="bloodPressure" />
-                </div>
-              </TableHead>
-              <TableHead
-                className="min-w-[60px] cursor-pointer hover:bg-muted/50 transition-colors group select-none"
-                onClick={() => handleSort('pulse')}
-              >
-                <div className="flex items-center">
-                  {t('History.cols.pulse')}
-                  <SortIcon columnKey="pulse" />
-                </div>
-              </TableHead>
-              <TableHead
-                className="min-w-[50px] cursor-pointer hover:bg-muted/50 transition-colors group select-none"
-                onClick={() => handleSort('spo2')}
-              >
-                <div className="flex items-center">
-                  {t('History.cols.spo2')}
-                  <SortIcon columnKey="spo2" />
-                </div>
-              </TableHead>
-              <TableHead
-                className="min-w-[70px] border-l cursor-pointer hover:bg-muted/50 transition-colors group select-none"
-                onClick={() => handleSort('ca125')}
-              >
-                <div className="flex items-center">
-                  {t('History.cols.ca125')}
-                  <SortIcon columnKey="ca125" />
-                </div>
-              </TableHead>
-              <TableHead
-                className="min-w-[90px] border-l cursor-pointer hover:bg-muted/50 transition-colors group select-none"
-                onClick={() => handleSort('weight')}
-              >
-                <div className="flex items-center">
-                  {t('History.cols.weight')}
-                  <SortIcon columnKey="weight" />
-                </div>
-              </TableHead>
-              <TableHead
-                className="min-w-[120px] cursor-pointer hover:bg-muted/50 transition-colors group select-none"
-                onClick={() => handleSort('weightLocation')}
-              >
-                <div className="flex items-center">
-                  {t('History.cols.site')}
-                  <SortIcon columnKey="weightLocation" />
-                </div>
-              </TableHead>
-              <TableHead className="min-w-[50px] border-l">{t('History.cols.note')}</TableHead>
-              {isAdmin && (
+              {isColumnVisible('createdAt') && (
+                <TableHead
+                  className="min-w-[100px] cursor-pointer hover:bg-muted/50 transition-colors group select-none"
+                  onClick={() => handleSort('createdAt')}
+                >
+                  <div className="flex items-center">
+                    {t('History.cols.date')}
+                    <SortIcon columnKey="createdAt" />
+                  </div>
+                </TableHead>
+              )}
+              {isColumnVisible('measurementContext') && (
+                <TableHead
+                  className="min-w-[100px] cursor-pointer hover:bg-muted/50 transition-colors group select-none"
+                  onClick={() => handleSort('measurementContext')}
+                >
+                  <div className="flex items-center">
+                    {t('History.cols.context')}
+                    <SortIcon columnKey="measurementContext" />
+                  </div>
+                </TableHead>
+              )}
+              {isColumnVisible('bloodPressure') && (
+                <TableHead
+                  className="min-w-[100px] cursor-pointer hover:bg-muted/50 transition-colors group select-none"
+                  onClick={() => handleSort('bloodPressure')}
+                >
+                  <div className="flex items-center">
+                    {t('History.cols.bp')}
+                    <SortIcon columnKey="bloodPressure" />
+                  </div>
+                </TableHead>
+              )}
+              {isColumnVisible('pulse') && (
+                <TableHead
+                  className="min-w-[60px] cursor-pointer hover:bg-muted/50 transition-colors group select-none"
+                  onClick={() => handleSort('pulse')}
+                >
+                  <div className="flex items-center">
+                    {t('History.cols.pulse')}
+                    <SortIcon columnKey="pulse" />
+                  </div>
+                </TableHead>
+              )}
+              {isColumnVisible('spo2') && (
+                <TableHead
+                  className="min-w-[50px] cursor-pointer hover:bg-muted/50 transition-colors group select-none"
+                  onClick={() => handleSort('spo2')}
+                >
+                  <div className="flex items-center">
+                    {t('History.cols.spo2')}
+                    <SortIcon columnKey="spo2" />
+                  </div>
+                </TableHead>
+              )}
+              {isColumnVisible('ca125') && (
+                <TableHead
+                  className="min-w-[70px] border-l cursor-pointer hover:bg-muted/50 transition-colors group select-none"
+                  onClick={() => handleSort('ca125')}
+                >
+                  <div className="flex items-center">
+                    {t('History.cols.ca125')}
+                    <SortIcon columnKey="ca125" />
+                  </div>
+                </TableHead>
+              )}
+              {isColumnVisible('weight') && (
+                <TableHead
+                  className="min-w-[90px] border-l cursor-pointer hover:bg-muted/50 transition-colors group select-none"
+                  onClick={() => handleSort('weight')}
+                >
+                  <div className="flex items-center">
+                    {t('History.cols.weight')}
+                    <SortIcon columnKey="weight" />
+                  </div>
+                </TableHead>
+              )}
+              {isColumnVisible('weightLocation') && (
+                <TableHead
+                  className="min-w-[120px] cursor-pointer hover:bg-muted/50 transition-colors group select-none"
+                  onClick={() => handleSort('weightLocation')}
+                >
+                  <div className="flex items-center">
+                    {t('History.cols.site')}
+                    <SortIcon columnKey="weightLocation" />
+                  </div>
+                </TableHead>
+              )}
+              {isColumnVisible('notes') && (
+                <TableHead className="min-w-[50px] border-l">{t('History.cols.note')}</TableHead>
+              )}
+              {isAdmin && isColumnVisible('actions') && (
                 <TableHead className="min-w-[70px] border-l text-right">
                   {t('History.cols.actions')}
                 </TableHead>
@@ -193,64 +217,98 @@ export function HistoryTableView({ data, isAdmin, onRefresh, embedded = false }:
               let sysStatus: HealthStatus = 'normal';
               let diaStatus: HealthStatus = 'normal';
               let sys = 0, dia = 0;
-              if (row.bloodPressure) {
-                const parts = row.bloodPressure.split('/');
-                if (parts.length === 2) { sys = Number(parts[0]); dia = Number(parts[1]); sysStatus = HealthCriteria.getSystolicStatus(sys); diaStatus = HealthCriteria.getDiastolicStatus(dia); }
-              }
-              const pulseStatus = row.pulse ? HealthCriteria.getPulseStatus(row.pulse) : 'normal';
-              const spo2Status = row.spo2 ? HealthCriteria.getSpO2Status(row.spo2) : 'normal';
               const activeStatuses: HealthStatus[] = [];
-              if (row.bloodPressure) { activeStatuses.push(sysStatus); activeStatuses.push(diaStatus); }
-              if (row.pulse) activeStatuses.push(pulseStatus);
-              if (row.spo2) activeStatuses.push(spo2Status);
+
+              if (isColumnVisible('bloodPressure') && row.bloodPressure) {
+                const parts = row.bloodPressure.split('/');
+                if (parts.length === 2) {
+                  sys = Number(parts[0]);
+                  dia = Number(parts[1]);
+                  sysStatus = HealthCriteria.getSystolicStatus(sys);
+                  diaStatus = HealthCriteria.getDiastolicStatus(dia);
+                  activeStatuses.push(sysStatus);
+                  activeStatuses.push(diaStatus);
+                }
+              }
+
+              let pulseStatus: HealthStatus = 'normal';
+              if (isColumnVisible('pulse') && row.pulse) {
+                pulseStatus = HealthCriteria.getPulseStatus(row.pulse);
+                activeStatuses.push(pulseStatus);
+              }
+
+              let spo2Status: HealthStatus = 'normal';
+              if (isColumnVisible('spo2') && row.spo2) {
+                spo2Status = HealthCriteria.getSpO2Status(row.spo2);
+                activeStatuses.push(spo2Status);
+              }
+
               const overallStatus = HealthCriteria.getWorstStatus(activeStatuses);
               const rowStyles = STATUS_COLORS[overallStatus];
 
               return (
                 <TableRow key={row.id} className={`hover:bg-hover transition-colors border-l-4 ${rowStyles.border}`}>
-                  <TableCell className="font-medium text-foreground">
-                    <div className="flex flex-col">
-                      <span>{dateObj.toLocaleDateString()}</span>
-                      <span className="text-xs text-muted-foreground font-normal">{dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                    </div>
-                  </TableCell>
+                  {isColumnVisible('createdAt') && (
+                    <TableCell className="font-medium text-foreground">
+                      <div className="flex flex-col">
+                        <span>{dateObj.toLocaleDateString()}</span>
+                        <span className="text-xs text-muted-foreground font-normal">{dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                      </div>
+                    </TableCell>
+                  )}
 
-                  <TableCell>
-                    {row.measurementContext ? (
-                      <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full font-medium inline-block border border-border">
-                        {renderContext(row.measurementContext)}
-                      </span>
-                    ) : <span className="text-muted-foreground/30">-</span>}
-                  </TableCell>
+                  {isColumnVisible('measurementContext') && (
+                    <TableCell>
+                      {row.measurementContext ? (
+                        <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full font-medium inline-block border border-border">
+                          {renderContext(row.measurementContext)}
+                        </span>
+                      ) : <span className="text-muted-foreground/30">-</span>}
+                    </TableCell>
+                  )}
 
-                  <TableCell>{row.bloodPressure ? <span className="font-bold"><span className={STATUS_COLORS[sysStatus].text}>{sys}</span><span className="text-muted-foreground/40 mx-0.5">/</span><span className={STATUS_COLORS[diaStatus].text}>{dia}</span></span> : <span className="text-muted-foreground/30">-</span>}</TableCell>
-                  <TableCell className="font-bold">{row.pulse ? <span className={STATUS_COLORS[pulseStatus].text}>{row.pulse}</span> : <span className="text-muted-foreground/30">-</span>}</TableCell>
-                  <TableCell className="font-bold">{row.spo2 ? <span className={STATUS_COLORS[spo2Status].text}>{row.spo2}</span> : <span className="text-muted-foreground/30">-</span>}</TableCell>
-                  <TableCell className="border-l border-border">{row.ca125 ? <span className="font-bold text-foreground">{row.ca125}</span> : <span className="text-muted-foreground/30">-</span>}</TableCell>
-                  <TableCell className="border-l border-border">{row.weight ? <span className="font-bold text-foreground">{row.weight}</span> : <span className="text-muted-foreground/30">-</span>}</TableCell>
+                  {isColumnVisible('bloodPressure') && (
+                    <TableCell>{row.bloodPressure ? <span className="font-bold"><span className={STATUS_COLORS[sysStatus].text}>{sys}</span><span className="text-muted-foreground/40 mx-0.5">/</span><span className={STATUS_COLORS[diaStatus].text}>{dia}</span></span> : <span className="text-muted-foreground/30">-</span>}</TableCell>
+                  )}
+                  {isColumnVisible('pulse') && (
+                    <TableCell className="font-bold">{row.pulse ? <span className={STATUS_COLORS[pulseStatus].text}>{row.pulse}</span> : <span className="text-muted-foreground/30">-</span>}</TableCell>
+                  )}
+                  {isColumnVisible('spo2') && (
+                    <TableCell className="font-bold">{row.spo2 ? <span className={STATUS_COLORS[spo2Status].text}>{row.spo2}</span> : <span className="text-muted-foreground/30">-</span>}</TableCell>
+                  )}
+                  {isColumnVisible('ca125') && (
+                    <TableCell className="border-l border-border">{row.ca125 ? <span className="font-bold text-foreground">{row.ca125}</span> : <span className="text-muted-foreground/30">-</span>}</TableCell>
+                  )}
+                  {isColumnVisible('weight') && (
+                    <TableCell className="border-l border-border">{row.weight ? <span className="font-bold text-foreground">{row.weight}</span> : <span className="text-muted-foreground/30">-</span>}</TableCell>
+                  )}
 
-                  <TableCell>
-                    {row.weightLocation ? (
-                      <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full flex items-center gap-1 w-fit border border-border">
-                        <MapPin size={10} /> {renderLocation(row.weightLocation)}
-                      </span>
-                    ) : <span className="text-muted-foreground/30">-</span>}
-                  </TableCell>
+                  {isColumnVisible('weightLocation') && (
+                    <TableCell>
+                      {row.weightLocation ? (
+                        <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full flex items-center gap-1 w-fit border border-border">
+                          <MapPin size={10} /> {renderLocation(row.weightLocation)}
+                        </span>
+                      ) : <span className="text-muted-foreground/30">-</span>}
+                    </TableCell>
+                  )}
 
-                  <TableCell className="border-l border-border">
-                    {row.notes ? (
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setNoteToView(row)}
-                        className="h-8 w-full justify-start p-1.5 hover:bg-hover"
-                        title={row.notes}
-                      >
-                        <FileText size={14} className="text-muted-foreground hover:text-foreground transition-colors" />
-                      </Button>
-                    ) : <span className="text-muted-foreground/30">-</span>}
-                  </TableCell>
-                  {isAdmin && (
+                  {isColumnVisible('notes') && (
+                    <TableCell className="border-l border-border">
+                      {row.notes ? (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setNoteToView(row)}
+                          className="h-8 w-full justify-start p-1.5 hover:bg-hover"
+                          title={row.notes}
+                        >
+                          <FileText size={14} className="text-muted-foreground hover:text-foreground transition-colors" />
+                        </Button>
+                      ) : <span className="text-muted-foreground/30">-</span>}
+                    </TableCell>
+                  )}
+                  {isAdmin && isColumnVisible('actions') && (
                     <TableCell className="border-l border-border text-right">
                       <div className="flex justify-end gap-2">
                         <Button variant="outline" size="icon" onClick={() => setMetricToEdit(row)} className="h-8 w-8 text-muted-foreground hover:text-foreground">

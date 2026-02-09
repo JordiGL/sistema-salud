@@ -5,7 +5,7 @@
     "saveButton": "Desar Registre",
     "errorSaving": "Error al desar. Revisa les dades.",
     "viewModeMessage": "Mode visualització • Inicia sessió com a administrador per editar dades",
-    "adminAccess": "Accés d'Administrador",
+    "adminAccess": "Administrador",
     "adminExit": "Sortir",
     "sessionExpired": "La teva sessió ha caducat.",
     "clear": "Netejar"

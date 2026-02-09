@@ -228,11 +228,11 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
               </div>
             )}
 
-            {activeTab === 'bp' && <BloodPressureChart data={metrics} />}
-            {activeTab === 'pulse' && <PulseChart data={metrics} />}
-            {activeTab === 'weight' && <WeightChart data={metrics} />}
-            {activeTab === 'spo2' && <SpO2Chart data={metrics} />}
-            {activeTab === 'ca125' && <CA125Chart data={metrics} />}
+            {activeTab === 'bp' && <BloodPressureChart data={metrics} isAdmin={isAdmin} />}
+            {activeTab === 'pulse' && <PulseChart data={metrics} isAdmin={isAdmin} />}
+            {activeTab === 'weight' && <WeightChart data={metrics} isAdmin={isAdmin} />}
+            {activeTab === 'spo2' && <SpO2Chart data={metrics} isAdmin={isAdmin} />}
+            {activeTab === 'ca125' && <CA125Chart data={metrics} isAdmin={isAdmin} />}
           </div>
 
           {/* MISSATGE VISITANT */}

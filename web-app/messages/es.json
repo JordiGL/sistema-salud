@@ -5,7 +5,7 @@
     "saveButton": "Guardar Registro",
     "errorSaving": "Error al guardar. Revisa los datos.",
     "viewModeMessage": "Modo visualización • Inicia sesión como administrador para editar datos",
-    "adminAccess": "Acceso de Administrador",
+    "adminAccess": "Administrador",
     "adminExit": "Salir",
     "sessionExpired": "Tu sesión ha caducado.",
     "clear": "Limpiar"
