@@ -45,14 +45,65 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
   const [viewMode, setViewMode] = useState<'grid' | 'table'>('table');
 
   // --- EFECTES ---
+
   useEffect(() => {
     checkAuth();
+
+    function handleAuthLogout() {
+      setIsAdmin(false);
+      setActiveTab('history');
+      router.refresh();
+      // Opcional: Mostrar un toast informatiu
+    }
+
+    window.addEventListener('auth:logout', handleAuthLogout);
+    window.addEventListener('focus', checkAuth); // Revalidar al tornar a la pestanya
+
+    return () => {
+      window.removeEventListener('auth:logout', handleAuthLogout);
+      window.removeEventListener('focus', checkAuth);
+    };
   }, []);
 
   // --- FUNCIONS ---
   function checkAuth() {
     const token = localStorage.getItem(STORAGE_KEYS.TOKEN);
-    setIsAdmin(!!token);
+    if (!token) {
+      setIsAdmin(false);
+      return;
+    }
+
+    try {
+      // Validar expiració del JWT
+      const payloadBase64 = token.split('.')[1];
+      if (payloadBase64) {
+        // Fixar format base64url a base64 estàndard per atob
+        const base64 = payloadBase64.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(
+          atob(base64)
+            .split('')
+            .map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+            .join('')
+        );
+
+        const payload = JSON.parse(jsonPayload);
+
+        // Comprovar si ha expirat (amb 10s de marge)
+        if (payload.exp && Date.now() >= (payload.exp * 1000 - 10000)) {
+          localStorage.removeItem(STORAGE_KEYS.TOKEN);
+          setIsAdmin(false);
+          return;
+        }
+      }
+    } catch (e) {
+      console.error("Error validant token:", e);
+      // Si el token és invàlid, el treiem per seguretat
+      localStorage.removeItem(STORAGE_KEYS.TOKEN);
+      setIsAdmin(false);
+      return;
+    }
+
+    setIsAdmin(true);
   }
 
   function handleLogout() {

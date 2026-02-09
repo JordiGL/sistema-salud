@@ -52,8 +52,10 @@ async function httpClient<T>(
     const response = await fetch(url, config);
 
     if (response.status === 401) {
-      // Aquí podries netejar el token si volguessis
-      // localStorage.removeItem(STORAGE_KEYS.TOKEN);
+      if (typeof window !== "undefined") {
+        localStorage.removeItem(STORAGE_KEYS.TOKEN);
+        window.dispatchEvent(new Event("auth:logout"));
+      }
       throw new ApiError("UNAUTHORIZED", 401);
     }
 
