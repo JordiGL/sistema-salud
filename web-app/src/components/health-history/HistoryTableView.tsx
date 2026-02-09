@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Metric } from '@/types/metrics';
-import { Pencil, Trash2, FileText, MapPin, MoveHorizontal } from 'lucide-react';
+import { Pencil, Trash2, FileText, MapPin, MoveHorizontal, ArrowUpDown } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { HealthCriteria, STATUS_COLORS, HealthStatus } from '@/lib/health-criteria';
 import { useMetricManager } from '@/hooks/useMetricManager';
@@ -34,6 +34,64 @@ export function HistoryTableView({ data, isAdmin, onRefresh, embedded = false }:
   const [metricToEdit, setMetricToEdit] = useState<Metric | null>(null);
   const [noteToView, setNoteToView] = useState<Metric | null>(null);
 
+  const [sortConfig, setSortConfig] = useState<{ key: keyof Metric | null; direction: 'asc' | 'desc' }>({
+    key: 'createdAt',
+    direction: 'desc',
+  });
+
+  const handleSort = (key: keyof Metric) => {
+    setSortConfig((current) => ({
+      key,
+      direction:
+        current.key === key && current.direction === 'desc' ? 'asc' : 'desc',
+    }));
+  };
+
+  const sortedData = useMemo(() => {
+    const sortableItems = [...data];
+    if (sortConfig.key !== null) {
+      sortableItems.sort((a, b) => {
+        let aValue: any = a[sortConfig.key!];
+        let bValue: any = b[sortConfig.key!];
+
+        // Manejo especial para Tensión (sys/dia) -> ordenamos por sistólica
+        if (sortConfig.key === 'bloodPressure') {
+          const getSys = (v: string | undefined) => v ? parseInt(v.split('/')[0]) : -1;
+          aValue = getSys(a.bloodPressure);
+          bValue = getSys(b.bloodPressure);
+        }
+        // Manejo de fechas
+        else if (sortConfig.key === 'createdAt') {
+          aValue = new Date(a.createdAt).getTime();
+          bValue = new Date(b.createdAt).getTime();
+        }
+
+        // Manejo de nulos (siempre al final)
+        if (aValue === undefined || aValue === null || aValue === -1) return 1;
+        if (bValue === undefined || bValue === null || bValue === -1) return -1;
+
+        if (aValue < bValue) {
+          return sortConfig.direction === 'asc' ? -1 : 1;
+        }
+        if (aValue > bValue) {
+          return sortConfig.direction === 'asc' ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return sortableItems;
+  }, [data, sortConfig]);
+
+  const SortIcon = ({ columnKey }: { columnKey: keyof Metric }) => {
+    const isActive = sortConfig.key === columnKey;
+    return (
+      <ArrowUpDown
+        size={14}
+        className={`ml-1 transition-all ${isActive ? 'text-primary opacity-100' : 'text-muted-foreground/50 opacity-0 group-hover:opacity-50'}`}
+      />
+    );
+  };
+
   const containerClass = embedded
     ? "bg-transparent"
     : "bg-card rounded-md border-border border shadow-sm";
@@ -47,14 +105,78 @@ export function HistoryTableView({ data, isAdmin, onRefresh, embedded = false }:
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead className="min-w-[100px]">{t('History.cols.date')}</TableHead>
-              <TableHead className="min-w-[100px]">{t('History.cols.context')}</TableHead>
-              <TableHead className="min-w-[100px]">{t('History.cols.bp')}</TableHead>
-              <TableHead className="min-w-[60px]">{t('History.cols.pulse')}</TableHead>
-              <TableHead className="min-w-[50px]">{t('History.cols.spo2')}</TableHead>
-              <TableHead className="min-w-[70px] border-l">{t('History.cols.ca125')}</TableHead>
-              <TableHead className="min-w-[90px] border-l">{t('History.cols.weight')}</TableHead>
-              <TableHead className="min-w-[120px]">{t('History.cols.site')}</TableHead>
+              <TableHead
+                className="min-w-[100px] cursor-pointer hover:bg-muted/50 transition-colors group select-none"
+                onClick={() => handleSort('createdAt')}
+              >
+                <div className="flex items-center">
+                  {t('History.cols.date')}
+                  <SortIcon columnKey="createdAt" />
+                </div>
+              </TableHead>
+              <TableHead
+                className="min-w-[100px] cursor-pointer hover:bg-muted/50 transition-colors group select-none"
+                onClick={() => handleSort('measurementContext')}
+              >
+                <div className="flex items-center">
+                  {t('History.cols.context')}
+                  <SortIcon columnKey="measurementContext" />
+                </div>
+              </TableHead>
+              <TableHead
+                className="min-w-[100px] cursor-pointer hover:bg-muted/50 transition-colors group select-none"
+                onClick={() => handleSort('bloodPressure')}
+              >
+                <div className="flex items-center">
+                  {t('History.cols.bp')}
+                  <SortIcon columnKey="bloodPressure" />
+                </div>
+              </TableHead>
+              <TableHead
+                className="min-w-[60px] cursor-pointer hover:bg-muted/50 transition-colors group select-none"
+                onClick={() => handleSort('pulse')}
+              >
+                <div className="flex items-center">
+                  {t('History.cols.pulse')}
+                  <SortIcon columnKey="pulse" />
+                </div>
+              </TableHead>
+              <TableHead
+                className="min-w-[50px] cursor-pointer hover:bg-muted/50 transition-colors group select-none"
+                onClick={() => handleSort('spo2')}
+              >
+                <div className="flex items-center">
+                  {t('History.cols.spo2')}
+                  <SortIcon columnKey="spo2" />
+                </div>
+              </TableHead>
+              <TableHead
+                className="min-w-[70px] border-l cursor-pointer hover:bg-muted/50 transition-colors group select-none"
+                onClick={() => handleSort('ca125')}
+              >
+                <div className="flex items-center">
+                  {t('History.cols.ca125')}
+                  <SortIcon columnKey="ca125" />
+                </div>
+              </TableHead>
+              <TableHead
+                className="min-w-[90px] border-l cursor-pointer hover:bg-muted/50 transition-colors group select-none"
+                onClick={() => handleSort('weight')}
+              >
+                <div className="flex items-center">
+                  {t('History.cols.weight')}
+                  <SortIcon columnKey="weight" />
+                </div>
+              </TableHead>
+              <TableHead
+                className="min-w-[120px] cursor-pointer hover:bg-muted/50 transition-colors group select-none"
+                onClick={() => handleSort('weightLocation')}
+              >
+                <div className="flex items-center">
+                  {t('History.cols.site')}
+                  <SortIcon columnKey="weightLocation" />
+                </div>
+              </TableHead>
               <TableHead className="min-w-[50px] border-l">{t('History.cols.note')}</TableHead>
               {isAdmin && (
                 <TableHead className="min-w-[70px] border-l text-right">
@@ -65,7 +187,7 @@ export function HistoryTableView({ data, isAdmin, onRefresh, embedded = false }:
           </TableHeader>
 
           <TableBody>
-            {data.map((row) => {
+            {sortedData.map((row) => {
               const dateObj = new Date(row.createdAt);
 
               let sysStatus: HealthStatus = 'normal';

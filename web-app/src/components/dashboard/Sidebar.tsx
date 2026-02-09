@@ -120,28 +120,6 @@ export function Sidebar({ isAdmin, activeTab, setActiveTab, onLogout }: SidebarP
                             )
                         })}
                     </div>
-
-                    {/* AI Feature */}
-                    <div className="relative overflow-hidden rounded-xl border border-border bg-gradient-to-b from-background to-muted/30 shadow-sm p-0.5">
-                        <div className="absolute top-0 right-0 p-4 opacity-10">
-                            <Sparkles size={80} strokeWidth={1} />
-                        </div>
-                        <div className="relative p-5 space-y-4">
-                            <div className="flex items-center gap-2.5">
-                                <div className="p-2 rounded-md bg-indigo-500/10 text-indigo-600 dark:text-indigo-400">
-                                    <Sparkles size={16} />
-                                </div>
-                                <span className="font-semibold text-sm tracking-tight">{t('Sidebar.aiInsights')}</span>
-                            </div>
-                            <p className="text-xs text-muted-foreground leading-relaxed pr-2">
-                                {t('Sidebar.aiDescription')}
-                            </p>
-                            <Button size="sm" className="w-full bg-indigo-600 hover:bg-indigo-700 text-white border-0 shadow-md transition-all">
-                                {t('Sidebar.exploreInsights')}
-                            </Button>
-                        </div>
-                    </div>
-
                 </div>
 
                 {/* FOOTER */}
