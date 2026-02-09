@@ -108,7 +108,7 @@ export function MetricCard({ data, isAdmin, onRefresh }: MetricCardProps) {
           {/* FOOTER */}
           {(data.measurementContext || data.notes) && (
             <div className="bg-muted p-3 rounded-lg mt-1 text-sm border border-border col-span-full">
-              {data.measurementContext && <div className="mb-1 text-primary font-bold text-xs uppercase tracking-wide">{renderContext(data.measurementContext)}</div>}
+              {data.measurementContext && <div className="mb-1 font-bold text-xs uppercase tracking-wide">{renderContext(data.measurementContext)}</div>}
               {data.notes && <div className="text-muted-foreground italic flex gap-2 items-start text-[13px] leading-relaxed"><FileText size={14} className="mt-1 opacity-40 flex-shrink-0 text-muted-foreground" /><span>{data.notes}</span></div>}
             </div>
           )}

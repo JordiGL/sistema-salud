@@ -98,7 +98,7 @@ export function SidebarContent({ isAdmin, activeTab, setActiveTab, onLogout, onC
                                     }`}
                                 onClick={() => handleTabClick(tab.id)}
                             >
-                                <Icon size={18} className={isActive ? "text-primary" : ""} />
+                                <Icon size={18} />
                                 {tab.label}
                             </Button>
                         )

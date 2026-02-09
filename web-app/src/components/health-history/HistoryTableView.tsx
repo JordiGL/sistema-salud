@@ -311,7 +311,7 @@ export function HistoryTableView({ data, isAdmin, onRefresh, embedded = false, v
                   {isAdmin && isColumnVisible('actions') && (
                     <TableCell className="border-l border-border text-right">
                       <div className="flex justify-end gap-2">
-                        <Button variant="outline" size="icon" onClick={() => setMetricToEdit(row)} className="h-8 w-8 text-muted-foreground hover:text-foreground">
+                        <Button variant="outline" size="icon" onClick={() => setMetricToEdit(row)} className="h-8 w-8 text-muted-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary">
                           <Pencil size={16} />
                         </Button>
                         <Button variant="destructive" size="icon" onClick={() => setMetricToDelete(row)} className="h-8 w-8">
