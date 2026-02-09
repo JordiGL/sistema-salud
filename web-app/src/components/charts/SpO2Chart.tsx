@@ -47,7 +47,7 @@ export function SpO2Chart({ data: initialData }: { data: Metric[] }) {
   const tFilter = useTranslations('Filters');
   const { renderContext } = useMetricManager();
 
-  const [chartData, setChartData] = useState<Metric[]>(initialData);
+  const [chartData, setChartData] = useState<Metric[]>(() => [...initialData].reverse());
   const [loading, setLoading] = useState(false);
 
   // Filtros

@@ -49,7 +49,7 @@ export function WeightChart({ data: initialData }: { data: Metric[] }) {
   const { renderLocation } = useMetricManager();
 
   // --- ESTADOS ---
-  const [chartData, setChartData] = useState<Metric[]>(initialData);
+  const [chartData, setChartData] = useState<Metric[]>(() => [...initialData].reverse());
   const [loading, setLoading] = useState(false);
 
   const [dateRange, setDateRange] = useState<string>('all');

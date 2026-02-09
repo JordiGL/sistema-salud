@@ -48,7 +48,7 @@ export function PulseChart({ data: initialData }: { data: Metric[] }) {
   const { renderContext } = useMetricManager();
 
   // --- ESTADOS ---
-  const [chartData, setChartData] = useState<Metric[]>(initialData);
+  const [chartData, setChartData] = useState<Metric[]>(() => [...initialData].reverse());
   const [loading, setLoading] = useState(false);
 
   const [dateRange, setDateRange] = useState<string>('all');
