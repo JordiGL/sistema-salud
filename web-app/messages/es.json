@@ -157,7 +157,10 @@
     "exploreInsights": "Explorar Insights",
     "login": "Iniciar Sesión",
     "lang": "Idioma",
-    "theme": "Tema"
+    "theme": "Tema",
+    "toggleMenu": "Alternar Menú",
+    "mainMenu": "Menú Principal",
+    "menuDescription": "Menú de navegación principal"
   },
   "Export": {
     "date": "Fecha",
