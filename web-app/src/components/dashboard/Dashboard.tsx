@@ -191,7 +191,7 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
                   {/* HEADER DE LA SECCIÓ DE HISTORIAL */}
                   <div className="p-4 border-b border-border bg-muted/30 flex flex-row justify-between items-center gap-4">
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-primary bg-primary/10 px-2.5 py-1 rounded-full border border-primary/20">
+                      <span className="text-xs font-bold bg-primary/10 px-2.5 py-1 rounded-full border border-primary/20">
                         {metrics.length}
                       </span>
                       <h3 className="hidden sm:block font-bold text-sm uppercase tracking-wider">{t('History.records')}</h3>
@@ -228,7 +228,7 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
                           variant="ghost"
                           size="icon"
                           onClick={() => setViewMode('grid')}
-                          className={`h-8 w-8 rounded-md transition-all ${viewMode === 'grid' ? 'bg-primary/10 text-primary shadow-sm' : 'text-muted-foreground hover:bg-hover'}`}
+                          className={`h-8 w-8 rounded-md transition-all ${viewMode === 'grid' ? 'bg-primary/10 shadow-sm' : 'text-muted-foreground hover:bg-hover'}`}
                           title={t('History.cardView')}
                         >
                           <LayoutGrid size={16} />
@@ -237,7 +237,7 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
                           variant="ghost"
                           size="icon"
                           onClick={() => setViewMode('table')}
-                          className={`h-8 w-8 rounded-md transition-all ${viewMode === 'table' ? 'bg-primary/10 text-primary shadow-sm' : 'text-muted-foreground hover:bg-hover'}`}
+                          className={`h-8 w-8 rounded-md transition-all ${viewMode === 'table' ? 'bg-primary/10 shadow-sm' : 'text-muted-foreground hover:bg-hover'}`}
                           title={t('History.tableView')}
                         >
                           <List size={16} />
