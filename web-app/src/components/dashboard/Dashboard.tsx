@@ -285,14 +285,6 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
             {activeTab === 'spo2' && <SpO2Chart data={metrics} isAdmin={isAdmin} />}
             {activeTab === 'ca125' && <CA125Chart data={metrics} isAdmin={isAdmin} />}
           </div>
-
-          {/* MISSATGE VISITANT */}
-          {!isAdmin && (
-            <div className="mt-10 text-center text-muted-foreground text-sm pb-10">
-              <p>{t('HomePage.viewModeMessage')}</p>
-            </div>
-          )}
-
         </div>
       </div>
     </div>
