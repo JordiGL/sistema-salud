@@ -4,6 +4,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { Activity, FileSpreadsheet, FileCode } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { metricApi } from '@/lib/api';
+import { useMetricManager } from '@/hooks/useMetricManager';
 import { Metric } from '@/types/metrics';
 import { StatsSummary } from '@/components/dashboard/StatsSummary';
 import { downloadCSV, downloadXML } from '@/lib/export-utils';
@@ -56,6 +57,7 @@ export function BloodPressureChart({ data: initialData }: { data: Metric[] }) {
   const t = useTranslations();
   const tCharts = useTranslations('Charts');
   const tFilter = useTranslations('Filters');
+  const { renderContext } = useMetricManager();
 
   // --- ESTADOS ---
   const [chartData, setChartData] = useState<Metric[]>(initialData);
@@ -184,7 +186,7 @@ export function BloodPressureChart({ data: initialData }: { data: Metric[] }) {
               <SelectContent>
                 <SelectItem value="all">{tFilter('allContexts')}</SelectItem>
                 {availableContexts.map((ctx: any, idx) => (
-                  <SelectItem key={idx} value={ctx}>{ctx}</SelectItem>
+                  <SelectItem key={idx} value={ctx}>{renderContext(ctx)}</SelectItem>
                 ))}
               </SelectContent>
             </Select>

@@ -6,6 +6,7 @@ import { Scale, FileSpreadsheet, FileCode } from 'lucide-react';
 import { ChartSkeleton } from './ChartSkeleton';
 import { useTranslations } from 'next-intl';
 import { metricApi } from '@/lib/api';
+import { useMetricManager } from '@/hooks/useMetricManager';
 import { Metric } from '@/types/metrics';
 import { StatsSummary } from '@/components/dashboard/StatsSummary';
 import { downloadCSV, downloadXML } from '@/lib/export-utils';
@@ -45,6 +46,7 @@ export function WeightChart({ data: initialData }: { data: Metric[] }) {
   const t = useTranslations();
   const tCharts = useTranslations('Charts');
   const tFilter = useTranslations('Filters');
+  const { renderLocation } = useMetricManager();
 
   // --- ESTADOS ---
   const [chartData, setChartData] = useState<Metric[]>(initialData);
@@ -163,7 +165,7 @@ export function WeightChart({ data: initialData }: { data: Metric[] }) {
               <SelectContent>
                 <SelectItem value="all">{tFilter('allContexts')}</SelectItem>
                 {availableLocations.map((loc: any) => (
-                  <SelectItem key={loc} value={loc}>{loc}</SelectItem>
+                  <SelectItem key={loc} value={loc}>{renderLocation(loc)}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
