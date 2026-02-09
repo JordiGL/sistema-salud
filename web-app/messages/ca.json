@@ -53,7 +53,9 @@
     "aiErrorRead": "No s'ha pogut llegir la imatge. Prova amb més llum.",
     "Errors": {
       "invalidBP": "La tensió sistòlica ha de ser major que la diastòlica."
-    }
+    },
+    "holdToClear": "Mantingues premut per netejar",
+    "clearing": "Deixa anar per cancel·lar"
   },
   "Charts": {
     "bpTitle": "Tensió Arterial",
@@ -146,7 +148,8 @@
     "undo": "Desfer",
     "undoSuccess": "Registre desfet correctament",
     "errorUndo": "Error al desfer el registre",
-    "autoSaveFailedValidation": "L'autodesat ha fallat la validació. Revisa les dades."
+    "autoSaveFailedValidation": "L'autodesat ha fallat la validació. Revisa les dades.",
+    "formCleared": "Formulari netejat"
   },
   "Sidebar": {
     "guestUser": "Usuari Convidat",

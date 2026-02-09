@@ -1,12 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import {
-    Heart, Scale, Save, RotateCcw,
+    Heart, Scale, Save, Eraser,
     ChevronDown, ChevronUp, Plus, Loader2, Zap
 } from 'lucide-react';
 import { useMetricManager } from '@/hooks/useMetricManager';
@@ -145,11 +145,57 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
 
     const onSubmit = (data: MetricFormValues) => saveMetric(data, false);
 
-    const handleResetClick = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        e.preventDefault();
-        form.reset();
+    // --- HOLD TO CLEAR LOGIC ---
+    const [resetProgress, setResetProgress] = useState(0);
+    const resetIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+    const clearResetInterval = () => {
+        if (resetIntervalRef.current) {
+            clearInterval(resetIntervalRef.current);
+            resetIntervalRef.current = null;
+        }
     };
+
+    const handleResetStart = (e?: React.MouseEvent | React.TouchEvent) => {
+        // Prevent default only if needed, usually we want to allow mouse down
+        if (e && e.cancelable) e.preventDefault();
+
+        clearResetInterval();
+
+        resetIntervalRef.current = setInterval(() => {
+            setResetProgress((prev) => {
+                // Adjust speed: 100 / 8 approx 12 steps. 12 * 30ms = 360ms
+                const next = prev + 8;
+                if (next >= 100) {
+                    return 100;
+                }
+                return next;
+            });
+        }, 30);
+    };
+
+    const handleResetEnd = () => {
+        clearResetInterval();
+        setResetProgress((prev) => (prev >= 100 ? 100 : 0));
+    };
+
+    // Handle Reset Completion
+    useEffect(() => {
+        if (resetProgress >= 100) {
+            clearResetInterval();
+            form.reset();
+            // Wait to show completion before resetting
+            const timer = setTimeout(() => {
+                setResetProgress(0);
+            }, 500);
+            return () => clearTimeout(timer);
+        }
+    }, [resetProgress, form]);
+
+    // Cleanup on unmount
+    useEffect(() => {
+        return () => clearResetInterval();
+    }, []);
 
     return (
         <div className={`bg-card dark:bg-slate-950 rounded-2xl shadow-sm border border-border animate-in fade-in slide-in-from-bottom-4 duration-700 overflow-hidden transition-all ${isOpen ? 'ring-1 ring-border' : ''}`}>
@@ -365,8 +411,25 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                 />
 
                                 <div className="flex gap-3">
-                                    <Button type="button" variant="outline" onClick={handleResetClick} className="h-auto px-6 py-4 rounded-xl font-bold text-muted-foreground border-dashed border-border bg-background hover:bg-hover hover:text-foreground" title={t('Form.clearTitle')}>
-                                        <RotateCcw size={18} /> <span className="hidden sm:inline">{t('HomePage.clear') || 'Limpiar'}</span>
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        onMouseDown={handleResetStart}
+                                        onMouseUp={handleResetEnd}
+                                        onMouseLeave={handleResetEnd}
+                                        onTouchStart={handleResetStart}
+                                        onTouchEnd={handleResetEnd}
+                                        className="relative overflow-hidden h-auto px-6 py-4 rounded-xl font-bold text-muted-foreground border-dashed border-border bg-background hover:bg-hover hover:text-foreground group select-none"
+                                        title={t('Form.holdToClear') || "Mantén presionado para limpiar"}
+                                    >
+                                        <div
+                                            className={`absolute inset-y-0 left-0 transition-all ease-linear duration-75 pointer-events-none ${resetProgress >= 100 ? 'bg-destructive/20' : 'bg-destructive/10'}`}
+                                            style={{ width: `${resetProgress}%` }}
+                                        />
+                                        <div className="relative z-10 flex items-center gap-2">
+                                            <Eraser size={18} className={`transition-transform duration-700 ${resetProgress > 0 ? 'rotate-12' : ''}`} />
+                                            <span className="hidden sm:inline">{t('HomePage.clear') || 'Limpiar'}</span>
+                                        </div>
                                     </Button>
                                     <Button type="submit" disabled={form.formState.isSubmitting} className="flex-1 h-auto py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl bg-primary text-primary-foreground dark:bg-slate-800 dark:text-slate-100 dark:border dark:border-slate-700 dark:hover:bg-slate-700 transition-all">
                                         {form.formState.isSubmitting ? <Loader2 size={20} className="animate-spin" /> : <><Save size={20} /> {t('HomePage.saveButton')}</>}

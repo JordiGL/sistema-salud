@@ -53,7 +53,9 @@
     "aiErrorRead": "No se pudo leer la imagen. Prueba con más luz.",
     "Errors": {
       "invalidBP": "La tensión sistólica debe ser mayor que la diastólica."
-    }
+    },
+    "holdToClear": "Mantén presionado para limpiar",
+    "clearing": "Suelta para cancelar"
   },
   "Charts": {
     "bpTitle": "Tensión Arterial",
@@ -146,7 +148,8 @@
     "undo": "Deshacer",
     "undoSuccess": "Registro deshecho correctamente",
     "errorUndo": "Error al deshacer el registro",
-    "autoSaveFailedValidation": "El autoguardado falló la validación. Revisa los datos."
+    "autoSaveFailedValidation": "El autoguardado falló la validación. Revisa los datos.",
+    "formCleared": "Formulario limpiado"
   },
   "Sidebar": {
     "guestUser": "Usuario Invitado",
