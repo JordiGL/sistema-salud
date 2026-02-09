@@ -410,7 +410,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                     )}
                                 />
 
-                                <div className="flex gap-3">
+                                <div className="flex gap-3 justify-end">
                                     <Button
                                         type="button"
                                         variant="outline"
@@ -423,7 +423,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                         title={t('Form.holdToClear') || "Mantén presionado para limpiar"}
                                     >
                                         <div
-                                            className={`absolute inset-y-0 left-0 transition-all ease-linear duration-75 pointer-events-none ${resetProgress >= 100 ? 'bg-destructive/20' : 'bg-destructive/10'}`}
+                                            className={`absolute inset-y-0 left-0 transition-all ease-linear duration-75 pointer-events-none ${resetProgress >= 100 ? 'bg-red-500/50' : 'bg-red-500/30'}`}
                                             style={{ width: `${resetProgress}%` }}
                                         />
                                         <div className="relative z-10 flex items-center gap-2">
@@ -431,8 +431,8 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                             <span className="hidden sm:inline">{t('HomePage.clear') || 'Limpiar'}</span>
                                         </div>
                                     </Button>
-                                    <Button type="submit" disabled={form.formState.isSubmitting} className="flex-1 h-auto py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl bg-primary text-primary-foreground dark:bg-slate-800 dark:text-slate-100 dark:border dark:border-slate-700 dark:hover:bg-slate-700 transition-all">
-                                        {form.formState.isSubmitting ? <Loader2 size={20} className="animate-spin" /> : <><Save size={20} /> {t('HomePage.saveButton')}</>}
+                                    <Button type="submit" disabled={form.formState.isSubmitting} className="h-auto px-6 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl bg-primary text-primary-foreground dark:bg-slate-800 dark:text-slate-100 dark:border dark:border-slate-700 dark:hover:bg-slate-700 transition-all">
+                                        {form.formState.isSubmitting ? <Loader2 size={20} className="animate-spin" /> : <><Save size={20} /> <span className="hidden sm:inline">{t('HomePage.saveButton')}</span></>}
                                     </Button>
                                 </div>
                             </div>

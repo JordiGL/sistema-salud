@@ -58,7 +58,7 @@ export default async function RootLayout({
               theme={theme as 'light' | 'dark' | 'system'}
               toastOptions={{
                 classNames: {
-                  toast: 'group bg-card dark:bg-slate-900 border-border text-foreground shadow-lg rounded-xl font-sans text-sm p-4',
+                  toast: 'group bg-background border-border text-foreground shadow-lg rounded-xl font-sans text-sm p-4',
                   description: 'text-muted-foreground text-xs',
                   actionButton: 'bg-primary text-primary-foreground',
                   cancelButton: 'bg-muted text-muted-foreground',
@@ -67,8 +67,8 @@ export default async function RootLayout({
                   info: 'border-l-4 border-l-blue-500/70'
                 },
                 style: {
-                  background: 'hsl(var(--card))',
-                  color: 'hsl(var(--foreground))',
+                  background: 'var(--background)',
+                  color: 'var(--foreground)',
                   border: '1px solid hsl(var(--border))',
                 }
               }}
