@@ -6,6 +6,78 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 
 export async function POST(req: Request) {
   try {
+    const contentType = req.headers.get("content-type") || "";
+
+    // --- CASE A: TEXT/JSON ANALYSIS (Briefing) ---
+    if (contentType.includes("application/json")) {
+      const { metrics, context, locale } = await req.json();
+
+      const model = genAI.getGenerativeModel({
+        model: "gemini-2.0-flash",
+        generationConfig: {
+          responseMimeType: "application/json",
+          temperature: 0.2,
+        },
+      });
+
+      const prompt = `
+        You are a medical assistant providing a Daily Briefing based on the user's recent health metrics.
+        
+        Recent History (Last 5 records):
+        ${JSON.stringify(metrics, null, 2)}
+        
+        Context (optional user tags): ${context || "None"}
+
+        Create a JSON summary with exactly these fields, providing the briefing in both Spanish (es) and Catalan (ca):
+        {
+          "es": {
+            "status": "Brief summary of current status (e.g., 'Estable', 'PA elevada'). 1 sentence.",
+            "trend": "Insight on the trend vs previous days. 1-2 sentences."
+          },
+          "ca": {
+            "status": "Brief summary of current status (e.g., 'Estable', 'PA elevada'). 1 sentence.",
+            "trend": "Insight on the trend vs previous days. 1-2 sentences."
+          }
+        }
+        
+        Rules:
+        - Be objective and factual.
+        - DO NOT provide medical advice or recommendations.
+        - If data is empty, say "No hay datos recientes" / "No hi ha dades recents".
+      `;
+
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
+      const json = JSON.parse(text);
+
+      // Save to Database (External API)
+      try {
+        const today = new Date().toISOString().split('T')[0];
+        const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000";
+
+        await fetch(`${apiUrl}/daily-briefing`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            date: today,
+            status_es: json.es.status,
+            trend_es: json.es.trend,
+            status_ca: json.ca.status,
+            trend_ca: json.ca.trend
+          })
+        });
+      } catch (err) {
+        console.error("Failed to save briefing to DB:", err);
+        // We continue to return the generated data even if save fails
+      }
+
+      // Return the requested locale
+      const requestedLocale = locale === 'ca' ? 'ca' : 'es';
+      return NextResponse.json(json[requestedLocale]);
+    }
+
+    // --- CASE B: IMAGE ANALYSIS (Existing) ---
     // 1. Read FormData
     const formData = await req.formData();
     const file = formData.get("file") as File;

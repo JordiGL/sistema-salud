@@ -14,7 +14,12 @@
     "downloadCSV": "Descarregar CSV",
     "downloadXML": "Descarregar XML",
     "noRecords": "No hi ha registres encara.",
-    "installApp": "Instal·lar Aplicació"
+    "installApp": "Instal·lar Aplicació",
+    "dailyBriefing": "Informe Diari IA"
+  },
+  "Briefing": {
+    "status": "Estat",
+    "trend": "Tendència"
   },
   "Login": {
     "title": "Accés Admin",

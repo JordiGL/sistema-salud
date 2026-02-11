@@ -10,6 +10,11 @@ interface AnalysisResult {
     weight?: number;
 }
 
+interface BriefingResult {
+    status: string;
+    trend: string;
+}
+
 export function useHealthAnalysis() {
     const t = useTranslations();
     const [isScanning, setIsScanning] = useState(false);
@@ -50,6 +55,29 @@ export function useHealthAnalysis() {
         }
     };
 
+    const generateBriefing = async (metrics: any[], context?: string, locale?: string): Promise<BriefingResult | null> => {
+        setIsScanning(true);
+        try {
+            const response = await fetch(API_ROUTES.ANALYZE, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ metrics, context, locale }),
+            });
+
+            if (!response.ok) throw new Error("Failed to generate briefing");
+
+            const data = await response.json();
+            return data;
+        } catch (error) {
+            console.error("Briefing Generation Error:", error);
+            return null;
+        } finally {
+            setIsScanning(false);
+        }
+    };
+
     const triggerFileInput = () => {
         fileInputRef.current?.click();
     };
@@ -58,6 +86,7 @@ export function useHealthAnalysis() {
         isScanning,
         fileInputRef,
         analyzeImage,
+        generateBriefing,
         triggerFileInput,
     };
 }

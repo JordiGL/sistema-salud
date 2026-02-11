@@ -9,49 +9,48 @@ datasource db {
 }
 
 model HealthMetric {
-  id          String   @id @default(uuid())
-  createdAt   DateTime @default(now())
-  
-  // 1. Tensión unificada (Ej: "120/80")
-  bloodPressure String? 
-
-  // 2. Contexto (Selector: Post-Ejercicio, etc.)
+  id                 String   @id @default(uuid())
+  createdAt          DateTime @default(now())
+  pulse              Int?
+  spo2               Float?
+  weight             Float?
+  ca125              Float?
+  bloodPressure      String?
   measurementContext String?
-
-  // 3. Lugar del pesaje (Selector: Casa, Farmacia, etc.)
-  weightLocation String?
-
-  // 4. Notas adicionales
-  notes String?
-
-  // Datos numéricos que se mantienen
-  pulse       Int?
-  spo2        Float?
-  weight      Float?
-  ca125       Float?
+  notes              String?
+  weightLocation     String?
 
   @@map("health_metrics")
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now())
+  id            String          @id @default(uuid())
+  email         String          @unique
+  password      String
+  createdAt     DateTime        @default(now())
 }
 
-// Opciones para el selector de Contexto
 model ContextOption {
   id        Int      @id @default(autoincrement())
-  key       String   @unique  // ej: "exercise", "stress"
-  value     String            // ej: "Post-Ejercicio" (Texto fallback)
+  key       String   @unique
+  value     String
   createdAt DateTime @default(now())
 }
 
-// Opciones para el selector de Lugar de Peso
 model LocationOption {
   id        Int      @id @default(autoincrement())
-  key       String   @unique  // ej: "home", "pharmacy"
-  value     String            // ej: "Casa" (Texto fallback)
+  key       String   @unique
+  value     String
+  createdAt DateTime @default(now())
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model DailyBriefing {
+  id        String   @id @default(uuid())
+  date      String   @unique
+  status_ca String
+  trend_ca  String
+  status_es String
+  trend_es  String
   createdAt DateTime @default(now())
 }

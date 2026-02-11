@@ -25,6 +25,7 @@ import { HistoryGridView } from '@/components/health-history/HistoryGridView';
 import { HistoryTableView } from '@/components/health-history/HistoryTableView';
 import { HealthDataForm } from '@/components/health-entry/HealthDataForm';
 import { Button } from "@/components/ui/button";
+import { DailyBriefingSection } from '@/components/dashboard/DailyBriefingSection';
 
 import { Sidebar, SidebarContent } from '@/components/dashboard/Sidebar';
 
@@ -178,6 +179,9 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
               <HealthDataForm onSuccess={refreshData} />
             </div>
           )}
+
+          {/* --- AI BRIEFING --- */}
+          <DailyBriefingSection metrics={metrics} />
 
           {/* --- ÀREA DE CONTINGUT --- */}
           <div className="min-h-[500px]">

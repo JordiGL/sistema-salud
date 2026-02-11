@@ -1,0 +1,23 @@
+import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { DailyBriefingService } from './daily-briefing.service';
+import { CreateBriefingDto } from './dtos/create-briefing.dto';
+
+@Controller('daily-briefing')
+export class DailyBriefingController {
+    constructor(private readonly service: DailyBriefingService) { }
+
+    @Get('today')
+    async getToday() {
+        return this.service.getTodayBriefing();
+    }
+
+    @Get(':date')
+    async getByDate(@Param('date') date: string) {
+        return this.service.getBriefingByDate(date);
+    }
+
+    @Post()
+    async save(@Body() dto: CreateBriefingDto) {
+        return this.service.saveBriefing(dto);
+    }
+}

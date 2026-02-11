@@ -7,6 +7,7 @@ export const API_ROUTES = {
   METRICS: "/metrics",
   ANALYZE: "/api/analyze",
   AUTH_LOGIN: "/auth/login",
+  DAILY_BRIEFING: "/daily-briefing",
 };
 
 export const APP_ROUTES = {
