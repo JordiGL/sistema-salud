@@ -85,23 +85,6 @@ export function SidebarContent({ isAdmin, activeTab, setActiveTab, onLogout, onC
                         {t('Sidebar.menu')}
                     </h4>
 
-                    {/* AI Briefing Scroll Link */}
-                    <Button
-                        variant="ghost"
-                        className="w-full justify-start gap-4 h-11 px-4 rounded-lg transition-all duration-200 text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 mb-2 font-medium"
-                        onClick={() => {
-                            const element = document.getElementById('daily-briefing');
-                            if (element) {
-                                element.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                // Highlight effect could be added here if we had state for it
-                            }
-                            if (onClose) onClose();
-                        }}
-                    >
-                        <Sparkles size={18} />
-                        {t('Dashboard.dailyBriefing') || "AI Daily Briefing"}
-                    </Button>
-
                     {tabs.map((tab) => {
                         const Icon = tab.icon;
                         const isActive = activeTab === tab.id;

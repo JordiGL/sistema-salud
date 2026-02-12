@@ -15,11 +15,14 @@
     "downloadXML": "Descarregar XML",
     "noRecords": "No hi ha registres encara.",
     "installApp": "Instal·lar Aplicació",
-    "dailyBriefing": "Informe Diari IA"
+    "dailyBriefing": "Informe diari"
   },
   "Briefing": {
     "status": "Estat",
-    "trend": "Tendència"
+    "trend": "Tendència",
+    "error": "No s'ha pogut generar l'informe.",
+    "retry": "Reintentar",
+    "generate": "Generar informe amb IA"
   },
   "Login": {
     "title": "Accés Admin",

@@ -10,6 +10,8 @@ export const API_ROUTES = {
   DAILY_BRIEFING: "/daily-briefing",
 };
 
+export const METRICS_LIMIT = 90;
+
 export const APP_ROUTES = {
   LOGIN: "/login",
   DASHBOARD: "/",

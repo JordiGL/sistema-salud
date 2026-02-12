@@ -181,7 +181,7 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
           )}
 
           {/* --- AI BRIEFING --- */}
-          <DailyBriefingSection metrics={metrics} />
+          {activeTab === 'history' && <DailyBriefingSection metrics={metrics} />}
 
           {/* --- ÀREA DE CONTINGUT --- */}
           <div className="min-h-[500px]">

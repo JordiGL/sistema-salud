@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import { Sparkles, TrendingUp, Activity, Lightbulb } from "lucide-react";
+import { Sparkles, TrendingUp, Activity, RefreshCw } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useHealthAnalysis } from "@/hooks/useHealthAnalysis";
 import { Metric } from "@/types/metrics";
-import { API_ROUTES } from "@/lib/constants";
+import { API_ROUTES, METRICS_LIMIT } from "@/lib/constants";
 
 interface DailyBriefingSectionProps {
     metrics: Metric[];
@@ -35,15 +35,18 @@ export function DailyBriefingSection({ metrics }: DailyBriefingSectionProps) {
 
 
     // Auto-generate on mount or when metrics change
-    const checkDatabase = async () => {
+    const checkDatabase = async (): Promise<'found' | 'not-found' | 'error'> => {
         try {
-            const today = new Date().toISOString().split('T')[0];
             // Assuming API runs on localhost:3000 or typically configured via env
             // We use API_ROUTES.BASE directly.
             const response = await fetch(`${API_ROUTES.BASE}${API_ROUTES.DAILY_BRIEFING}/today`);
 
             if (response.ok) {
-                const data = await response.json();
+                const text = await response.text();
+                // Handle empty body (NestJS returns 200 with empty body for null sometimes, or explicit null)
+                if (!text || text === "null" || text === "") return 'not-found';
+
+                const data = JSON.parse(text);
                 if (data) {
                     // Map based on locale
                     const status = locale === 'ca' ? data.status_ca : data.status_es;
@@ -52,19 +55,25 @@ export function DailyBriefingSection({ metrics }: DailyBriefingSectionProps) {
                     if (status && trend) {
                         setBriefing({ status, trend });
                         setHasLoaded(true);
-                        return true; // Found in DB
+                        return 'found'; // Found in DB
                     }
                 }
+                return 'not-found'; // 200 OK but invalid/empty structure
+            } else if (response.status === 404) {
+                return 'not-found';
+            } else {
+                // 500 or other error
+                return 'error';
             }
         } catch (error) {
             console.error("Failed to check daily briefing DB:", error);
+            return 'error';
         }
-        return false;
     };
 
     const handleGenerate = async () => {
         // Take last 5 metrics for context
-        const recentMetrics = metrics.slice(0, 5);
+        const recentMetrics = metrics.slice(0, METRICS_LIMIT);
         const result = await generateBriefing(recentMetrics, undefined, locale);
 
         if (result) {
@@ -77,10 +86,16 @@ export function DailyBriefingSection({ metrics }: DailyBriefingSectionProps) {
         const init = async () => {
             if (metrics.length > 0 && !briefing && !hasLoaded) {
                 // Try DB first
-                const found = await checkDatabase();
-                // If not found, generate
-                if (!found) {
-                    handleGenerate();
+                const status = await checkDatabase();
+
+                // Only generate if explicitly NOT FOUND (DB is working but has no record)
+                if (status === 'not-found') {
+                    // Start with empty state, let user trigger generation
+                    setHasLoaded(true);
+                } else if (status === 'error') {
+                    // If DB is down, we stop loading to avoid skeleton valid forever,
+                    // but we DO NOT call AI to prevent cost loop.
+                    setHasLoaded(true);
                 }
             }
         };
@@ -113,22 +128,30 @@ export function DailyBriefingSection({ metrics }: DailyBriefingSectionProps) {
                         </div>
                         {/* Optional Refresh Button */}
                         <Button
-                            variant="ghost"
+                            variant="outline"
                             size="sm"
                             onClick={handleGenerate}
                             disabled={isScanning}
                             className="h-8 w-8 p-0"
                         >
-                            <Sparkles size={14} className={isScanning ? "animate-spin text-muted-foreground" : "text-muted-foreground"} />
+                            <RefreshCw size={14} className={isScanning ? "animate-spin text-muted-foreground" : "text-muted-foreground"} />
                         </Button>
                     </div>
                 </CardHeader>
 
                 <CardContent>
-                    {isScanning || !briefing ? (
+                    {(!hasLoaded || isScanning) ? (
                         <div className="space-y-4">
                             <Skeleton className="h-4 w-3/4 bg-primary/5" />
                             <Skeleton className="h-4 w-full bg-primary/5" />
+                        </div>
+                    ) : !briefing ? (
+                        <div className="p-4 text-center text-sm text-muted-foreground bg-muted/20 rounded-lg">
+                            {/* If not found, show button to generate */}
+                            <Button variant="link" size="sm" onClick={handleGenerate} className="h-auto p-0 gap-2 font-normal">
+                                <Sparkles size={14} />
+                                {t('Briefing.generate')}
+                            </Button>
                         </div>
                     ) : (
                         <div className="grid gap-4 sm:grid-cols-2">

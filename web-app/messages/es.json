@@ -15,11 +15,14 @@
     "downloadXML": "Descargar XML",
     "noRecords": "No hay registros todavía.",
     "installApp": "Instalar Aplicación",
-    "dailyBriefing": "Informe Diario IA"
+    "dailyBriefing": "Informe diario"
   },
   "Briefing": {
     "status": "Estado",
-    "trend": "Tendencia"
+    "trend": "Tendencia",
+    "error": "No se pudo generar el informe.",
+    "retry": "Reintentar",
+    "generate": "Generar informe con IA"
   },
   "Login": {
     "title": "Acceso Admin",

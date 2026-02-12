@@ -21,31 +21,38 @@ export async function POST(req: Request) {
       });
 
       const prompt = `
-        You are a medical assistant providing a Daily Briefing based on the user's recent health metrics.
+        You are a medical assistant analyzing a patient's health metrics history.
         
-        Recent History (Last 5 records):
-        ${JSON.stringify(metrics, null, 2)}
-        
-        Context (optional user tags): ${context || "None"}
+        DATA CONTEXT:
+        - The data provided in "History" is sorted from **Newest to Oldest**.
+        - **Important:** There may be multiple records for the same day (e.g., morning and evening). Consider all records for the current day to determine the "Status".
+        - Use 'measurementContext' and 'notes' (e.g., "chemo", "exercise") to explain variations in pulse or blood pressure.
+        - If 'ca125' (tumor marker) appears in the history, strictly compare the latest value with previous ones in the "Trend" section.
 
-        Create a JSON summary with exactly these fields, providing the briefing in both Spanish (es) and Catalan (ca):
+        History (Last ${metrics.length} records):
+        ${JSON.stringify(metrics, null, 2)}
+
+        INSTRUCTIONS FOR OUTPUT:
+        1. **Status**: Focus ONLY on the most recent 24-48 hours. If there are multiple readings, mention if they are stable or fluctuating throughout the day.
+        2. **Trend**: Analyze the evolution over the full history provided. Are values improving, stable, or declining compared to weeks ago?
+
+        Return ONLY a raw JSON object with this exact structure:
         {
-          "es": {
-            "status": "Brief summary of current status (e.g., 'Estable', 'PA elevada'). 1 sentence.",
-            "trend": "Insight on the trend vs previous days. 1-2 sentences."
+          "es": { 
+            "status": "Resumen del estado ACTUAL (últimas 24h). Menciona estabilidad intra-diaria si hay varios registros. Máx 2 frases.", 
+            "trend": "Tendencia a largo plazo comparando con el historial completo. Màx 2 frases." 
           },
-          "ca": {
-            "status": "Brief summary of current status (e.g., 'Estable', 'PA elevada'). 1 sentence.",
-            "trend": "Insight on the trend vs previous days. 1-2 sentences."
+          "ca": { 
+            "status": "Resum de l'estat ACTUAL (darreres 24h). Esmenta estabilitat intra-diària si hi ha diversos registres. Màx 2 frases.", 
+            "trend": "Tendència a llarg termini comparant amb l'historial complet. Màx 2 frases." 
           }
         }
-        
-        Rules:
-        - Be objective and factual.
-        - DO NOT provide medical advice or recommendations.
-        - If data is empty, say "No hay datos recientes" / "No hi ha dades recents".
-      `;
 
+        SAFETY RULES:
+        - Language: "es" MUST be Spanish, "ca" MUST be Catalan.
+        - Objective tone. No medical advice or diagnosis.
+        - Return ONLY the JSON object. No markdown formatting (no \`\`\`json).
+      `;
       const result = await model.generateContent(prompt);
       const response = await result.response;
       const text = response.text();
