@@ -21,37 +21,35 @@ export async function POST(req: Request) {
       });
 
       const prompt = `
-        You are a medical assistant analyzing a patient's health metrics history.
+        ROLE: You are a Professional Health Data Analyst. 
+        NON-MEDICAL MANDATE: You analyze numerical patterns and correlations. You do NOT provide medical advice or diagnoses.
+
+        GOAL: Provide a natural language summary that interprets the data trends for a non-technical user (family member).
         
-        DATA CONTEXT:
-        - The data provided in "History" is sorted from **Newest to Oldest**.
-        - **Important:** There may be multiple records for the same day (e.g., morning and evening). Consider all records for the current day to determine the "Status".
-        - Use 'measurementContext' and 'notes' (e.g., "chemo", "exercise") to explain variations in pulse or blood pressure.
-        - If 'ca125' (tumor marker) appears in the history, strictly compare the latest value with previous ones in the "Trend" section.
-
-        History (Last ${metrics.length} records):
+        DATA CONTEXT (Newest first):
         ${JSON.stringify(metrics, null, 2)}
+        
+        INSTRUCTIONS:
+        1. **Analyst Approach:** Look for stability, volatility, or significant changes in the numbers.
+        2. **Correlations:** Observe links between context (exercise, chemo) and data points (e.g., "Pulse spikes coincide with exercise sessions" rather than "Exercise caused high pulse").
+        3. **Synthesize, Don't List:** Do not read the table out loud. Interpret what the numbers *mean* in terms of continuity or change.
 
-        INSTRUCTIONS FOR OUTPUT:
-        1. **Status**: Focus ONLY on the most recent 24-48 hours. If there are multiple readings, mention if they are stable or fluctuating throughout the day.
-        2. **Trend**: Analyze the evolution over the full history provided. Are values improving, stable, or declining compared to weeks ago?
-
-        Return ONLY a raw JSON object with this exact structure:
+        OUTPUT FORMAT (JSON):
         {
           "es": { 
-            "status": "Resumen del estado ACTUAL (últimas 24h). Menciona estabilidad intra-diaria si hay varios registros. Máx 2 frases.", 
-            "trend": "Tendencia a largo plazo comparando con el historial completo. Màx 2 frases." 
+            "status": "Análisis objetivo de los datos recientes (24-48h). Destaca la estabilidad o variaciones lógicas. (Máx 2 frases)", 
+            "trend": "Observación de tendencias a largo plazo basada estrictamente en los datos. (Máx 2 frases)" 
           },
           "ca": { 
-            "status": "Resum de l'estat ACTUAL (darreres 24h). Esmenta estabilitat intra-diària si hi ha diversos registres. Màx 2 frases.", 
-            "trend": "Tendència a llarg termini comparant amb l'historial complet. Màx 2 frases." 
+            "status": "Anàlisi objectiva de les dades recents (24-48h). Destaca l'estabilitat o variacions lògiques. (Màx 2 frases)", 
+            "trend": "Observació de tendències a llarg termini basada estrictament en les dades. (Màx 2 frases)" 
           }
         }
 
-        SAFETY RULES:
-        - Language: "es" MUST be Spanish, "ca" MUST be Catalan.
-        - Objective tone. No medical advice or diagnosis.
-        - Return ONLY the JSON object. No markdown formatting (no \`\`\`json).
+        STRICT RULES:
+        - Language: "es" = Spanish, "ca" = Catalan.
+        - Tone: Professional, objective, clear, and reassuring (focus on stability).
+        - NO ROBOTIC LISTS.
       `;
       const result = await model.generateContent(prompt);
       const response = await result.response;

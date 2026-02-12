@@ -15,7 +15,7 @@
     "downloadXML": "Descargar XML",
     "noRecords": "No hay registros todavía.",
     "installApp": "Instalar Aplicación",
-    "dailyBriefing": "Informe diario"
+    "dailyBriefing": "Informe"
   },
   "Briefing": {
     "status": "Estado",
@@ -81,7 +81,7 @@
     }
   },
   "Tabs": {
-    "history": "Historial",
+    "history": "Registros",
     "bp": "Tensión",
     "pulse": "Pulso",
     "weight": "Peso",

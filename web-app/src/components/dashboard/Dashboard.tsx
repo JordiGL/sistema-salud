@@ -198,7 +198,6 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
                       <span className="text-xs font-bold bg-primary/10 px-2.5 py-1 rounded-full border border-primary/20">
                         {metrics.length}
                       </span>
-                      <h3 className="hidden sm:block font-bold text-sm uppercase tracking-wider">{t('History.records')}</h3>
                     </div>
 
                     {/* Controls */}

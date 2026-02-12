@@ -5,7 +5,7 @@ import { useTranslations, useLocale } from 'next-intl';
 import Link from 'next/link';
 import {
     Menu, Activity, Heart, Scale, Droplets, TestTube,
-    LayoutList, ShieldCheck, Sparkles, LogOut,
+    LayoutList, ShieldCheck, Sparkles, LogOut, ClipboardList,
     Globe
 } from 'lucide-react';
 
@@ -39,7 +39,7 @@ export function SidebarContent({ isAdmin, activeTab, setActiveTab, onLogout, onC
     const locale = useLocale();
 
     const tabs = [
-        { id: 'history', label: t('Tabs.history'), icon: LayoutList },
+        { id: 'history', label: t('Tabs.history'), icon: ClipboardList },
         { id: 'bp', label: t('Charts.bpTitle'), icon: Activity },
         { id: 'pulse', label: t('Charts.pulseTitle'), icon: Heart },
         { id: 'weight', label: t('Charts.weightTitle'), icon: Scale },
