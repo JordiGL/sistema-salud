@@ -65,7 +65,7 @@ export function SidebarContent({ isAdmin, activeTab, setActiveTab, onLogout, onC
                         <div className="flex items-center gap-1.5">
                             {isAdmin ? (
                                 <>
-                                    <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                                    <div className="w-2 h-2 rounded-full bg-metric-stable animate-pulse" />
                                     <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">{t('HomePage.adminAccess')}</span>
                                 </>
                             ) : (
@@ -114,8 +114,8 @@ export function SidebarContent({ isAdmin, activeTab, setActiveTab, onLogout, onC
                     {/* Language */}
                     <div className="flex h-8.5 items-center gap-2 bg-background p-1 rounded-full shadow-sm border border-border">
                         <Globe size={14} className="ml-2 text-muted-foreground" />
-                        <Link href="/es" className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${locale === 'es' ? 'bg-slate-900 text-white dark:bg-slate-800 dark:text-slate-100 dark:border dark:border-slate-700 shadow-sm' : 'text-muted-foreground bg-muted/30 hover:bg-hover hover:text-foreground'}`}>ES</Link>
-                        <Link href="/ca" className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${locale === 'ca' ? 'bg-slate-900 text-white dark:bg-slate-800 dark:text-slate-100 dark:border dark:border-slate-700 shadow-sm' : 'text-muted-foreground bg-muted/30 hover:bg-hover hover:text-foreground'}`}>CA</Link>
+                        <Link href="/es" className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${locale === 'es' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground bg-muted/30 hover:bg-hover hover:text-foreground'}`}>ES</Link>
+                        <Link href="/ca" className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${locale === 'ca' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground bg-muted/30 hover:bg-hover hover:text-foreground'}`}>CA</Link>
                     </div>
 
                     {/* Theme & Auth */}

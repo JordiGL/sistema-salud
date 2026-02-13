@@ -62,8 +62,8 @@ export function SplashScreen() {
                     </style>
                     <defs>
                         <linearGradient id="health-gradient-splash" x1="0%" y1="0%" x2="100%" y2="0%">
-                            <stop offset="0%" stopColor="#3b82f6" />
-                            <stop offset="100%" stopColor="#06b6d4" />
+                            <stop offset="0%" stopColor="var(--vital-ai)" />
+                            <stop offset="100%" stopColor="var(--vital-main)" />
                         </linearGradient>
                     </defs>
                     <path d="M2 12h3l2-3 3 10 4-14 3 7h5" className="health-pulse" />
@@ -72,17 +72,17 @@ export function SplashScreen() {
 
             <div className="animate-pulse flex flex-col items-center">
                 <h1 className="text-4xl md:text-5xl font-black tracking-tighter flex items-center">
-                    <span className="bg-gradient-to-r from-blue-600 to-blue-400 bg-clip-text text-transparent">
+                    <span className="bg-gradient-to-r from-vital-ai to-primary bg-clip-text text-transparent">
                         Vital
                     </span>
-                    <span className="ml-1 px-3 rounded bg-blue-400 text-white text-xl md:text-2xl font-bold inline-flex items-center justify-center pb-1.5 pt-1.5 pl-2 leading-none">
+                    <span className="ml-1 px-3 rounded bg-vital-ai text-white text-xl md:text-2xl font-bold inline-flex items-center justify-center pb-1.5 pt-1.5 pl-2 leading-none">
                         ai
                     </span>
                 </h1>
                 <div className="mt-4 flex gap-1">
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500/40 animate-bounce [animation-delay:-0.3s]"></span>
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500/60 animate-bounce [animation-delay:-0.15s]"></span>
-                    <span className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-bounce"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-vital-ai/40 animate-bounce [animation-delay:-0.3s]"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-vital-ai/60 animate-bounce [animation-delay:-0.15s]"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-vital-ai animate-bounce"></span>
                 </div>
             </div>
         </div>

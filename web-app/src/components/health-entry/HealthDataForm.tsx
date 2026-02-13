@@ -282,7 +282,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
     }, []);
 
     return (
-        <div className={`bg-card dark:bg-slate-950 rounded-2xl shadow-sm border border-border animate-in fade-in slide-in-from-bottom-4 duration-700 overflow-hidden transition-all ${isOpen ? 'ring-1 ring-border' : ''}`}>
+        <div className={`bg-card rounded-2xl shadow-sm border border-border animate-in fade-in slide-in-from-bottom-4 duration-700 overflow-hidden transition-all ${isOpen ? 'ring-1 ring-border' : ''}`}>
 
             {/* CABECERA */}
             <div
@@ -391,7 +391,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                                     <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.contextLabel')}</FormLabel>
                                                     <Select onValueChange={field.onChange} defaultValue={field.value ?? undefined} value={field.value || ""}>
                                                         <FormControl>
-                                                            <SelectTrigger className="bg-background dark:bg-slate-900/50 border-border">
+                                                            <SelectTrigger className="bg-background border-border">
                                                                 <SelectValue placeholder={t('Form.contextPlaceholder')} />
                                                             </SelectTrigger>
                                                         </FormControl>
@@ -417,7 +417,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                                 <FormItem>
                                                     <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.bpLabel')}</FormLabel>
                                                     <FormControl>
-                                                        <Input placeholder="120/80" className="text-center font-mono bg-background dark:bg-slate-900/50 border-border text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
+                                                        <Input placeholder="120/80" className="text-center font-mono bg-background border-border text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -430,7 +430,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                                 <FormItem>
                                                     <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.pulseLabel')}</FormLabel>
                                                     <FormControl>
-                                                        <Input type="number" placeholder="80" className="text-center font-mono bg-background dark:bg-slate-900/50 border-border text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
+                                                        <Input type="number" placeholder="80" className="text-center font-mono bg-background border-border text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -443,7 +443,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                                 <FormItem>
                                                     <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.spo2Label')}</FormLabel>
                                                     <FormControl>
-                                                        <Input type="number" placeholder="98" className="text-center font-mono bg-background dark:bg-slate-900/50 border-border text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
+                                                        <Input type="number" placeholder="98" className="text-center font-mono bg-background border-border text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -456,7 +456,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                                 <FormItem>
                                                     <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.ca125Label')}</FormLabel>
                                                     <FormControl>
-                                                        <Input type="number" placeholder="35.5" className="text-center font-mono bg-background dark:bg-slate-900/50 border-border text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
+                                                        <Input type="number" placeholder="35.5" className="text-center font-mono bg-background border-border text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -479,7 +479,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                                     <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.locationLabel')}</FormLabel>
                                                     <Select onValueChange={field.onChange} defaultValue={field.value ?? undefined} value={field.value || ""}>
                                                         <FormControl>
-                                                            <SelectTrigger className="bg-background dark:bg-slate-900/50 border-border">
+                                                            <SelectTrigger className="bg-background border-border">
                                                                 <SelectValue placeholder={t('Form.locationPlaceholder')} />
                                                             </SelectTrigger>
                                                         </FormControl>
@@ -502,7 +502,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                                 <FormItem>
                                                     <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.weightLabel')}</FormLabel>
                                                     <FormControl>
-                                                        <Input type="number" placeholder="75.5" className="text-center font-mono text-lg bg-background dark:bg-slate-900/50 border-border text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
+                                                        <Input type="number" placeholder="75.5" className="text-center font-mono text-lg bg-background border-border text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -522,7 +522,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                                 <FormControl>
                                                     <Textarea
                                                         placeholder={t('Form.notesPlaceholder')}
-                                                        className="resize-none h-20 bg-background dark:bg-slate-900/50 border-border text-foreground placeholder:text-muted-foreground"
+                                                        className="resize-none h-20 bg-background border-border text-foreground placeholder:text-muted-foreground"
                                                         {...field}
                                                         value={field.value || ''}
                                                     />
@@ -545,7 +545,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                             title={t('Form.holdToClear') || "Mantén presionado para limpiar"}
                                         >
                                             <div
-                                                className={`absolute inset-y-0 left-0 transition-all ease-linear duration-75 pointer-events-none ${resetProgress >= 100 ? 'bg-red-500/50' : 'bg-red-500/30'}`}
+                                                className={`absolute inset-y-0 left-0 transition-all ease-linear duration-75 pointer-events-none ${resetProgress >= 100 ? 'bg-metric-alert/50' : 'bg-metric-alert/30'}`}
                                                 style={{ width: `${resetProgress}%` }}
                                             />
                                             <div className="relative z-10 flex items-center gap-2">
@@ -553,7 +553,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                                 <span className="hidden sm:inline">{t('HomePage.clear') || 'Limpiar'}</span>
                                             </div>
                                         </Button>
-                                        <Button type="submit" disabled={form.formState.isSubmitting} className="h-auto px-6 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl bg-primary text-primary-foreground dark:bg-slate-800 dark:text-slate-100 dark:border dark:border-slate-700 dark:hover:bg-slate-700 transition-all">
+                                        <Button type="submit" disabled={form.formState.isSubmitting} className="h-auto px-6 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-all">
                                             {form.formState.isSubmitting ? <Loader2 size={20} className="animate-spin" /> : <><Save size={20} /> <span className="hidden sm:inline">{t('HomePage.saveButton')}</span></>}
                                         </Button>
                                     </div>
@@ -575,7 +575,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                                 <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('HealthEvents.type')}</FormLabel>
                                                 <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value || ""}>
                                                     <FormControl>
-                                                        <SelectTrigger className="bg-background dark:bg-slate-900/50 border-border">
+                                                        <SelectTrigger className="bg-background border-border">
                                                             <SelectValue placeholder={t('HealthEvents.typePlaceholder')} />
                                                         </SelectTrigger>
                                                     </FormControl>
@@ -600,7 +600,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                                 <FormItem>
                                                     <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('HealthEvents.date')}</FormLabel>
                                                     <FormControl>
-                                                        <Input type="date" className="bg-background dark:bg-slate-900/50 border-border text-foreground" {...field} />
+                                                        <Input type="date" className="bg-background border-border text-foreground" {...field} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -613,7 +613,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                                 <FormItem>
                                                     <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Hora</FormLabel>
                                                     <FormControl>
-                                                        <Input type="time" className="bg-background dark:bg-slate-900/50 border-border text-foreground" {...field} value={field.value || ''} />
+                                                        <Input type="time" className="bg-background border-border text-foreground" {...field} value={field.value || ''} />
                                                     </FormControl>
                                                     <FormMessage />
                                                 </FormItem>
@@ -631,7 +631,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                             <FormControl>
                                                 <Textarea
                                                     placeholder={t('HealthEvents.notes')}
-                                                    className="bg-background dark:bg-slate-900/50 border-border text-foreground placeholder:text-muted-foreground h-32 resize-none"
+                                                    className="bg-background border-border text-foreground placeholder:text-muted-foreground h-32 resize-none"
                                                     {...field}
                                                 />
                                             </FormControl>
@@ -653,7 +653,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                         title={t('Form.holdToClear') || "Mantén presionado para limpiar"}
                                     >
                                         <div
-                                            className={`absolute inset-y-0 left-0 transition-all ease-linear duration-75 pointer-events-none ${eventResetProgress >= 100 ? 'bg-red-500/50' : 'bg-red-500/30'}`}
+                                            className={`absolute inset-y-0 left-0 transition-all ease-linear duration-75 pointer-events-none ${eventResetProgress >= 100 ? 'bg-metric-alert/50' : 'bg-metric-alert/30'}`}
                                             style={{ width: `${eventResetProgress}%` }}
                                         />
                                         <div className="relative z-10 flex items-center gap-2">
@@ -661,7 +661,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                             <span className="hidden sm:inline">{t('HomePage.clear') || 'Limpiar'}</span>
                                         </div>
                                     </Button>
-                                    <Button type="submit" disabled={eventForm.formState.isSubmitting} className="h-auto px-6 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl bg-primary text-primary-foreground dark:bg-slate-800 dark:text-slate-100 dark:border dark:border-slate-700 dark:hover:bg-slate-700 transition-all">
+                                    <Button type="submit" disabled={eventForm.formState.isSubmitting} className="h-auto px-6 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-all">
                                         {eventForm.formState.isSubmitting ? <Loader2 size={20} className="animate-spin" /> : <div className="flex items-center gap-2"><Save size={20} /> <span className="hidden sm:inline">{t('HealthEvents.save')}</span></div>}
                                     </Button>
                                 </div>

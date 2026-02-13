@@ -45,7 +45,7 @@ export function DeleteMetricModal({ isOpen, onClose, metricId, onSuccess, type =
       <DialogContent className="max-w-sm [&>button]:hidden">
         <DialogHeader>
           <div className="flex flex-col items-center text-center gap-4">
-            <div className="bg-red-100 dark:bg-red-900/20 p-3 rounded-full text-red-600 dark:text-red-400"><AlertTriangle size={32} /></div>
+            <div className="bg-metric-alert/20 p-3 rounded-full text-metric-alert"><AlertTriangle size={32} /></div>
             <DialogTitle className="text-lg font-bold text-foreground text-center">
               {type === 'event' ? t('HealthEvents.deleteTitle') || t('History.deleteTitle') : t('History.deleteTitle')}
             </DialogTitle>

@@ -65,6 +65,17 @@ const config = {
                     metric: "var(--chart-metric)",
                 },
                 hover: "var(--hover)",
+                metric: {
+                    stable: "hsl(var(--metric-stable))",
+                    warning: "hsl(var(--metric-warning))",
+                    alert: "hsl(var(--metric-alert))",
+                },
+                event: {
+                    chemo: {
+                        DEFAULT: "hsl(var(--event-chemo))",
+                        muted: "hsl(var(--event-chemo-muted))",
+                    }
+                },
             },
             borderRadius: {
                 lg: "var(--radius)",

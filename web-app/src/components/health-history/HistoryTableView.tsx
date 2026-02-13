@@ -224,9 +224,9 @@ export function HistoryTableView({ data, isAdmin, onRefresh, embedded = false, v
               if (isEvent(row)) {
                 const dateObj = new Date(row.date || row.createdAt);
                 return (
-                  <TableRow key={row.id} className="bg-purple-50/50 dark:bg-purple-900/10 hover:bg-purple-100/50 dark:hover:bg-purple-900/20 border-l-4 border-purple-500 transition-colors">
+                  <TableRow key={row.id} className="bg-event-chemo-muted/50 hover:bg-event-chemo-muted border-l-4 border-event-chemo transition-colors">
                     {isColumnVisible('createdAt') && (
-                      <TableCell className="font-medium text-purple-900 dark:text-purple-100">
+                      <TableCell className="font-medium text-event-chemo">
                         <div className="flex flex-col">
                           <span>{dateObj.toLocaleDateString()}</span>
                           <span className="text-xs opacity-70 font-normal">{dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
@@ -255,10 +255,10 @@ export function HistoryTableView({ data, isAdmin, onRefresh, embedded = false, v
                             variant="ghost"
                             size="sm"
                             onClick={() => setNoteToView(row as any)}
-                            className="h-8 w-full justify-start p-1.5 hover:bg-purple-200 dark:hover:bg-purple-800/50"
+                            className="h-8 w-full justify-start p-1.5 hover:bg-event-chemo-muted"
                             title={row.notes}
                           >
-                            <FileText size={14} className="text-purple-600 dark:text-purple-400" />
+                            <FileText size={14} className="text-event-chemo" />
                           </Button>
                         ) : <span className="text-muted-foreground/30">-</span>}
                       </TableCell>

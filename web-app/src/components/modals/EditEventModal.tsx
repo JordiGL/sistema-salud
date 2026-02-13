@@ -107,7 +107,7 @@ export function EditEventModal({ isOpen, onClose, event, onSuccess }: EditEventM
 
     return (
         <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DialogContent onOpenAutoFocus={(e) => e.preventDefault()} className="max-w-md bg-card dark:bg-slate-950 border-border shadow-2xl [&>button]:hidden">
+            <DialogContent onOpenAutoFocus={(e) => e.preventDefault()} className="max-w-md bg-card border-border shadow-2xl [&>button]:hidden">
                 <DialogHeader>
                     <DialogTitle className="flex items-center gap-2 text-foreground">
                         <Pencil size={18} /> {t('HealthEvents.editEvent')}
@@ -125,7 +125,7 @@ export function EditEventModal({ isOpen, onClose, event, onSuccess }: EditEventM
                                     <FormLabel className="text-xs font-bold text-muted-foreground uppercase">{t('HealthEvents.label')}</FormLabel>
                                     <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
                                         <FormControl>
-                                            <SelectTrigger className="bg-background dark:bg-slate-900/50 border-input">
+                                            <SelectTrigger className="bg-background border-input">
                                                 <SelectValue placeholder="-" />
                                             </SelectTrigger>
                                         </FormControl>
@@ -150,7 +150,7 @@ export function EditEventModal({ isOpen, onClose, event, onSuccess }: EditEventM
                                     <FormItem>
                                         <FormLabel className="text-xs font-bold text-muted-foreground uppercase">{t('History.cols.date')}</FormLabel>
                                         <FormControl>
-                                            <Input type="date" className="bg-background dark:bg-slate-900/50 border-input text-foreground" {...field} />
+                                            <Input type="date" className="bg-background border-input text-foreground" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -163,7 +163,7 @@ export function EditEventModal({ isOpen, onClose, event, onSuccess }: EditEventM
                                     <FormItem>
                                         <FormLabel className="text-xs font-bold text-muted-foreground uppercase">Hora</FormLabel>
                                         <FormControl>
-                                            <Input type="time" className="bg-background dark:bg-slate-900/50 border-input text-foreground" {...field} value={field.value || ''} />
+                                            <Input type="time" className="bg-background border-input text-foreground" {...field} value={field.value || ''} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -178,7 +178,7 @@ export function EditEventModal({ isOpen, onClose, event, onSuccess }: EditEventM
                                 <FormItem>
                                     <FormLabel className="text-xs font-bold text-muted-foreground uppercase">{t('Form.notes')}</FormLabel>
                                     <FormControl>
-                                        <Textarea className="bg-background dark:bg-slate-900/50 border-input h-20 resize-none" {...field} value={field.value || ''} />
+                                        <Textarea className="bg-background border-input h-20 resize-none" {...field} value={field.value || ''} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -189,7 +189,7 @@ export function EditEventModal({ isOpen, onClose, event, onSuccess }: EditEventM
                             <Button type="button" variant="outline" onClick={onClose} className="h-auto py-4 rounded-xl font-bold text-muted-foreground border-border hover:bg-hover hover:text-accent-foreground">
                                 <ArrowLeft size={18} className="mr-0 sm:mr-2" /> <span className="hidden sm:inline">{t('History.cancel')}</span>
                             </Button>
-                            <Button type="submit" disabled={form.formState.isSubmitting} className="h-auto py-4 rounded-xl font-bold flex gap-2 bg-primary text-primary-foreground dark:bg-slate-800 dark:text-slate-100 dark:border dark:border-slate-700 dark:hover:bg-slate-700 shadow-lg hover:shadow-xl transition-all">
+                            <Button type="submit" disabled={form.formState.isSubmitting} className="h-auto py-4 rounded-xl font-bold flex gap-2 bg-primary text-primary-foreground shadow-lg hover:shadow-xl hover:bg-primary/90 transition-all">
                                 <Save size={18} /> <span className="hidden sm:inline">{t('History.save')}</span>
                             </Button>
                         </div>

@@ -41,6 +41,20 @@
     --vital-main: #0f172a;
     --vital-ai: #4f46e5;
 
+    /* HEALTH STATES - Semantic */
+    --metric-stable: 151 55% 42%;
+    /* emerald-600 */
+    --metric-warning: 38 92% 50%;
+    /* amber-500 */
+    --metric-alert: 0 84% 60%;
+    /* red-500 */
+
+    /* EVENTS - Semantic */
+    --event-chemo: 270 50% 40%;
+    /* purple-600 */
+    --event-chemo-muted: 270 50% 96%;
+    /* purple-50 */
+
     /* CHART COLORS */
     --chart-systolic: #1e293b;
     --chart-diastolic: #64748b;
@@ -73,7 +87,7 @@
     --secondary: 222 40% 25%;
     --secondary-foreground: 222 30% 85%;
 
-    --muted: 222 40% 25%;
+    --muted: 222 40% 20%;
     --muted-foreground: 222 20% 60%;
 
     --accent: 222 40% 25%;
@@ -85,6 +99,20 @@
     --border: 222 40% 25%;
     --input: 222 40% 25%;
     --ring: 222 40% 50%;
+
+    /* HEALTH STATES DARK */
+    --metric-stable: 151 55% 60%;
+    /* emerald-400 */
+    --metric-warning: 38 92% 60%;
+    /* amber-400 */
+    --metric-alert: 0 84% 70%;
+    /* red-400 */
+
+    /* EVENTS DARK */
+    --event-chemo: 270 60% 70%;
+    /* purple-400 */
+    --event-chemo-muted: 270 40% 25%;
+    /* purple-900/40 approx */
 
     /* BRAND COLORS DARK override */
     --vital-ai: #818cf8;
@@ -101,7 +129,6 @@
     /* Matching secondary/muted for consistency */
   }
 }
-
 @layer base {
   * {
     @apply border-border;

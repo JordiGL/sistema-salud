@@ -19,7 +19,7 @@ export function ViewNoteModal({ isOpen, onClose, note, date }: ViewNoteModalProp
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-md bg-card dark:bg-slate-950 border-border shadow-2xl [&>button]:hidden">
+      <DialogContent className="max-w-md bg-card border-border shadow-2xl [&>button]:hidden">
         <DialogHeader className="mb-4">
           <DialogTitle className="flex items-center gap-2 text-foreground text-lg font-bold">
             <FileText size={20} className="text-foreground" />

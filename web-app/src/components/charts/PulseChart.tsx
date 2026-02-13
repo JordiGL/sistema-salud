@@ -229,18 +229,18 @@ export function PulseChart({ data: initialData, events = [], isAdmin }: { data: 
                       content={
                         <ChartTooltipContent
                           indicator="dot"
-                          className="w-[200px] rounded-2xl border border-border/10 shadow-xl bg-white/95 dark:bg-slate-950/90 backdrop-blur-md p-3 text-slate-900 dark:text-slate-50"
+                          className="w-[200px] rounded-2xl border border-border/10 shadow-xl bg-card/95 backdrop-blur-md p-3 text-foreground"
                           labelFormatter={(value, payload) => {
-                            const rawDate = value || (payload && payload[0]?.payload?.createdAt);
-                            if (!rawDate) return null;
-                            const date = new Date(rawDate);
+                            const dateValue = (payload && payload[0]?.payload?.createdAt) || value;
+                            if (!dateValue) return null;
+                            const date = new Date(dateValue);
                             if (isNaN(date.getTime())) return null;
                             return (
                               <div className="flex flex-col border-b border-border pb-2 mb-2">
                                 <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">
                                   {t('History.cols.date')}
                                 </span>
-                                <span className="text-xs font-bold text-slate-900 dark:text-slate-50">
+                                <span className="text-xs font-bold text-foreground">
                                   {date.toLocaleDateString('es-ES', { day: 'numeric', month: 'numeric', year: 'numeric' })}
                                   <span className="mx-1 text-muted">|</span>
                                   {date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false })}
@@ -254,7 +254,7 @@ export function PulseChart({ data: initialData, events = [], isAdmin }: { data: 
                                 <span className="text-muted-foreground text-xs font-medium">
                                   {tCharts('pulseTitle')}
                                 </span>
-                                <span className="font-bold text-slate-900 dark:text-slate-50 text-sm">
+                                <span className="font-bold text-foreground text-sm">
                                   {value}
                                   <span className="ml-1 font-normal text-[10px] text-muted-foreground uppercase">
                                     bpm
@@ -295,9 +295,9 @@ export function PulseChart({ data: initialData, events = [], isAdmin }: { data: 
                   </div>
                   <div className="flex md:flex-col gap-3 overflow-x-auto md:overflow-x-visible md:max-h-[400px] md:overflow-y-auto pb-2 md:pb-0 pr-1 custom-scrollbar">
                     {events.map((event) => (
-                      <div key={event.id} className="min-w-[140px] md:min-w-0 group relative pl-3 py-1 border-l-2 border-violet-500 transition-colors shrink-0">
+                      <div key={event.id} className="min-w-[140px] md:min-w-0 group relative pl-3 py-1 border-l-2 border-event-chemo transition-colors shrink-0">
                         <div className="flex flex-col">
-                          <span className="text-[9px] font-bold text-violet-500/80 uppercase tracking-wider mb-0.5">
+                          <span className="text-[9px] font-bold text-event-chemo/80 uppercase tracking-wider mb-0.5">
                             {new Date(event.date).toLocaleDateString(undefined, { day: '2-digit', month: '2-digit' })}
                           </span>
                           <span className="text-xs font-medium text-foreground leading-none">
@@ -324,8 +324,8 @@ export function PulseChart({ data: initialData, events = [], isAdmin }: { data: 
             <StatsSummary
               label={tCharts('pulseTitle')}
               data={pulseData}
-              colorClass="text-slate-600 dark:text-slate-400"
-              bgClass="bg-slate-100 dark:bg-slate-900/50"
+              colorClass="text-muted-foreground"
+              bgClass="bg-muted/50"
               unit="bpm"
               legendDotColor="#475569"
             />

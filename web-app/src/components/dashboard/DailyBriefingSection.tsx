@@ -158,7 +158,7 @@ export function DailyBriefingSection({ metrics }: DailyBriefingSectionProps) {
                             {/* 1. Status */}
                             <div className="space-y-2 p-3 rounded-lg bg-background/50 border border-border/50 backdrop-blur-sm">
                                 <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
-                                    <Activity size={16} className="text-emerald-500" />
+                                    <Activity size={16} className="text-metric-stable" />
                                     <span>{t('Briefing.status')}</span>
                                 </div>
                                 <p className="text-sm font-medium leading-relaxed">
@@ -169,7 +169,7 @@ export function DailyBriefingSection({ metrics }: DailyBriefingSectionProps) {
                             {/* 2. Trend */}
                             <div className="space-y-2 p-3 rounded-lg bg-background/50 border border-border/50 backdrop-blur-sm">
                                 <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
-                                    <TrendingUp size={16} className="text-blue-500" />
+                                    <TrendingUp size={16} className="text-vital-ai" />
                                     <span>{t('Briefing.trend')}</span>
                                 </div>
                                 <p className="text-sm font-medium leading-relaxed">
