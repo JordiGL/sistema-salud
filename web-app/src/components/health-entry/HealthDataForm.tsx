@@ -6,8 +6,21 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import {
-    Heart, Scale, Save, Eraser,
-    ChevronDown, ChevronUp, Plus, Loader2, Zap
+    Plus,
+    Minus,
+    Camera,
+    X,
+    ChevronDown,
+    ChevronUp,
+    Zap, // Import Zap icon
+    Save,
+    RotateCw,
+    Eraser,
+    Loader2,
+    Activity, // Added
+    Calendar,  // Added
+    Heart, // Restored
+    Scale // Restored
 } from 'lucide-react';
 import { useMetricManager } from '@/hooks/useMetricManager';
 import { useHealthAnalysis } from '@/hooks/useHealthAnalysis';
@@ -67,7 +80,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
     const eventForm = useForm<EventFormValues>({
         resolver: zodResolver(eventSchema),
         defaultValues: {
-            type: 'CHEMOTHERAPY',
+            type: '',
             date: new Date().toLocaleDateString('en-CA'),
             time: new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
             notes: ''
@@ -174,7 +187,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
 
             await metricApi.createEvent(payload);
             eventForm.reset({
-                type: 'CHEMOTHERAPY',
+                type: '',
                 date: new Date().toLocaleDateString('en-CA'),
                 time: new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
                 notes: ''
@@ -190,6 +203,41 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
     // --- HOLD TO CLEAR LOGIC ---
     const [resetProgress, setResetProgress] = useState(0);
     const resetIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+    // Lógica para borrar manteniendo pulsado (Eventos)
+    const [eventResetProgress, setEventResetProgress] = useState(0);
+    const eventResetTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+    const handleEventResetStart = () => {
+        setEventResetProgress(0);
+        const startTime = Date.now();
+        const duration = 1000; // 1 segundo para borrar
+
+        eventResetTimerRef.current = setInterval(() => {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min((elapsed / duration) * 100, 100);
+            setEventResetProgress(progress);
+
+            if (progress >= 100) {
+                if (eventResetTimerRef.current) clearInterval(eventResetTimerRef.current);
+                eventForm.reset({
+                    type: '',
+                    date: new Date().toLocaleDateString('en-CA'),
+                    time: new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
+                    notes: ''
+                });
+                setEventResetProgress(0);
+            }
+        }, 50);
+    };
+
+    const handleEventResetEnd = () => {
+        if (eventResetTimerRef.current) {
+            clearInterval(eventResetTimerRef.current);
+            eventResetTimerRef.current = null;
+        }
+        setEventResetProgress(0);
+    };
 
     const clearResetInterval = () => {
         if (resetIntervalRef.current) {
@@ -248,9 +296,46 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                 className={`flex justify-between items-center p-4 cursor-pointer transition-colors select-none ${isOpen ? 'bg-muted/50 border-b border-border' : 'bg-card'}`}
                 title={isOpen ? t('Form.toggleCollapse') : t('Form.toggleExpand')}
             >
-                <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-lg transition-colors ${isOpen ? 'bg-muted text-foreground' : 'bg-muted/50 text-muted-foreground hover:bg-hover hover:text-foreground'}`}>
-                        <Plus size={20} />
+                <div className="flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
+                    <div className="inline-flex items-center bg-muted/80 p-0.5 rounded-lg border border-border/40">
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                                setActiveTab('metrics');
+                                if (!isOpen) setIsOpen(true);
+                            }}
+                            className={cn(
+                                "h-8 px-3 text-xs font-semibold rounded-md transition-all decoration-0 flex items-center gap-2",
+                                activeTab === 'metrics'
+                                    ? "bg-background text-foreground shadow-sm ring-1 ring-black/5 dark:ring-white/10"
+                                    : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+                            )}
+                            title={t('HomePage.newRecord')}
+                        >
+                            <Activity size={14} />
+                            <span className="hidden sm:inline">{t('HomePage.newRecord')}</span>
+                        </Button>
+                        <Button
+                            type="button"
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                                setActiveTab('events');
+                                if (!isOpen) setIsOpen(true);
+                            }}
+                            className={cn(
+                                "h-8 px-3 text-xs font-semibold rounded-md transition-all decoration-0 flex items-center gap-2",
+                                activeTab === 'events'
+                                    ? "bg-background text-foreground shadow-sm ring-1 ring-black/5 dark:ring-white/10"
+                                    : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+                            )}
+                            title={t('HealthEvents.newEvent')}
+                        >
+                            <Calendar size={14} />
+                            <span className="hidden sm:inline">{t('HealthEvents.newEvent')}</span>
+                        </Button>
                     </div>
                 </div>
 
@@ -291,39 +376,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
             {isOpen && (
                 <div className="p-6 animate-in slide-in-from-top-2 duration-300">
 
-                    {/* TABS - Segmented Control Style */}
-                    <div className="flex justify-start mb-6">
-                        <div className="inline-flex items-center bg-muted/80 p-1 rounded-xl">
-                            <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setActiveTab('metrics')}
-                                className={cn(
-                                    "h-9 px-6 text-sm font-bold rounded-lg transition-all decoration-0",
-                                    activeTab === 'metrics'
-                                        ? "bg-background text-foreground shadow-sm ring-1 ring-black/5 dark:ring-white/10"
-                                        : "text-muted-foreground hover:text-foreground hover:bg-background/50"
-                                )}
-                            >
-                                {t('HomePage.newRecord')}
-                            </Button>
-                            <Button
-                                type="button"
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => setActiveTab('events')}
-                                className={cn(
-                                    "h-9 px-6 text-sm font-bold rounded-lg transition-all decoration-0",
-                                    activeTab === 'events'
-                                        ? "bg-background text-foreground shadow-sm ring-1 ring-black/5 dark:ring-white/10"
-                                        : "text-muted-foreground hover:text-foreground hover:bg-background/50"
-                                )}
-                            >
-                                {t('HealthEvents.newEvent')}
-                            </Button>
-                        </div>
-                    </div>
+                    {/* TABS - Moved to Header */}
 
                     {activeTab === 'metrics' ? (
                         <Form {...form}>
@@ -526,10 +579,10 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                         render={({ field }) => (
                                             <FormItem>
                                                 <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('HealthEvents.type')}</FormLabel>
-                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                                                <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value || ""}>
                                                     <FormControl>
                                                         <SelectTrigger className="bg-background dark:bg-slate-900/50 border-border">
-                                                            <SelectValue placeholder={t('HealthEvents.type')} />
+                                                            <SelectValue placeholder={t('HealthEvents.typePlaceholder')} />
                                                         </SelectTrigger>
                                                     </FormControl>
                                                     <SelectContent>
@@ -593,9 +646,29 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                     )}
                                 />
 
-                                <div className="flex justify-end pt-2">
+                                <div className="flex gap-3 justify-end pt-2">
+                                    <Button
+                                        type="button"
+                                        variant="outline"
+                                        onMouseDown={handleEventResetStart}
+                                        onMouseUp={handleEventResetEnd}
+                                        onMouseLeave={handleEventResetEnd}
+                                        onTouchStart={handleEventResetStart}
+                                        onTouchEnd={handleEventResetEnd}
+                                        className="relative overflow-hidden h-auto px-6 py-4 rounded-xl font-bold text-muted-foreground border-dashed border-border bg-background hover:bg-hover hover:text-foreground group select-none"
+                                        title={t('Form.holdToClear') || "Mantén presionado para limpiar"}
+                                    >
+                                        <div
+                                            className={`absolute inset-y-0 left-0 transition-all ease-linear duration-75 pointer-events-none ${eventResetProgress >= 100 ? 'bg-red-500/50' : 'bg-red-500/30'}`}
+                                            style={{ width: `${eventResetProgress}%` }}
+                                        />
+                                        <div className="relative z-10 flex items-center gap-2">
+                                            <Eraser size={18} className={`transition-transform duration-700 ${eventResetProgress > 0 ? 'rotate-12' : ''}`} />
+                                            <span className="hidden sm:inline">{t('HomePage.clear') || 'Limpiar'}</span>
+                                        </div>
+                                    </Button>
                                     <Button type="submit" disabled={eventForm.formState.isSubmitting} className="h-auto px-6 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl bg-primary text-primary-foreground dark:bg-slate-800 dark:text-slate-100 dark:border dark:border-slate-700 dark:hover:bg-slate-700 transition-all">
-                                        {eventForm.formState.isSubmitting ? <Loader2 size={20} className="animate-spin" /> : <><Save size={20} className="mr-2" /> {t('HealthEvents.save')}</>}
+                                        {eventForm.formState.isSubmitting ? <Loader2 size={20} className="animate-spin" /> : <div className="flex items-center gap-2"><Save size={20} /> <span className="hidden sm:inline">{t('HealthEvents.save')}</span></div>}
                                     </Button>
                                 </div>
                             </form>
