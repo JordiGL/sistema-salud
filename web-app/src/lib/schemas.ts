@@ -47,3 +47,11 @@ export const metricSchema = z.object({
 
 export type MetricFormValues = z.infer<typeof metricSchema>;
 export type MetricFormInput = z.input<typeof metricSchema>;
+
+export const eventSchema = z.object({
+    type: z.string().min(1, { message: "Selecciona un tipo" }),
+    date: z.string().refine((val) => !isNaN(Date.parse(val)), { message: "Fecha inválida" }),
+    time: z.string().optional(),
+    notes: z.string().optional(),
+});
+export type EventFormValues = z.infer<typeof eventSchema>;

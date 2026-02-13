@@ -25,3 +25,13 @@ export interface MetricsFilters {
     context?: string;
     location?: string;
 }
+
+export interface HealthEvent {
+    id: string;
+    date: string;
+    createdAt: string;
+    type: string;
+    notes?: string;
+    severity?: string;
+    medication?: string;
+}

@@ -19,7 +19,7 @@ export function ViewNoteModal({ isOpen, onClose, note, date }: ViewNoteModalProp
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md bg-card dark:bg-slate-950 border-border shadow-2xl">
         <DialogHeader className="mb-4">
           <DialogTitle className="flex items-center gap-2 text-foreground text-lg font-bold">
             <FileText size={20} className="text-foreground" />
@@ -39,10 +39,11 @@ export function ViewNoteModal({ isOpen, onClose, note, date }: ViewNoteModalProp
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end pt-2">
+        <div className="flex flex-col sm:flex-row justify-end pt-2">
           <Button
             onClick={onClose}
-            className="px-8 py-6 rounded-xl font-bold shadow-sm"
+            variant="outline"
+            className="w-full sm:w-auto px-8 py-6 rounded-xl font-bold text-muted-foreground border-border hover:bg-hover hover:text-accent-foreground shadow-sm transition-all"
           >
             {t('History.close')}
           </Button>

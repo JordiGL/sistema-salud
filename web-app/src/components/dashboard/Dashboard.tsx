@@ -11,7 +11,7 @@ import {
 
 // Imports de la nova API i Constants
 import { metricApi } from '@/lib/api';
-import { Metric } from '@/types/metrics';
+import { Metric, HealthEvent } from '@/types/metrics';
 import { STORAGE_KEYS, APP_ROUTES } from '@/lib/constants';
 import { downloadCSV, downloadXML } from '@/lib/export-utils';
 
@@ -40,6 +40,7 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
 
   // --- ESTATS ---
   const [metrics, setMetrics] = useState<Metric[]>(initialMetrics);
+  const [events, setEvents] = useState<HealthEvent[]>([]);
   const [isAdmin, setIsAdmin] = useState(false);
 
   const [activeTab, setActiveTab] = useState<'history' | 'bp' | 'pulse' | 'weight' | 'spo2' | 'ca125'>('history');
@@ -49,6 +50,7 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
 
   useEffect(() => {
     checkAuth();
+    refreshData(); // Load initial data including events
 
     function handleAuthLogout() {
       setIsAdmin(false);
@@ -116,8 +118,12 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
 
   async function refreshData() {
     try {
-      const data = await metricApi.getAll();
+      const [data, eventsData] = await Promise.all([
+        metricApi.getAll(),
+        metricApi.getEvents()
+      ]);
       setMetrics(data);
+      setEvents(eventsData);
     } catch (error) {
       console.error("Error refrescant dades:", error);
     }
@@ -226,12 +232,13 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
                       </div>
 
                       {/* View Toggle */}
-                      <div className="flex items-center bg-card rounded-lg border border-border p-1 shadow-sm">
+                      {/* View Toggle */}
+                      <div className="flex items-center bg-muted/80 p-1 rounded-lg">
                         <Button
                           variant="ghost"
                           size="icon"
                           onClick={() => setViewMode('grid')}
-                          className={`h-8 w-8 rounded-md transition-all ${viewMode === 'grid' ? 'bg-primary/10 shadow-sm' : 'text-muted-foreground hover:bg-hover'}`}
+                          className={`h-8 w-8 rounded-md transition-all ${viewMode === 'grid' ? 'bg-background text-foreground shadow-sm ring-1 ring-black/5 dark:ring-white/10' : 'text-muted-foreground hover:text-foreground hover:bg-background/50'}`}
                           title={t('History.cardView')}
                         >
                           <LayoutGrid size={16} />
@@ -240,7 +247,7 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
                           variant="ghost"
                           size="icon"
                           onClick={() => setViewMode('table')}
-                          className={`h-8 w-8 rounded-md transition-all ${viewMode === 'table' ? 'bg-primary/10 shadow-sm' : 'text-muted-foreground hover:bg-hover'}`}
+                          className={`h-8 w-8 rounded-md transition-all ${viewMode === 'table' ? 'bg-background text-foreground shadow-sm ring-1 ring-black/5 dark:ring-white/10' : 'text-muted-foreground hover:text-foreground hover:bg-background/50'}`}
                           title={t('History.tableView')}
                         >
                           <List size={16} />
@@ -268,7 +275,7 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
                           />
                         ) : (
                           <HistoryTableView
-                            data={metrics}
+                            data={[...metrics, ...events]}
                             isAdmin={isAdmin}
                             onRefresh={refreshData}
                             embedded={true}
@@ -282,11 +289,11 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
               </div>
             )}
 
-            {activeTab === 'bp' && <BloodPressureChart data={metrics} isAdmin={isAdmin} />}
-            {activeTab === 'pulse' && <PulseChart data={metrics} isAdmin={isAdmin} />}
-            {activeTab === 'weight' && <WeightChart data={metrics} isAdmin={isAdmin} />}
-            {activeTab === 'spo2' && <SpO2Chart data={metrics} isAdmin={isAdmin} />}
-            {activeTab === 'ca125' && <CA125Chart data={metrics} isAdmin={isAdmin} />}
+            {activeTab === 'bp' && <BloodPressureChart data={metrics} events={events} isAdmin={isAdmin} />}
+            {activeTab === 'pulse' && <PulseChart data={metrics} events={events} isAdmin={isAdmin} />}
+            {activeTab === 'weight' && <WeightChart data={metrics} events={events} isAdmin={isAdmin} />}
+            {activeTab === 'spo2' && <SpO2Chart data={metrics} events={events} isAdmin={isAdmin} />}
+            {activeTab === 'ca125' && <CA125Chart data={metrics} events={events} isAdmin={isAdmin} />}
           </div>
         </div>
       </div>

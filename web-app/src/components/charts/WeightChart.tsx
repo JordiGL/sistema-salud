@@ -1,13 +1,14 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid } from 'recharts';
-import { Scale, FileSpreadsheet, FileCode } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Label } from 'recharts';
+import { Scale, FileSpreadsheet, FileCode, MoveHorizontal } from 'lucide-react';
 import { ChartSkeleton } from './ChartSkeleton';
 import { useTranslations } from 'next-intl';
 import { metricApi } from '@/lib/api';
 import { useMetricManager } from '@/hooks/useMetricManager';
-import { Metric } from '@/types/metrics';
+import { Metric, HealthEvent } from '@/types/metrics';
+import { ReferenceLine } from 'recharts';
 import { StatsSummary } from '@/components/dashboard/StatsSummary';
 import { downloadCSV, downloadXML } from '@/lib/export-utils';
 import { HistoryTableView } from '@/components/health-history/HistoryTableView';
@@ -19,7 +20,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 
 const CustomXAxisTick = ({ x, y, payload, hideTime }: any) => {
-  const date = new Date(payload.value);
+  const date = new Date(payload.value); // Works for timestamp or ISO string
   return (
     <g transform={`translate(${x},${y})`}>
       <text x={0} y={18} textAnchor="middle" fill="#6b7280" fontSize={10} fontFamily="sans-serif">
@@ -43,7 +44,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig;
 
-export function WeightChart({ data: initialData, isAdmin }: { data: Metric[], isAdmin: boolean }) {
+export function WeightChart({ data: initialData, events = [], isAdmin }: { data: Metric[], events?: HealthEvent[], isAdmin: boolean }) {
   const t = useTranslations();
   const tCharts = useTranslations('Charts');
   const tFilter = useTranslations('Filters');
@@ -97,15 +98,40 @@ export function WeightChart({ data: initialData, isAdmin }: { data: Metric[], is
         return true;
       });
     }
-    return result;
+
+    // Add timestamp for numeric axis
+    return result.map(d => ({
+      ...d,
+      timestamp: new Date(d.createdAt).getTime()
+    })).sort((a, b) => a.timestamp - b.timestamp);
   }, [chartData, timeOfDay]);
+
+  // Translation helper for event types
+  const getEventLabel = (eventType: string) => {
+    try {
+      return t(`HealthEvents.types.${eventType}`);
+    } catch {
+      return eventType;
+    }
+  };
 
   // CALCULO DE DATOS PARA ESTADÍSTICAS
   const weightData = useMemo(() =>
     finalData
-      .map(d => d.weight || 0)
+      .map(d => d.weight ? Number(d.weight) : 0)
       .filter(n => n > 0),
     [finalData]);
+
+  const tableData = useMemo(() => {
+    let relevantEvents = events || [];
+    if (dateRange !== 'all') {
+      const days = dateRange === '7d' ? 7 : 30;
+      const cutoff = new Date();
+      cutoff.setDate(cutoff.getDate() - days);
+      relevantEvents = relevantEvents.filter(e => new Date(e.date) >= cutoff);
+    }
+    return [...finalData, ...relevantEvents];
+  }, [finalData, events, dateRange]);
 
   // Skeleton solo en la carga inicial
   if (loading && chartData.length === 0) {
@@ -177,7 +203,7 @@ export function WeightChart({ data: initialData, isAdmin }: { data: Metric[], is
 
         <CardContent>
           {finalData.length === 0 ? (
-            <div className="h-[400px] flex flex-col items-center justify-center text-muted-foreground animate-in fade-in duration-500">
+            <div className="flex flex-col items-center justify-center text-muted-foreground animate-in fade-in duration-500">
               <div className="p-4 bg-muted rounded-full mb-3">
                 <Scale size={32} className="opacity-20 text-muted-foreground" />
               </div>
@@ -185,77 +211,120 @@ export function WeightChart({ data: initialData, isAdmin }: { data: Metric[], is
             </div>
           ) : (
             /* Transición fluida durante el filtrado */
-            <div className={loading ? "opacity-50 transition-opacity duration-300" : "opacity-100 transition-opacity duration-300"}>
-              <ChartContainer config={chartConfig} className="w-full h-[400px]">
-                <LineChart data={finalData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} stroke="#94a3b8" />
-                  <XAxis
-                    dataKey="createdAt"
-                    tick={(props) => <CustomXAxisTick {...props} hideTime={finalData.length > 30} />}
-                    interval="preserveStartEnd"
-                    minTickGap={50}
-                    axisLine={false}
-                    tickLine={false}
-                  />
-                  <YAxis
-                    domain={[45, 'auto']}
-                    tick={{ fontSize: 11, fill: '#94a3b8' }}
-                    axisLine={false}
-                    tickLine={false}
-                    tickCount={6}
-                  />
-                  <ChartTooltip
-                    cursor={{ stroke: 'var(--border)', strokeWidth: 2 }}
-                    content={
-                      <ChartTooltipContent
-                        indicator="dot"
-                        className="w-[200px] rounded-2xl border border-border/10 shadow-xl bg-white/95 dark:bg-slate-950/90 backdrop-blur-md p-3 text-slate-900 dark:text-slate-50"
-                        labelFormatter={(value, payload) => {
-                          const rawDate = value || (payload && payload[0]?.payload?.createdAt);
-                          if (!rawDate) return null;
-                          const date = new Date(rawDate);
-                          return (
-                            <div className="flex flex-col border-b border-border pb-2 mb-2">
-                              <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">
-                                {t('History.cols.date')}
-                              </span>
-                              <span className="text-xs font-bold text-slate-900 dark:text-slate-50">
-                                {date.toLocaleDateString('es-ES', { day: 'numeric', month: 'numeric', year: 'numeric' })}
-                                <span className="mx-1 text-muted">|</span>
-                                {date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false })}
-                              </span>
-                            </div>
-                          );
-                        }}
-                        formatter={(value, name, item) => (
-                          <div className="flex flex-col gap-2 w-full">
-                            <div className="flex items-center justify-between w-full my-0.5">
-                              <span className="text-muted-foreground text-xs font-medium">{tCharts('weightTitle')}</span>
-                              <span className="font-bold text-slate-900 dark:text-slate-50 text-sm">
-                                {value} <span className="ml-1 font-normal text-[10px] text-muted-foreground uppercase">Kg</span>
-                              </span>
-                            </div>
-                            {item.payload.weightLocation && (
-                              <div className="flex items-center justify-between w-full pt-1.5 border-t border-border">
-                                <span className="text-muted-foreground text-[10px] uppercase font-bold tracking-tight">{tFilter('location')}</span>
-                                <span className="text-muted-foreground text-[11px] font-semibold italic">{item.payload.weightLocation}</span>
+            <div className={`flex flex-col md:flex-row gap-6 ${loading ? "opacity-50" : "opacity-100"} transition-opacity duration-300`}>
+              <div className="flex-1 min-w-0">
+                <ChartContainer config={chartConfig} className="w-full h-[400px]">
+                  <LineChart data={finalData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                    <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} stroke="#94a3b8" />
+                    <XAxis
+                      dataKey="timestamp"
+                      type="number"
+                      domain={['dataMin', 'dataMax']}
+                      tick={(props) => <CustomXAxisTick {...props} hideTime={finalData.length > 30} />}
+                      interval="preserveStartEnd"
+                      minTickGap={50}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <YAxis
+                      domain={[45, 'auto']}
+                      tick={{ fontSize: 11, fill: '#94a3b8' }}
+                      axisLine={false}
+                      tickLine={false}
+                      tickCount={6}
+                    />
+                    <ChartTooltip
+                      cursor={{ stroke: 'var(--border)', strokeWidth: 2 }}
+                      content={
+                        <ChartTooltipContent
+                          indicator="dot"
+                          className="w-[200px] rounded-2xl border border-border/10 shadow-xl bg-white/95 dark:bg-slate-950/90 backdrop-blur-md p-3 text-slate-900 dark:text-slate-50"
+                          labelFormatter={(value, payload) => {
+                            const rawDate = value || (payload && payload[0]?.payload?.createdAt);
+                            if (!rawDate) return null;
+                            const date = new Date(rawDate);
+                            if (isNaN(date.getTime())) return null;
+                            return (
+                              <div className="flex flex-col border-b border-border pb-2 mb-2">
+                                <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">
+                                  {t('History.cols.date')}
+                                </span>
+                                <span className="text-xs font-bold text-slate-900 dark:text-slate-50">
+                                  {date.toLocaleDateString('es-ES', { day: 'numeric', month: 'numeric', year: 'numeric' })}
+                                  <span className="mx-1 text-muted">|</span>
+                                  {date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false })}
+                                </span>
                               </div>
-                            )}
-                          </div>
-                        )}
+                            );
+                          }}
+                          formatter={(value, name, item) => (
+                            <div className="flex flex-col gap-2 w-full">
+                              <div className="flex items-center justify-between w-full my-0.5">
+                                <span className="text-muted-foreground text-xs font-medium">{tCharts('weightTitle')}</span>
+                                <span className="font-bold text-slate-900 dark:text-slate-50 text-sm">
+                                  {value} <span className="ml-1 font-normal text-[10px] text-muted-foreground uppercase">Kg</span>
+                                </span>
+                              </div>
+                              {item.payload.weightLocation && (
+                                <div className="flex items-center justify-between w-full pt-1.5 border-t border-border">
+                                  <span className="text-muted-foreground text-[10px] uppercase font-bold tracking-tight">{tFilter('location')}</span>
+                                  <span className="text-muted-foreground text-[11px] font-semibold italic">{item.payload.weightLocation}</span>
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        />
+                      }
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="weight"
+                      stroke="var(--color-weight)"
+                      strokeWidth={3}
+                      dot={{ r: 4, fill: "var(--color-weight)", strokeWidth: 2, stroke: '#fff' }}
+                      activeDot={{ r: 6 }}
+                    />
+
+                    {events && events.map((event) => (
+                      <ReferenceLine
+                        key={event.id}
+                        x={new Date(event.date).getTime()}
+                        stroke="#8b5cf6"
+                        strokeDasharray="3 3"
                       />
-                    }
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="weight"
-                    stroke="var(--color-weight)"
-                    strokeWidth={3}
-                    dot={{ r: 4, fill: "var(--color-weight)", strokeWidth: 2, stroke: '#fff' }}
-                    activeDot={{ r: 6 }}
-                  />
-                </LineChart>
-              </ChartContainer>
+                    ))}
+                  </LineChart>
+                </ChartContainer>
+              </div>
+
+              {/* Event Legend Sidebar */}
+              {events && events.length > 0 && (
+                <div className="w-full md:w-48 border-t md:border-t-0 md:border-l border-border pt-4 md:pt-0 pl-0 md:pl-4 space-y-3">
+                  <h4 className="text-[10px] font-bold uppercase text-muted-foreground mb-2 tracking-wider opacity-70">{t('HealthEvents.records')}</h4>
+                  <div className="md:hidden flex items-center gap-2 mb-2 text-[10px] font-medium text-muted-foreground/70">
+                    <MoveHorizontal size={12} className="animate-pulse" /> <span>{t('History.scrollHint')}</span> <MoveHorizontal size={12} className="animate-pulse" />
+                  </div>
+                  <div className="flex md:flex-col gap-3 overflow-x-auto md:overflow-x-visible md:max-h-[400px] md:overflow-y-auto pb-2 md:pb-0 pr-1 custom-scrollbar">
+                    {events.map((event) => (
+                      <div key={event.id} className="min-w-[140px] md:min-w-0 group relative pl-3 py-1 border-l-2 border-violet-500 transition-colors shrink-0">
+                        <div className="flex flex-col">
+                          <span className="text-[9px] font-bold text-violet-500/80 uppercase tracking-wider mb-0.5">
+                            {new Date(event.date).toLocaleDateString(undefined, { day: '2-digit', month: '2-digit' })}
+                          </span>
+                          <span className="text-xs font-medium text-foreground leading-none">
+                            {getEventLabel(event.type)}
+                          </span>
+                        </div>
+                        {event.notes && (
+                          <p className="text-[10px] text-muted-foreground/70 line-clamp-1 mt-1 leading-tight">
+                            {event.notes}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           )}
         </CardContent>
@@ -277,7 +346,7 @@ export function WeightChart({ data: initialData, isAdmin }: { data: Metric[], is
 
       <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
         <HistoryTableView
-          data={finalData}
+          data={tableData}
           isAdmin={false} // Read-only
           onRefresh={() => { }}
           visibleColumns={['createdAt', 'weightLocation', 'weight', 'notes']}

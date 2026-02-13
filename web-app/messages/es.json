@@ -182,5 +182,27 @@
     "location": "Lugar",
     "ca125": "CA125",
     "notes": "Notas"
+  },
+  "HealthEvents": {
+    "records": "Eventos",
+    "newEvent": "Nuevo Evento",
+    "type": "Tipo de Evento",
+    "date": "Fecha",
+    "notes": "Notas / Detalles",
+    "save": "Guardar Evento",
+    "label": "Tipo de Evento",
+    "success": "Evento registrado correctamente",
+    "deleteTitle": "¿Eliminar evento?",
+    "editEvent": "Editar Evento",
+    "types": {
+      "CHEMOTHERAPY": "Quimioterapia",
+      "DOCTOR_VISIT": "Visita Médica",
+      "BLOOD_TEST": "Analítica",
+      "IMAGING": "Pruebas de Imagen",
+      "MEDICATION_CHANGE": "Cambio Medicación",
+      "SYMPTOM_FLARE": "Agudización Síntomas",
+      "HOSPITALIZATION": "Hospitalización",
+      "OTHER": "Otro"
+    }
   }
 }

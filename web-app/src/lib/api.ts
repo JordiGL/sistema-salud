@@ -2,7 +2,7 @@ import { STORAGE_KEYS, API_ROUTES } from "./constants";
 
 // --- INTERFÍCIES ---
 
-import { Metric, MetricsFilters } from "@/types/metrics";
+import { Metric, MetricsFilters, HealthEvent } from "@/types/metrics";
 
 // --- INTERFÍCIES ---
 // (Las interfaces Metric y MetricsFilters ahora se importan de types/metrics.ts)
@@ -152,7 +152,35 @@ export const metricApi = {
 
   delete: (id: string) =>
     httpClient<void>(`${API_ROUTES.METRICS}/${id}`, { method: "DELETE" }),
+
+  // --- HEALTH EVENTS ---
+
+  getEvents: async (filters?: MetricsFilters) => {
+    const params = new URLSearchParams();
+    if (filters?.range) params.append("range", filters.range);
+
+    return await httpClient<HealthEvent[]>(
+      `${API_ROUTES.METRICS}/events?${params.toString()}`,
+      { cache: "no-store" }
+    );
+  },
+
+  createEvent: (data: any) =>
+    httpClient<HealthEvent>(`${API_ROUTES.METRICS}/events`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    }),
+
+  deleteEvent: (id: string) =>
+    httpClient<void>(`${API_ROUTES.METRICS}/events/${id}`, { method: "DELETE" }),
+
+  updateEvent: (id: string, data: any) =>
+    httpClient<HealthEvent>(`${API_ROUTES.METRICS}/events/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    }),
 };
+
 
 export interface LoginResponse {
   access_token: string;

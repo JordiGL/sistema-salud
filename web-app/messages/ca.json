@@ -182,5 +182,27 @@
     "location": "Lloc",
     "ca125": "CA125",
     "notes": "Notes"
+  },
+  "HealthEvents": {
+    "records": "Esdeveniments",
+    "newEvent": "Nou Esdeveniment",
+    "type": "Tipus d'Esdeveniment",
+    "date": "Data",
+    "notes": "Notes / Detalls",
+    "save": "Desar Esdeveniment",
+    "label": "Tipus d'Esdeveniment",
+    "success": "Esdeveniment registrat correctament",
+    "deleteTitle": "Eliminar esdeveniment?",
+    "editEvent": "Editar Esdeveniment",
+    "types": {
+      "CHEMOTHERAPY": "Quimioteràpia",
+      "DOCTOR_VISIT": "Visita Mèdica",
+      "BLOOD_TEST": "Analítica",
+      "IMAGING": "Proves d'Imatge",
+      "MEDICATION_CHANGE": "Canvi Medicació",
+      "SYMPTOM_FLARE": "Agudització Símptomes",
+      "HOSPITALIZATION": "Hospitalització",
+      "OTHER": "Altre"
+    }
   }
 }

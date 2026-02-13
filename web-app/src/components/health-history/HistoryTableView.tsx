@@ -1,12 +1,13 @@
 'use client';
 
 import { useMemo, useState } from 'react';
-import { Metric } from '@/types/metrics';
-import { Pencil, Trash2, FileText, MapPin, MoveHorizontal, ArrowUpDown } from 'lucide-react';
+import { Metric, HealthEvent } from '@/types/metrics';
+import { Pencil, Trash2, FileText, MapPin, MoveHorizontal, ArrowUpDown, Syringe } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { HealthCriteria, STATUS_COLORS, HealthStatus } from '@/lib/health-criteria';
 import { useMetricManager } from '@/hooks/useMetricManager';
 import { EditMetricModal } from '@/components/modals/EditMetricModal';
+import { EditEventModal } from '@/components/modals/EditEventModal';
 import { DeleteMetricModal } from '@/components/modals/DeleteMetricModal';
 import { ViewNoteModal } from '@/components/modals/ViewNoteModal';
 import { Button } from "@/components/ui/button";
@@ -20,7 +21,7 @@ import {
 } from "@/components/ui/table";
 
 interface HistoryTableViewProps {
-  data: Metric[];
+  data: (Metric | HealthEvent)[];
   isAdmin: boolean;
   onRefresh: () => void;
   embedded?: boolean;
@@ -31,8 +32,9 @@ export function HistoryTableView({ data, isAdmin, onRefresh, embedded = false, v
   const t = useTranslations();
   const { renderContext, renderLocation, contextOptions, locationOptions, translateOption } = useMetricManager();
 
-  const [metricToDelete, setMetricToDelete] = useState<Metric | null>(null);
+  const [metricToDelete, setMetricToDelete] = useState<Metric | HealthEvent | null>(null);
   const [metricToEdit, setMetricToEdit] = useState<Metric | null>(null);
+  const [eventToEdit, setEventToEdit] = useState<HealthEvent | null>(null);
   const [noteToView, setNoteToView] = useState<Metric | null>(null);
 
   const [sortConfig, setSortConfig] = useState<{ key: keyof Metric | null; direction: 'asc' | 'desc' }>({
@@ -57,19 +59,24 @@ export function HistoryTableView({ data, isAdmin, onRefresh, embedded = false, v
     const sortableItems = [...data];
     if (sortConfig.key !== null) {
       sortableItems.sort((a, b) => {
-        let aValue: any = a[sortConfig.key!];
-        let bValue: any = b[sortConfig.key!];
+        let aValue: any = (a as any)[sortConfig.key!];
+        let bValue: any = (b as any)[sortConfig.key!];
 
         // Manejo especial para Tensión (sys/dia) -> ordenamos por sistólica
         if (sortConfig.key === 'bloodPressure') {
+          const m1 = a as Metric;
+          const m2 = b as Metric;
           const getSys = (v: string | undefined) => v ? parseInt(v.split('/')[0]) : -1;
-          aValue = getSys(a.bloodPressure);
-          bValue = getSys(b.bloodPressure);
+          aValue = m1.bloodPressure ? getSys(m1.bloodPressure) : -1;
+          bValue = m2.bloodPressure ? getSys(m2.bloodPressure) : -1;
         }
         // Manejo de fechas
         else if (sortConfig.key === 'createdAt') {
-          aValue = new Date(a.createdAt).getTime();
-          bValue = new Date(b.createdAt).getTime();
+          const getDate = (item: any) => {
+            return new Date(item.date || item.createdAt).getTime();
+          };
+          aValue = getDate(a);
+          bValue = getDate(b);
         }
 
         // Manejo de nulos (siempre al final)
@@ -212,6 +219,67 @@ export function HistoryTableView({ data, isAdmin, onRefresh, embedded = false, v
 
           <TableBody>
             {sortedData.map((row) => {
+              const isEvent = (item: any): item is HealthEvent => item.type !== undefined;
+
+              if (isEvent(row)) {
+                const dateObj = new Date(row.date || row.createdAt);
+                return (
+                  <TableRow key={row.id} className="bg-purple-50/50 dark:bg-purple-900/10 hover:bg-purple-100/50 dark:hover:bg-purple-900/20 border-l-4 border-purple-500 transition-colors">
+                    {isColumnVisible('createdAt') && (
+                      <TableCell className="font-medium text-purple-900 dark:text-purple-100">
+                        <div className="flex flex-col">
+                          <span>{dateObj.toLocaleDateString()}</span>
+                          <span className="text-xs opacity-70 font-normal">{dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                        </div>
+                      </TableCell>
+                    )}
+                    {isColumnVisible('measurementContext') && (
+                      <TableCell>
+                        <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full font-medium inline-block border border-border">
+                          {t(('HealthEvents.types.' + row.type) as any)}
+                        </span>
+                      </TableCell>
+                    )}
+                    {/* Empty cells for metrics */}
+                    {isColumnVisible('bloodPressure') && <TableCell><span className="text-muted-foreground/10">-</span></TableCell>}
+                    {isColumnVisible('pulse') && <TableCell><span className="text-muted-foreground/10">-</span></TableCell>}
+                    {isColumnVisible('spo2') && <TableCell><span className="text-muted-foreground/10">-</span></TableCell>}
+                    {isColumnVisible('ca125') && <TableCell className="border-l border-border"><span className="text-muted-foreground/10">-</span></TableCell>}
+                    {isColumnVisible('weight') && <TableCell className="border-l border-border"><span className="text-muted-foreground/10">-</span></TableCell>}
+                    {isColumnVisible('weightLocation') && <TableCell><span className="text-muted-foreground/10">-</span></TableCell>}
+
+                    {isColumnVisible('notes') && (
+                      <TableCell className="border-l border-border">
+                        {row.notes ? (
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => setNoteToView(row as any)}
+                            className="h-8 w-full justify-start p-1.5 hover:bg-purple-200 dark:hover:bg-purple-800/50"
+                            title={row.notes}
+                          >
+                            <FileText size={14} className="text-purple-600 dark:text-purple-400" />
+                          </Button>
+                        ) : <span className="text-muted-foreground/30">-</span>}
+                      </TableCell>
+                    )}
+
+                    {isAdmin && isColumnVisible('actions') && (
+                      <TableCell className="border-l border-border text-right">
+                        <div className="flex justify-end gap-2">
+                          <Button variant="outline" size="icon" onClick={() => setEventToEdit(row)} className="h-8 w-8 text-muted-foreground hover:bg-primary hover:text-primary-foreground hover:border-primary">
+                            <Pencil size={16} />
+                          </Button>
+                          <Button variant="destructive" size="icon" onClick={() => setMetricToDelete(row)} className="h-8 w-8">
+                            <Trash2 size={16} />
+                          </Button>
+                        </div>
+                      </TableCell>
+                    )}
+                  </TableRow>
+                );
+              }
+
               const dateObj = new Date(row.createdAt);
 
               let sysStatus: HealthStatus = 'normal';
@@ -333,6 +401,7 @@ export function HistoryTableView({ data, isAdmin, onRefresh, embedded = false, v
           onClose={() => setMetricToDelete(null)}
           metricId={metricToDelete.id}
           onSuccess={onRefresh}
+          type={(metricToDelete as any).type ? 'event' : 'metric'}
         />
       )}
 
@@ -354,6 +423,15 @@ export function HistoryTableView({ data, isAdmin, onRefresh, embedded = false, v
           onClose={() => setNoteToView(null)}
           note={noteToView.notes || ''}
           date={new Date(noteToView.createdAt)}
+        />
+      )}
+
+      {eventToEdit && (
+        <EditEventModal
+          isOpen={!!eventToEdit}
+          onClose={() => setEventToEdit(null)}
+          event={eventToEdit}
+          onSuccess={onRefresh}
         />
       )}
     </>

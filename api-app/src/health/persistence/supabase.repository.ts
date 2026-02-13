@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { PrismaClient, HealthMetric, Prisma } from '@prisma/client';
+import { PrismaClient, HealthMetric, HealthEvent, Prisma } from '@prisma/client';
 
 export interface MetricsFilter {
   startDate?: Date;
@@ -61,6 +61,38 @@ export class SupabaseRepository extends PrismaClient {
   async deleteMetric(id: string): Promise<HealthMetric> {
     return this.healthMetric.delete({
       where: { id },
+    });
+  }
+
+  // --- HEALTH EVENTS ---
+
+  async createEvent(data: Prisma.HealthEventCreateInput): Promise<HealthEvent> {
+    return this.healthEvent.create({ data });
+  }
+
+  async findAllEvents(filters?: MetricsFilter): Promise<HealthEvent[]> {
+    const where: Prisma.HealthEventWhereInput = {};
+    if (filters?.startDate) {
+      where.date = {
+        gte: filters.startDate,
+        lte: filters.endDate || new Date(),
+      };
+    }
+    return this.healthEvent.findMany({
+      where,
+      orderBy: { date: 'desc' },
+      take: filters?.limit,
+    });
+  }
+
+  async deleteEvent(id: string): Promise<HealthEvent> {
+    return this.healthEvent.delete({ where: { id } });
+  }
+
+  async updateEvent(id: string, data: Prisma.HealthEventUpdateInput): Promise<HealthEvent> {
+    return this.healthEvent.update({
+      where: { id },
+      data,
     });
   }
 }

@@ -13,9 +13,10 @@ import {
 } from '@nestjs/common';
 import { HealthService } from '../business/health.service';
 import { CreateMetricDto } from './dtos/create-metric.dto';
+import { CreateEventDto } from './dtos/create-event.dto';
 import { AuthGuard } from '../common/guards/auth.guard';
 
-import { GetHistoryDto, UpdateMetricDto } from './dtos/metric-operations.dto';
+import { GetHistoryDto, UpdateMetricDto, UpdateEventDto } from './dtos/metric-operations.dto';
 
 // Componente C4: "Health Data Controller"
 @Controller('metrics')
@@ -53,4 +54,31 @@ export class HealthController {
   ) {
     return this.healthService.updateHealthData(id, updateData);
   }
+
+  // --- HEALTH EVENTS ---
+
+  @Post('events')
+  @UseGuards(AuthGuard)
+  @UsePipes(new ValidationPipe({ transform: true }))
+  async addEvent(@Body() createEventDto: CreateEventDto) {
+    return this.healthService.recordEvent(createEventDto);
+  }
+
+  @Get('events')
+  async getEvents(@Query() filters: GetHistoryDto) {
+    return this.healthService.getEvents(filters);
+  }
+
+  @Delete('events/:id')
+  @UseGuards(AuthGuard)
+  async deleteEvent(@Param('id') id: string) {
+    return this.healthService.removeEvent(id);
+  }
+
+  @Patch('events/:id')
+  @UseGuards(AuthGuard)
+  async updateEvent(@Param('id') id: string, @Body() updateData: UpdateEventDto) {
+    return this.healthService.updateEvent(id, updateData);
+  }
 }
+

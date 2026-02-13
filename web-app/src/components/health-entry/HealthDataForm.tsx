@@ -12,9 +12,10 @@ import {
 import { useMetricManager } from '@/hooks/useMetricManager';
 import { useHealthAnalysis } from '@/hooks/useHealthAnalysis';
 import { AIAnalysisButton } from '@/components/forms/AIAnalysisButton';
-import { metricSchema, MetricFormValues, MetricFormInput } from '@/lib/schemas';
+import { metricSchema, MetricFormValues, MetricFormInput, eventSchema, EventFormValues } from '@/lib/schemas';
 import { metricApi, ApiError } from '@/lib/api';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 import {
     Form,
@@ -59,6 +60,18 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
             measurementContext: '',
             weightLocation: ''
         },
+    });
+
+    // EVENT FORM
+    const [activeTab, setActiveTab] = useState<'metrics' | 'events'>('metrics');
+    const eventForm = useForm<EventFormValues>({
+        resolver: zodResolver(eventSchema),
+        defaultValues: {
+            type: 'CHEMOTHERAPY',
+            date: new Date().toLocaleDateString('en-CA'),
+            time: new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
+            notes: ''
+        }
     });
 
     const {
@@ -143,7 +156,36 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
         }
     };
 
+
     const onSubmit = (data: MetricFormValues) => saveMetric(data, false);
+
+    const onEventSubmit = async (data: EventFormValues) => {
+        try {
+            // Combine date and time
+            const hasTime = !!data.time;
+            const dateStr = data.date;
+            const timeStr = data.time || '00:00';
+
+            const dateObj = new Date(`${dateStr}T${timeStr}`);
+            const payload = {
+                ...data,
+                date: dateObj.toISOString()
+            };
+
+            await metricApi.createEvent(payload);
+            eventForm.reset({
+                type: 'CHEMOTHERAPY',
+                date: new Date().toLocaleDateString('en-CA'),
+                time: new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }),
+                notes: ''
+            });
+
+            toast.success("Evento registrado correctamente");
+            onSuccess();
+        } catch (err: any) {
+            toast.error(err.message || "Error al guardar el evento");
+        }
+    };
 
     // --- HOLD TO CLEAR LOGIC ---
     const [resetProgress, setResetProgress] = useState(0);
@@ -210,9 +252,6 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                     <div className={`p-2 rounded-lg transition-colors ${isOpen ? 'bg-muted text-foreground' : 'bg-muted/50 text-muted-foreground hover:bg-hover hover:text-foreground'}`}>
                         <Plus size={20} />
                     </div>
-                    <h2 className="hidden sm:block text-lg font-bold text-foreground">
-                        {t('HomePage.newRecord')}
-                    </h2>
                 </div>
 
                 <div className="flex items-center gap-4">
@@ -251,158 +290,302 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
             {/* CUERPO DEL FORMULARIO */}
             {isOpen && (
                 <div className="p-6 animate-in slide-in-from-top-2 duration-300">
-                    <Form {...form}>
-                        <form onSubmit={form.handleSubmit(onSubmit as any)} className="grid grid-cols-1 lg:grid-cols-12 gap-6">
 
-                            {/* SECCIÓN 1: DATOS FISIOLÓGICOS */}
-                            <div className="lg:col-span-8 p-5 rounded-xl border border-border bg-muted/30">
-                                <div className="flex items-center gap-2 mb-4 text-foreground font-bold border-b border-border pb-2">
-                                    <Heart size={18} /> {t('Form.physiologicalData')}
+                    {/* TABS - Segmented Control Style */}
+                    <div className="flex justify-start mb-6">
+                        <div className="inline-flex items-center bg-muted/80 p-1 rounded-xl">
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setActiveTab('metrics')}
+                                className={cn(
+                                    "h-9 px-6 text-sm font-bold rounded-lg transition-all decoration-0",
+                                    activeTab === 'metrics'
+                                        ? "bg-background text-foreground shadow-sm ring-1 ring-black/5 dark:ring-white/10"
+                                        : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+                                )}
+                            >
+                                {t('HomePage.newRecord')}
+                            </Button>
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setActiveTab('events')}
+                                className={cn(
+                                    "h-9 px-6 text-sm font-bold rounded-lg transition-all decoration-0",
+                                    activeTab === 'events'
+                                        ? "bg-background text-foreground shadow-sm ring-1 ring-black/5 dark:ring-white/10"
+                                        : "text-muted-foreground hover:text-foreground hover:bg-background/50"
+                                )}
+                            >
+                                {t('HealthEvents.newEvent')}
+                            </Button>
+                        </div>
+                    </div>
+
+                    {activeTab === 'metrics' ? (
+                        <Form {...form}>
+                            <form onSubmit={form.handleSubmit(onSubmit as any)} className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+                                {/* SECCIÓN 1: DATOS FISIOLÓGICOS */}
+                                <div className="lg:col-span-8 p-5 rounded-xl border border-border bg-muted/30">
+                                    <div className="flex items-center gap-2 mb-4 text-foreground font-bold border-b border-border pb-2">
+                                        <Heart size={18} /> {t('Form.physiologicalData')}
+                                    </div>
+
+                                    <div className="mb-4">
+                                        <FormField
+                                            control={form.control}
+                                            name="measurementContext"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.contextLabel')}</FormLabel>
+                                                    <Select onValueChange={field.onChange} defaultValue={field.value ?? undefined} value={field.value || ""}>
+                                                        <FormControl>
+                                                            <SelectTrigger className="bg-background dark:bg-slate-900/50 border-border">
+                                                                <SelectValue placeholder={t('Form.contextPlaceholder')} />
+                                                            </SelectTrigger>
+                                                        </FormControl>
+                                                        <SelectContent>
+                                                            {contextOptions.map((opt) => (
+                                                                <SelectItem key={opt.key} value={opt.key}>
+                                                                    {translateOption('ContextOptions', opt)}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+
+                                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                        <FormField
+                                            control={form.control}
+                                            name="bloodPressure"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.bpLabel')}</FormLabel>
+                                                    <FormControl>
+                                                        <Input placeholder="120/80" className="text-center font-mono bg-background dark:bg-slate-900/50 border-border text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="pulse"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.pulseLabel')}</FormLabel>
+                                                    <FormControl>
+                                                        <Input type="number" placeholder="80" className="text-center font-mono bg-background dark:bg-slate-900/50 border-border text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="spo2"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.spo2Label')}</FormLabel>
+                                                    <FormControl>
+                                                        <Input type="number" placeholder="98" className="text-center font-mono bg-background dark:bg-slate-900/50 border-border text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="ca125"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.ca125Label')}</FormLabel>
+                                                    <FormControl>
+                                                        <Input type="number" placeholder="35.5" className="text-center font-mono bg-background dark:bg-slate-900/50 border-border text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
                                 </div>
 
-                                <div className="mb-4">
+                                {/* SECCIÓN 2: CONTROL DE PESO */}
+                                <div className="lg:col-span-4 p-5 rounded-xl border border-border bg-muted/30 flex flex-col h-full">
+                                    <div className="flex items-center gap-2 mb-4 text-foreground font-bold border-b border-border pb-2">
+                                        <Scale size={18} /> {t('Form.weightControl')}
+                                    </div>
+                                    <div className="space-y-4 grow">
+                                        <FormField
+                                            control={form.control}
+                                            name="weightLocation"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.locationLabel')}</FormLabel>
+                                                    <Select onValueChange={field.onChange} defaultValue={field.value ?? undefined} value={field.value || ""}>
+                                                        <FormControl>
+                                                            <SelectTrigger className="bg-background dark:bg-slate-900/50 border-border">
+                                                                <SelectValue placeholder={t('Form.locationPlaceholder')} />
+                                                            </SelectTrigger>
+                                                        </FormControl>
+                                                        <SelectContent>
+                                                            {locationOptions.map((opt) => (
+                                                                <SelectItem key={opt.key} value={opt.key}>
+                                                                    {translateOption('LocationOptions', opt)}
+                                                                </SelectItem>
+                                                            ))}
+                                                        </SelectContent>
+                                                    </Select>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={form.control}
+                                            name="weight"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.weightLabel')}</FormLabel>
+                                                    <FormControl>
+                                                        <Input type="number" placeholder="75.5" className="text-center font-mono text-lg bg-background dark:bg-slate-900/50 border-border text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* FILA INFERIOR */}
+                                <div className="lg:col-span-12 space-y-4">
                                     <FormField
                                         control={form.control}
-                                        name="measurementContext"
+                                        name="notes"
                                         render={({ field }) => (
                                             <FormItem>
-                                                <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.contextLabel')}</FormLabel>
-                                                <Select onValueChange={field.onChange} defaultValue={field.value ?? undefined} value={field.value || ""}>
+                                                <FormLabel className="text-sm font-medium text-foreground">{t('Form.notes')}</FormLabel>
+                                                <FormControl>
+                                                    <Textarea
+                                                        placeholder={t('Form.notesPlaceholder')}
+                                                        className="resize-none h-20 bg-background dark:bg-slate-900/50 border-border text-foreground placeholder:text-muted-foreground"
+                                                        {...field}
+                                                        value={field.value || ''}
+                                                    />
+                                                </FormControl>
+                                                <FormMessage />
+                                            </FormItem>
+                                        )}
+                                    />
+
+                                    <div className="flex gap-3 justify-end">
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            onMouseDown={handleResetStart}
+                                            onMouseUp={handleResetEnd}
+                                            onMouseLeave={handleResetEnd}
+                                            onTouchStart={handleResetStart}
+                                            onTouchEnd={handleResetEnd}
+                                            className="relative overflow-hidden h-auto px-6 py-4 rounded-xl font-bold text-muted-foreground border-dashed border-border bg-background hover:bg-hover hover:text-foreground group select-none"
+                                            title={t('Form.holdToClear') || "Mantén presionado para limpiar"}
+                                        >
+                                            <div
+                                                className={`absolute inset-y-0 left-0 transition-all ease-linear duration-75 pointer-events-none ${resetProgress >= 100 ? 'bg-red-500/50' : 'bg-red-500/30'}`}
+                                                style={{ width: `${resetProgress}%` }}
+                                            />
+                                            <div className="relative z-10 flex items-center gap-2">
+                                                <Eraser size={18} className={`transition-transform duration-700 ${resetProgress > 0 ? 'rotate-12' : ''}`} />
+                                                <span className="hidden sm:inline">{t('HomePage.clear') || 'Limpiar'}</span>
+                                            </div>
+                                        </Button>
+                                        <Button type="submit" disabled={form.formState.isSubmitting} className="h-auto px-6 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl bg-primary text-primary-foreground dark:bg-slate-800 dark:text-slate-100 dark:border dark:border-slate-700 dark:hover:bg-slate-700 transition-all">
+                                            {form.formState.isSubmitting ? <Loader2 size={20} className="animate-spin" /> : <><Save size={20} /> <span className="hidden sm:inline">{t('HomePage.saveButton')}</span></>}
+                                        </Button>
+                                    </div>
+                                </div>
+
+                            </form>
+                        </Form>
+
+                    ) : (
+                        // EVENT FORM RENDER
+                        <Form {...eventForm}>
+                            <form onSubmit={eventForm.handleSubmit(onEventSubmit)} className="space-y-6">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <FormField
+                                        control={eventForm.control}
+                                        name="type"
+                                        render={({ field }) => (
+                                            <FormItem>
+                                                <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('HealthEvents.type')}</FormLabel>
+                                                <Select onValueChange={field.onChange} defaultValue={field.value}>
                                                     <FormControl>
                                                         <SelectTrigger className="bg-background dark:bg-slate-900/50 border-border">
-                                                            <SelectValue placeholder={t('Form.contextPlaceholder')} />
+                                                            <SelectValue placeholder={t('HealthEvents.type')} />
                                                         </SelectTrigger>
                                                     </FormControl>
                                                     <SelectContent>
-                                                        {contextOptions.map((opt) => (
-                                                            <SelectItem key={opt.key} value={opt.key}>
-                                                                {translateOption('ContextOptions', opt)}
-                                                            </SelectItem>
-                                                        ))}
+                                                        <SelectItem value="CHEMOTHERAPY">{t('HealthEvents.types.CHEMOTHERAPY')}</SelectItem>
+                                                        <SelectItem value="DOCTOR_VISIT">{t('HealthEvents.types.DOCTOR_VISIT')}</SelectItem>
+                                                        <SelectItem value="BLOOD_TEST">{t('HealthEvents.types.BLOOD_TEST')}</SelectItem>
+                                                        <SelectItem value="IMAGING">{t('HealthEvents.types.IMAGING')}</SelectItem>
+                                                        <SelectItem value="OTHER">{t('HealthEvents.types.OTHER')}</SelectItem>
                                                     </SelectContent>
                                                 </Select>
                                                 <FormMessage />
                                             </FormItem>
                                         )}
                                     />
-                                </div>
 
-                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                    <FormField
-                                        control={form.control}
-                                        name="bloodPressure"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.bpLabel')}</FormLabel>
-                                                <FormControl>
-                                                    <Input placeholder="120/80" className="text-center font-mono bg-background dark:bg-slate-900/50 border-border text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="pulse"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.pulseLabel')}</FormLabel>
-                                                <FormControl>
-                                                    <Input type="number" placeholder="80" className="text-center font-mono bg-background dark:bg-slate-900/50 border-border text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="spo2"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.spo2Label')}</FormLabel>
-                                                <FormControl>
-                                                    <Input type="number" placeholder="98" className="text-center font-mono bg-background dark:bg-slate-900/50 border-border text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="ca125"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.ca125Label')}</FormLabel>
-                                                <FormControl>
-                                                    <Input type="number" placeholder="35.5" className="text-center font-mono bg-background dark:bg-slate-900/50 border-border text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                </div>
-                            </div>
-
-                            {/* SECCIÓN 2: CONTROL DE PESO */}
-                            <div className="lg:col-span-4 p-5 rounded-xl border border-border bg-muted/30 flex flex-col h-full">
-                                <div className="flex items-center gap-2 mb-4 text-foreground font-bold border-b border-border pb-2">
-                                    <Scale size={18} /> {t('Form.weightControl')}
-                                </div>
-                                <div className="space-y-4 grow">
-                                    <FormField
-                                        control={form.control}
-                                        name="weightLocation"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.locationLabel')}</FormLabel>
-                                                <Select onValueChange={field.onChange} defaultValue={field.value ?? undefined} value={field.value || ""}>
+                                    <div className="grid grid-cols-2 gap-2">
+                                        <FormField
+                                            control={eventForm.control}
+                                            name="date"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('HealthEvents.date')}</FormLabel>
                                                     <FormControl>
-                                                        <SelectTrigger className="bg-background dark:bg-slate-900/50 border-border">
-                                                            <SelectValue placeholder={t('Form.locationPlaceholder')} />
-                                                        </SelectTrigger>
+                                                        <Input type="date" className="bg-background dark:bg-slate-900/50 border-border text-foreground" {...field} />
                                                     </FormControl>
-                                                    <SelectContent>
-                                                        {locationOptions.map((opt) => (
-                                                            <SelectItem key={opt.key} value={opt.key}>
-                                                                {translateOption('LocationOptions', opt)}
-                                                            </SelectItem>
-                                                        ))}
-                                                    </SelectContent>
-                                                </Select>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
-                                    <FormField
-                                        control={form.control}
-                                        name="weight"
-                                        render={({ field }) => (
-                                            <FormItem>
-                                                <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.weightLabel')}</FormLabel>
-                                                <FormControl>
-                                                    <Input type="number" placeholder="75.5" className="text-center font-mono text-lg bg-background dark:bg-slate-900/50 border-border text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
-                                                </FormControl>
-                                                <FormMessage />
-                                            </FormItem>
-                                        )}
-                                    />
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                        <FormField
+                                            control={eventForm.control}
+                                            name="time"
+                                            render={({ field }) => (
+                                                <FormItem>
+                                                    <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Hora</FormLabel>
+                                                    <FormControl>
+                                                        <Input type="time" className="bg-background dark:bg-slate-900/50 border-border text-foreground" {...field} value={field.value || ''} />
+                                                    </FormControl>
+                                                    <FormMessage />
+                                                </FormItem>
+                                            )}
+                                        />
+                                    </div>
                                 </div>
-                            </div>
 
-                            {/* FILA INFERIOR */}
-                            <div className="lg:col-span-12 space-y-4">
                                 <FormField
-                                    control={form.control}
+                                    control={eventForm.control}
                                     name="notes"
                                     render={({ field }) => (
                                         <FormItem>
-                                            <FormLabel className="text-sm font-medium text-foreground">{t('Form.notes')}</FormLabel>
+                                            <FormLabel className="text-sm font-medium text-foreground">{t('HealthEvents.notes')}</FormLabel>
                                             <FormControl>
                                                 <Textarea
-                                                    placeholder={t('Form.notesPlaceholder')}
-                                                    className="resize-none h-20 bg-background dark:bg-slate-900/50 border-border text-foreground placeholder:text-muted-foreground"
+                                                    placeholder={t('HealthEvents.notes')}
+                                                    className="bg-background dark:bg-slate-900/50 border-border text-foreground placeholder:text-muted-foreground h-32 resize-none"
                                                     {...field}
-                                                    value={field.value || ''}
                                                 />
                                             </FormControl>
                                             <FormMessage />
@@ -410,37 +593,17 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                     )}
                                 />
 
-                                <div className="flex gap-3 justify-end">
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        onMouseDown={handleResetStart}
-                                        onMouseUp={handleResetEnd}
-                                        onMouseLeave={handleResetEnd}
-                                        onTouchStart={handleResetStart}
-                                        onTouchEnd={handleResetEnd}
-                                        className="relative overflow-hidden h-auto px-6 py-4 rounded-xl font-bold text-muted-foreground border-dashed border-border bg-background hover:bg-hover hover:text-foreground group select-none"
-                                        title={t('Form.holdToClear') || "Mantén presionado para limpiar"}
-                                    >
-                                        <div
-                                            className={`absolute inset-y-0 left-0 transition-all ease-linear duration-75 pointer-events-none ${resetProgress >= 100 ? 'bg-red-500/50' : 'bg-red-500/30'}`}
-                                            style={{ width: `${resetProgress}%` }}
-                                        />
-                                        <div className="relative z-10 flex items-center gap-2">
-                                            <Eraser size={18} className={`transition-transform duration-700 ${resetProgress > 0 ? 'rotate-12' : ''}`} />
-                                            <span className="hidden sm:inline">{t('HomePage.clear') || 'Limpiar'}</span>
-                                        </div>
-                                    </Button>
-                                    <Button type="submit" disabled={form.formState.isSubmitting} className="h-auto px-6 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl bg-primary text-primary-foreground dark:bg-slate-800 dark:text-slate-100 dark:border dark:border-slate-700 dark:hover:bg-slate-700 transition-all">
-                                        {form.formState.isSubmitting ? <Loader2 size={20} className="animate-spin" /> : <><Save size={20} /> <span className="hidden sm:inline">{t('HomePage.saveButton')}</span></>}
+                                <div className="flex justify-end pt-2">
+                                    <Button type="submit" disabled={eventForm.formState.isSubmitting} className="h-auto px-6 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl bg-primary text-primary-foreground dark:bg-slate-800 dark:text-slate-100 dark:border dark:border-slate-700 dark:hover:bg-slate-700 transition-all">
+                                        {eventForm.formState.isSubmitting ? <Loader2 size={20} className="animate-spin" /> : <><Save size={20} className="mr-2" /> {t('HealthEvents.save')}</>}
                                     </Button>
                                 </div>
-                            </div>
-
-                        </form>
-                    </Form>
+                            </form>
+                        </Form>
+                    )}
                 </div>
-            )}
-        </div>
+            )
+            }
+        </div >
     );
 }

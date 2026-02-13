@@ -23,6 +23,18 @@ model HealthMetric {
   @@map("health_metrics")
 }
 
+model HealthEvent {
+  id          String   @id @default(uuid())
+  createdAt   DateTime @default(now())
+  date        DateTime @default(now()) // Event date might differ from creation date
+  type        String   @default("CHEMOTHERAPY")
+  notes       String?
+  severity    String?  // Potential future use: "Low", "High"
+  medication  String?  // Optional: medication details if needed
+
+  @@map("health_events")
+}
+
 model User {
   id            String          @id @default(uuid())
   email         String          @unique

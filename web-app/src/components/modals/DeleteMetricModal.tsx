@@ -13,16 +13,21 @@ interface DeleteMetricModalProps {
   onClose: () => void;
   metricId: string;
   onSuccess: () => void;
+  type?: 'metric' | 'event';
 }
 
-export function DeleteMetricModal({ isOpen, onClose, metricId, onSuccess }: DeleteMetricModalProps) {
+export function DeleteMetricModal({ isOpen, onClose, metricId, onSuccess, type = 'metric' }: DeleteMetricModalProps) {
   const t = useTranslations();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleDelete = async () => {
     setIsSubmitting(true);
     try {
-      await metricApi.delete(metricId);
+      if (type === 'event') {
+        await metricApi.deleteEvent(metricId);
+      } else {
+        await metricApi.delete(metricId);
+      }
       toast.success(t('Toast.deleteSuccess'));
       onSuccess();
       onClose();
@@ -41,7 +46,9 @@ export function DeleteMetricModal({ isOpen, onClose, metricId, onSuccess }: Dele
         <DialogHeader>
           <div className="flex flex-col items-center text-center gap-4">
             <div className="bg-red-100 dark:bg-red-900/20 p-3 rounded-full text-red-600 dark:text-red-400"><AlertTriangle size={32} /></div>
-            <DialogTitle className="text-lg font-bold text-foreground text-center">{t('History.deleteTitle')}</DialogTitle>
+            <DialogTitle className="text-lg font-bold text-foreground text-center">
+              {type === 'event' ? t('HealthEvents.deleteTitle') || t('History.deleteTitle') : t('History.deleteTitle')}
+            </DialogTitle>
           </div>
         </DialogHeader>
 

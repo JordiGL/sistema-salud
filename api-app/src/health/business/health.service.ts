@@ -13,6 +13,14 @@ export interface CreateHealthData {
   notes?: string;
 }
 
+export interface CreateEventData {
+  type: string;
+  notes?: string;
+  date?: Date | string;
+  severity?: string;
+  medication?: string;
+}
+
 // DTO para los filtros que vendrán del Controller
 export interface GetHistoryDto {
   range?: '7d' | '30d' | 'all';
@@ -77,8 +85,59 @@ export class HealthService {
   }
 
   // Editar
+  // Editar
   async updateHealthData(id: string, data: Partial<CreateHealthData>) {
     // Validaciones extra si fueran necesarias
     return this.repository.updateMetric(id, data);
   }
+
+  // --- HEALTH EVENTS ---
+
+  async recordEvent(data: CreateEventData) {
+    const eventDate = data.date ? new Date(data.date) : new Date();
+    // @ts-ignore
+    return this.repository.createEvent({
+      type: data.type,
+      notes: data.notes,
+      date: eventDate,
+      severity: data.severity,
+      medication: data.medication,
+    });
+  }
+
+  async getEvents(filters: GetHistoryDto) {
+    const { range } = filters;
+    let startDate: Date | undefined;
+
+    if (range === '7d') {
+      const d = new Date();
+      d.setDate(d.getDate() - 7);
+      startDate = d;
+    } else if (range === '30d') {
+      const d = new Date();
+      d.setDate(d.getDate() - 30);
+      startDate = d;
+    }
+
+    // @ts-ignore
+    return this.repository.findAllEvents({
+      startDate,
+    });
+  }
+
+  async removeEvent(id: string) {
+    return this.repository.deleteEvent(id);
+  }
+
+  async updateEvent(id: string, data: Partial<CreateEventData>) {
+    // Exclude 'time' if it exists in the payload, as it's not a database field
+    const { time, ...rest } = data as any;
+    const updatePayload: any = { ...rest };
+
+    if (updatePayload.date) {
+      updatePayload.date = new Date(updatePayload.date);
+    }
+    return this.repository.updateEvent(id, updatePayload);
+  }
 }
+
