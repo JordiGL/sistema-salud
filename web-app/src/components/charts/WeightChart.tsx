@@ -268,7 +268,7 @@ export function WeightChart({ data: initialData, events = [], isAdmin }: { data:
                               {item.payload.weightLocation && (
                                 <div className="flex items-center justify-between w-full pt-1.5 border-t border-border">
                                   <span className="text-muted-foreground text-[10px] uppercase font-bold tracking-tight">{tFilter('location')}</span>
-                                  <span className="text-muted-foreground text-[11px] font-semibold italic">{item.payload.weightLocation}</span>
+                                  <span className="text-muted-foreground text-[11px] font-semibold italic">{renderLocation(item.payload.weightLocation)}</span>
                                 </div>
                               )}
                             </div>

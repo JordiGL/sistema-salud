@@ -1,6 +1,6 @@
 'use client';
 
-import { FileText, Calendar } from 'lucide-react';
+import { FileText, Calendar, Check } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,7 @@ export function ViewNoteModal({ isOpen, onClose, note, date }: ViewNoteModalProp
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-md bg-card dark:bg-slate-950 border-border shadow-2xl">
+      <DialogContent className="max-w-md bg-card dark:bg-slate-950 border-border shadow-2xl [&>button]:hidden">
         <DialogHeader className="mb-4">
           <DialogTitle className="flex items-center gap-2 text-foreground text-lg font-bold">
             <FileText size={20} className="text-foreground" />
@@ -34,18 +34,18 @@ export function ViewNoteModal({ isOpen, onClose, note, date }: ViewNoteModalProp
         </DialogHeader>
 
         {/* Contingut */}
-        <div className="bg-muted/30 p-4 rounded-xl border border-border text-foreground text-sm leading-relaxed max-h-[60vh] overflow-y-auto whitespace-pre-wrap mb-4">
+        <div className="bg-muted/50 p-4 rounded-lg text-foreground text-sm leading-relaxed max-h-[60vh] overflow-y-auto whitespace-pre-wrap mb-4">
           {note}
         </div>
 
         {/* Footer */}
-        <div className="flex flex-col sm:flex-row justify-end pt-2">
+        <div className="flex justify-end pt-2">
           <Button
             onClick={onClose}
             variant="outline"
-            className="w-full sm:w-auto px-8 py-6 rounded-xl font-bold text-muted-foreground border-border hover:bg-hover hover:text-accent-foreground shadow-sm transition-all"
+            className="h-auto px-8 py-4 rounded-xl font-bold text-muted-foreground border-border hover:bg-hover hover:text-accent-foreground shadow-sm transition-all"
           >
-            {t('History.close')}
+            <Check size={18} className="mr-0 sm:mr-2" /> <span className="hidden sm:inline">{t('History.close')}</span>
           </Button>
         </div>
       </DialogContent>

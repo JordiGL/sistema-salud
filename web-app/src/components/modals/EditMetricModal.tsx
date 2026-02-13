@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
-import { Save, Pencil } from 'lucide-react';
+import { Save, Pencil, ArrowLeft } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from "@/components/ui/button";
@@ -90,7 +90,7 @@ export function EditMetricModal({ isOpen, onClose, metric, onSuccess, contextOpt
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto bg-card dark:bg-slate-950 border-border shadow-2xl">
+      <DialogContent onOpenAutoFocus={(e) => e.preventDefault()} className="max-w-md max-h-[90vh] overflow-y-auto bg-card dark:bg-slate-950 border-border shadow-2xl [&>button]:hidden">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2 text-foreground">
             <Pencil size={18} /> {t('History.editTitle')}
@@ -232,12 +232,12 @@ export function EditMetricModal({ isOpen, onClose, metric, onSuccess, contextOpt
               )}
             />
 
-            <div className="flex gap-3 pt-2">
-              <Button type="button" variant="outline" onClick={onClose} className="flex-1 py-6 rounded-xl font-bold text-muted-foreground border-border hover:bg-hover hover:text-accent-foreground">
-                {t('History.cancel')}
+            <div className="flex justify-end gap-3 pt-2">
+              <Button type="button" variant="outline" onClick={onClose} className="h-auto py-4 rounded-xl font-bold text-muted-foreground border-border hover:bg-hover hover:text-accent-foreground">
+                <ArrowLeft size={18} className="mr-0 sm:mr-2" /> <span className="hidden sm:inline">{t('History.cancel')}</span>
               </Button>
-              <Button type="submit" disabled={form.formState.isSubmitting} className="flex-1 py-6 rounded-xl font-bold flex gap-2 bg-primary text-primary-foreground dark:bg-slate-800 dark:text-slate-100 dark:border dark:border-slate-700 dark:hover:bg-slate-700 shadow-md transition-all">
-                <Save size={18} /> {t('History.save')}
+              <Button type="submit" disabled={form.formState.isSubmitting} className="h-auto py-4 rounded-xl font-bold flex gap-2 bg-primary text-primary-foreground dark:bg-slate-800 dark:text-slate-100 dark:border dark:border-slate-700 dark:hover:bg-slate-700 shadow-lg hover:shadow-xl transition-all">
+                <Save size={18} /> <span className="hidden sm:inline">{t('History.save')}</span>
               </Button>
             </div>
           </form>

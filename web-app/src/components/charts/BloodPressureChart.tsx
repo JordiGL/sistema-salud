@@ -277,25 +277,33 @@ export function BloodPressureChart({ data: initialData, events = [], isAdmin }: 
                               </div>
                             );
                           }}
-                          formatter={(value, name) => {
+                          formatter={(value, name, item) => {
                             const labelMap: Record<string, string> = {
                               systolic_graph: tCharts('systolic'),
                               diastolic_graph: tCharts('diastolic'),
                             };
 
                             return (
-                              <div className="flex items-center justify-between w-full my-0.5">
-                                <div className="flex items-center gap-2">
-                                  <span className="text-muted-foreground text-xs font-medium">
-                                    {labelMap[name as string] || name}
+                              <div className="flex flex-col gap-2 w-full">
+                                <div className="flex items-center justify-between w-full my-0.5">
+                                  <div className="flex items-center gap-2">
+                                    <span className="text-muted-foreground text-xs font-medium">
+                                      {labelMap[name as string] || name}
+                                    </span>
+                                  </div>
+                                  <span className="font-bold text-slate-900 dark:text-slate-50 text-sm">
+                                    {value}
+                                    <span className="ml-1 font-normal text-[10px] text-muted-foreground uppercase">
+                                      mmHg
+                                    </span>
                                   </span>
                                 </div>
-                                <span className="font-bold text-slate-900 dark:text-slate-50 text-sm">
-                                  {value}
-                                  <span className="ml-1 font-normal text-[10px] text-muted-foreground uppercase">
-                                    mmHg
-                                  </span>
-                                </span>
+                                {name === 'diastolic_graph' && item.payload.measurementContext && (
+                                  <div className="flex items-center justify-between w-full pt-1.5 border-t border-border">
+                                    <span className="text-muted-foreground text-[10px] uppercase font-bold tracking-tight">{t('History.cols.context')}</span>
+                                    <span className="text-muted-foreground text-[11px] font-semibold italic">{renderContext(item.payload.measurementContext)}</span>
+                                  </div>
+                                )}
                               </div>
                             );
                           }}

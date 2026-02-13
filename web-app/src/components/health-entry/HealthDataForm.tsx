@@ -148,11 +148,6 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
             if (result.spo2) form.setValue('spo2', result.spo2.toString());
             if (result.weight) form.setValue('weight', result.weight.toString());
 
-            const currentNotes = form.getValues('notes');
-            if (!currentNotes) {
-                form.setValue('notes', result.bloodPressure || result.weight || result.spo2 ? t('Form.aiAutoNote') : '');
-            }
-
             if (!isOpen && !autoSave) setIsOpen(true);
 
             // Auto-save logic
@@ -168,7 +163,6 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
             }
         }
     };
-
 
     const onSubmit = (data: MetricFormValues) => saveMetric(data, false);
 

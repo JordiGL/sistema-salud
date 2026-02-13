@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { AlertTriangle } from 'lucide-react';
+import { AlertTriangle, Trash2, ArrowLeft } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { metricApi } from '@/lib/api';
 import { toast } from 'sonner';
@@ -42,7 +42,7 @@ export function DeleteMetricModal({ isOpen, onClose, metricId, onSuccess, type =
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-sm">
+      <DialogContent className="max-w-sm [&>button]:hidden">
         <DialogHeader>
           <div className="flex flex-col items-center text-center gap-4">
             <div className="bg-red-100 dark:bg-red-900/20 p-3 rounded-full text-red-600 dark:text-red-400"><AlertTriangle size={32} /></div>
@@ -52,21 +52,21 @@ export function DeleteMetricModal({ isOpen, onClose, metricId, onSuccess, type =
           </div>
         </DialogHeader>
 
-        <div className="flex gap-3 w-full mt-2">
+        <div className="flex justify-end gap-3 w-full mt-2">
           <Button
             variant="outline"
             onClick={onClose}
-            className="flex-1 py-6 rounded-xl font-bold text-muted-foreground"
+            className="h-auto py-4 rounded-xl font-bold text-muted-foreground"
           >
-            {t('History.cancel')}
+            <ArrowLeft size={18} className="mr-0 sm:mr-2" /> <span className="hidden sm:inline">{t('History.cancel')}</span>
           </Button>
           <Button
             variant="destructive"
             onClick={handleDelete}
             disabled={isSubmitting}
-            className="flex-1 py-6 rounded-xl font-bold"
+            className="h-auto py-4 rounded-xl font-bold shadow-lg hover:shadow-xl"
           >
-            {t('History.delete')}
+            <Trash2 size={18} className="mr-0 sm:mr-2" /> <span className="hidden sm:inline">{t('History.delete')}</span>
           </Button>
         </div>
       </DialogContent>

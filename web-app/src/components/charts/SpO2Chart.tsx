@@ -249,17 +249,25 @@ export function SpO2Chart({ data: initialData, events = [], isAdmin }: { data: M
                               </div>
                             );
                           }}
-                          formatter={(value) => (
-                            <div className="flex items-center justify-between w-full my-0.5">
-                              <span className="text-muted-foreground text-xs font-medium">
-                                {tCharts('spo2Title')}
-                              </span>
-                              <span className="font-bold text-slate-900 dark:text-slate-50 text-sm">
-                                {value}
-                                <span className="ml-1 font-normal text-[10px] text-muted-foreground uppercase">
-                                  %
+                          formatter={(value, name, item) => (
+                            <div className="flex flex-col gap-2 w-full">
+                              <div className="flex items-center justify-between w-full my-0.5">
+                                <span className="text-muted-foreground text-xs font-medium">
+                                  {tCharts('spo2Title')}
                                 </span>
-                              </span>
+                                <span className="font-bold text-slate-900 dark:text-slate-50 text-sm">
+                                  {value}
+                                  <span className="ml-1 font-normal text-[10px] text-muted-foreground uppercase">
+                                    %
+                                  </span>
+                                </span>
+                              </div>
+                              {item.payload.measurementContext && (
+                                <div className="flex items-center justify-between w-full pt-1.5 border-t border-border">
+                                  <span className="text-muted-foreground text-[10px] uppercase font-bold tracking-tight">{t('History.cols.context')}</span>
+                                  <span className="text-muted-foreground text-[11px] font-semibold italic">{renderContext(item.payload.measurementContext)}</span>
+                                </div>
+                              )}
                             </div>
                           )}
                         />
