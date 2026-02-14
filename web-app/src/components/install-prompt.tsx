@@ -20,10 +20,10 @@ export function InstallPrompt() {
 
     return (
         <Button
-            variant="ghost"
+            variant="outline"
             size="icon"
             onClick={promptInstall}
-            className="w-8 h-8 flex items-center justify-center rounded-full bg-slate-900 dark:bg-slate-800 text-white dark:text-slate-100 dark:border dark:border-slate-700 shadow-sm hover:opacity-90 dark:hover:bg-slate-700 transition-all"
+            className="w-9 h-9 rounded-full border border-border bg-background shadow-sm hover:bg-muted transition-all text-muted-foreground hover:text-foreground"
             title={t('Dashboard.installApp')}
         >
             <Download size={16} />

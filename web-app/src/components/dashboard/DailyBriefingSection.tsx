@@ -12,6 +12,7 @@ import { API_ROUTES, METRICS_LIMIT } from "@/lib/constants";
 
 interface DailyBriefingSectionProps {
     metrics: Metric[];
+    isAdmin: boolean;
 }
 
 interface BriefingData {
@@ -19,7 +20,7 @@ interface BriefingData {
     trend: string;
 }
 
-export function DailyBriefingSection({ metrics }: DailyBriefingSectionProps) {
+export function DailyBriefingSection({ metrics, isAdmin }: DailyBriefingSectionProps) {
     const t = useTranslations();
     const locale = useLocale();
     const { generateBriefing, isScanning } = useHealthAnalysis();
@@ -111,36 +112,10 @@ export function DailyBriefingSection({ metrics }: DailyBriefingSectionProps) {
             className="scroll-mt-20 animate-in fade-in slide-in-from-bottom-4 duration-700"
         >
             <Card
-                className="overflow-hidden border-border/50 shadow-sm transition-all hover:shadow-md"
-                style={{
-                    background: "linear-gradient(135deg, color-mix(in srgb, var(--vital-ai), transparent 92%), var(--background))"
-                }}
+                className="overflow-hidden bg-card border-border shadow-sm transition-all hover:shadow-md"
             >
-                <CardHeader className="pb-2">
-                    <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                            <div className="p-2 rounded-lg bg-primary/10 text-primary">
-                                <Sparkles size={18} />
-                            </div>
-                            <CardTitle className="text-lg font-bold tracking-tight">
-                                {t('Dashboard.dailyBriefing') || "AI Daily Briefing"}
-                            </CardTitle>
-                        </div>
-                        {/* Optional Refresh Button */}
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={handleGenerate}
-                            disabled={isScanning}
-                            className="h-8 w-8 p-0"
-                        >
-                            <RefreshCw size={14} className={isScanning ? "animate-spin text-muted-foreground" : "text-muted-foreground"} />
-                        </Button>
-                    </div>
-                </CardHeader>
-
-                <CardContent>
-                    {(!hasLoaded || isScanning) ? (
+                <CardContent className="pt-6">
+                    {(!briefing && (!hasLoaded || isScanning)) ? (
                         <div className="space-y-4">
                             <Skeleton className="h-4 w-3/4 bg-primary/5" />
                             <Skeleton className="h-4 w-full bg-primary/5" />
@@ -154,29 +129,46 @@ export function DailyBriefingSection({ metrics }: DailyBriefingSectionProps) {
                             </Button>
                         </div>
                     ) : (
-                        <div className="grid gap-4 sm:grid-cols-2">
-                            {/* 1. Status */}
-                            <div className="space-y-2 p-3 rounded-lg bg-background/50 border border-border/50 backdrop-blur-sm">
-                                <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
-                                    <Activity size={16} className="text-metric-stable" />
-                                    <span>{t('Briefing.status')}</span>
+                        <>
+                            <div className="grid gap-4 sm:grid-cols-2">
+                                {/* 1. Status */}
+                                <div className="space-y-2 p-3 rounded-lg bg-muted/10 border border-border">
+                                    <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+                                        <Activity size={16} className="text-metric-stable" />
+                                        <span>{t('Briefing.status')}</span>
+                                    </div>
+                                    <p className="text-sm font-medium leading-relaxed">
+                                        {briefing.status}
+                                    </p>
                                 </div>
-                                <p className="text-sm font-medium leading-relaxed">
-                                    {briefing.status}
-                                </p>
+
+                                {/* 2. Trend */}
+                                <div className="space-y-2 p-3 rounded-lg bg-muted/10 border border-border">
+                                    <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
+                                        <TrendingUp size={16} className="text-vital-ai" />
+                                        <span>{t('Briefing.trend')}</span>
+                                    </div>
+                                    <p className="text-sm font-medium leading-relaxed">
+                                        {briefing.trend}
+                                    </p>
+                                </div>
                             </div>
 
-                            {/* 2. Trend */}
-                            <div className="space-y-2 p-3 rounded-lg bg-background/50 border border-border/50 backdrop-blur-sm">
-                                <div className="flex items-center gap-2 text-sm font-semibold text-muted-foreground">
-                                    <TrendingUp size={16} className="text-vital-ai" />
-                                    <span>{t('Briefing.trend')}</span>
+                            {isAdmin && (
+                                <div className="flex justify-end mt-4">
+                                    <Button
+                                        variant="outline"
+                                        size="icon"
+                                        onClick={handleGenerate}
+                                        disabled={isScanning}
+                                        className="h-8 w-8 text-foreground border border-input shadow-sm hover:bg-accent hover:text-accent-foreground hover:border-accent"
+                                        title={t('Briefing.generate') || "Generate Briefing"}
+                                    >
+                                        <RefreshCw size={16} className={isScanning ? "animate-spin" : ""} />
+                                    </Button>
                                 </div>
-                                <p className="text-sm font-medium leading-relaxed">
-                                    {briefing.trend}
-                                </p>
-                            </div>
-                        </div>
+                            )}
+                        </>
                     )}
                 </CardContent>
             </Card>

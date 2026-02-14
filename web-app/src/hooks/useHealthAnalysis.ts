@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react';
 import { useTranslations } from 'next-intl';
-import { API_ROUTES } from '@/lib/constants';
+import { API_ROUTES, STORAGE_KEYS } from '@/lib/constants';
 import { toast } from 'sonner';
 
 interface AnalysisResult {
@@ -58,10 +58,12 @@ export function useHealthAnalysis() {
     const generateBriefing = async (metrics: any[], context?: string, locale?: string): Promise<BriefingResult | null> => {
         setIsScanning(true);
         try {
+            const token = localStorage.getItem(STORAGE_KEYS.TOKEN);
             const response = await fetch(API_ROUTES.ANALYZE, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
                 },
                 body: JSON.stringify({ metrics, context, locale }),
             });

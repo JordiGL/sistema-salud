@@ -35,11 +35,10 @@ export function AIAnalysisButton({
                 size="sm"
                 onClick={onButtonClick}
                 disabled={isScanning || isSubmitting}
-                className="gap-2 bg-muted/30 text-foreground border-border hover:bg-hover hover:text-foreground uppercase tracking-wide font-medium"
+                className="gap-2 bg-background text-foreground border-input shadow-sm hover:bg-accent hover:text-accent-foreground"
                 title={t('Form.aiButtonTitle')}
             >
                 {isScanning ? <Loader2 size={16} className="animate-spin" /> : <Camera size={16} />}
-                <span className="hidden sm:inline">{isScanning ? t('Form.aiScanning') : t('Form.aiButtonLabel')}</span>
             </Button>
         </div>
     );

@@ -187,7 +187,7 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
           )}
 
           {/* --- AI BRIEFING --- */}
-          {activeTab === 'history' && <DailyBriefingSection metrics={metrics} />}
+          {activeTab === 'history' && <DailyBriefingSection metrics={metrics} isAdmin={isAdmin} />}
 
           {/* --- ÀREA DE CONTINGUT --- */}
           <div className="min-h-[500px]">
@@ -233,7 +233,7 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
 
                       {/* View Toggle */}
                       {/* View Toggle */}
-                      <div className="flex items-center bg-muted/80 p-1 rounded-lg">
+                      <div className="flex items-center bg-muted border border-border shadow-inner p-1 rounded-lg">
                         <Button
                           variant="ghost"
                           size="icon"

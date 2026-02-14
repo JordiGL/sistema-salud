@@ -40,11 +40,11 @@ export function SidebarContent({ isAdmin, activeTab, setActiveTab, onLogout, onC
 
     const tabs = [
         { id: 'history', label: t('Tabs.history'), icon: ClipboardList },
-        { id: 'bp', label: t('Charts.bpTitle'), icon: Activity },
-        { id: 'pulse', label: t('Charts.pulseTitle'), icon: Heart },
-        { id: 'weight', label: t('Charts.weightTitle'), icon: Scale },
-        { id: 'spo2', label: t('Charts.spo2Title'), icon: Droplets },
-        { id: 'ca125', label: t('Charts.ca125Title'), icon: TestTube },
+        { id: 'bp', label: t('Tabs.bp'), icon: Activity },
+        { id: 'pulse', label: t('Tabs.pulse'), icon: Heart },
+        { id: 'weight', label: t('Tabs.weight'), icon: Scale },
+        { id: 'spo2', label: t('Tabs.spo2'), icon: Droplets },
+        { id: 'ca125', label: t('Tabs.ca125'), icon: TestTube },
     ];
 
     const handleTabClick = (id: string) => {
@@ -118,8 +118,9 @@ export function SidebarContent({ isAdmin, activeTab, setActiveTab, onLogout, onC
                         <Link href="/ca" className={`px-3 py-1 rounded-full text-xs font-bold transition-all ${locale === 'ca' ? 'bg-primary text-primary-foreground shadow-sm' : 'text-muted-foreground bg-muted/30 hover:bg-hover hover:text-foreground'}`}>CA</Link>
                     </div>
 
-                    {/* Theme & Auth */}
-                    <div className="flex items-center">
+                    {/* Theme & Auth & Install */}
+                    <div className="flex items-center gap-1">
+                        <InstallPrompt />
                         <ModeToggle />
 
                         {isAdmin ? (
@@ -154,8 +155,6 @@ export function SidebarContent({ isAdmin, activeTab, setActiveTab, onLogout, onC
                         )}
                     </div>
                 </div>
-
-                <InstallPrompt />
 
             </div>
         </div>

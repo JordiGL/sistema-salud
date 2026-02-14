@@ -19,30 +19,30 @@ const config = {
         },
         extend: {
             colors: {
-                border: "hsl(var(--border))",
-                input: "hsl(var(--input))",
-                ring: "hsl(var(--ring))",
+                border: "var(--border)",
+                input: "var(--input)",
+                ring: "var(--ring)",
                 background: "var(--background)",
                 foreground: "var(--foreground)",
                 primary: {
-                    DEFAULT: "hsl(var(--primary))",
-                    foreground: "hsl(var(--primary-foreground))",
+                    DEFAULT: "var(--primary)",
+                    foreground: "var(--primary-foreground)",
                 },
                 secondary: {
-                    DEFAULT: "hsl(var(--secondary))",
-                    foreground: "hsl(var(--secondary-foreground))",
+                    DEFAULT: "var(--secondary)",
+                    foreground: "var(--secondary-foreground)",
                 },
                 destructive: {
-                    DEFAULT: "hsl(var(--destructive))",
-                    foreground: "hsl(var(--destructive-foreground))",
+                    DEFAULT: "var(--destructive)",
+                    foreground: "var(--destructive-foreground)",
                 },
                 muted: {
-                    DEFAULT: "hsl(var(--muted))",
-                    foreground: "hsl(var(--muted-foreground))",
+                    DEFAULT: "var(--muted)",
+                    foreground: "var(--muted-foreground)",
                 },
                 accent: {
-                    DEFAULT: "hsl(var(--accent))",
-                    foreground: "hsl(var(--accent-foreground))",
+                    DEFAULT: "var(--accent)",
+                    foreground: "var(--accent-foreground)",
                 },
                 popover: {
                     DEFAULT: "var(--popover)",
@@ -66,16 +66,34 @@ const config = {
                 },
                 hover: "var(--hover)",
                 metric: {
-                    stable: "hsl(var(--metric-stable))",
-                    warning: "hsl(var(--metric-warning))",
-                    alert: "hsl(var(--metric-alert))",
+                    stable: "var(--metric-stable)",
+                    warning: "var(--metric-warning)",
+                    alert: "var(--metric-alert)",
                 },
                 event: {
                     chemo: {
-                        DEFAULT: "hsl(var(--event-chemo))",
-                        muted: "hsl(var(--event-chemo-muted))",
+                        DEFAULT: "var(--event-chemo)",
+                        muted: "var(--event-chemo-muted)",
                     }
                 },
+
+                // Semantic Button colors
+                btn: {
+                    save: {
+                        DEFAULT: "var(--btn-save)",
+                        foreground: "var(--btn-save-foreground)",
+                    },
+                    clear: {
+                        DEFAULT: "var(--btn-clear)",
+                        foreground: "var(--btn-clear-foreground)",
+                        hover: "var(--btn-clear-hover)",
+                    },
+                    delete: {
+                        DEFAULT: "var(--btn-delete)",
+                        foreground: "var(--btn-delete-foreground)",
+                    },
+                },
+                // Keep 'save' for backward compatibility if any
                 save: {
                     DEFAULT: "var(--btn-save)",
                     foreground: "var(--btn-save-foreground)",

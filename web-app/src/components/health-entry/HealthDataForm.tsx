@@ -291,7 +291,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                 title={isOpen ? t('Form.toggleCollapse') : t('Form.toggleExpand')}
             >
                 <div className="flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
-                    <div className="flex items-center bg-muted/80 p-1 rounded-lg">
+                    <div className="flex items-center bg-muted border border-border shadow-inner p-1 rounded-lg">
                         <Button
                             type="button"
                             variant="ghost"
@@ -340,9 +340,10 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                             aria-label={t('Form.autoSave')}
                             title={autoSave ? t('Form.autoSave') : t('Form.enableAutoSave')}
                             className={`
-                                gap-2 transition-all border-dashed
-                                data-[state=on]:bg-primary/10 data-[state=on]:text-primary data-[state=on]:border-primary data-[state=on]:border-solid
-                                hover:bg-hover font-medium
+                                gap-2 transition-all bg-background shadow-sm
+                                border-2 border-dotted border-muted-foreground/40 text-muted-foreground
+                                data-[state=on]:border-solid data-[state=on]:bg-primary/10 data-[state=on]:text-primary data-[state=on]:border-primary
+                                hover:bg-accent hover:text-accent-foreground font-medium
                             `}
                         >
                             <Zap size={16} className={autoSave ? "fill-current" : ""} />

@@ -46,7 +46,7 @@ export function MetricCard({ data, isAdmin, onRefresh }: MetricCardProps) {
 
   return (
     <>
-      <Card className={`rounded-xl shadow-sm border-border ${cardStyles.border} border-l-[6px] hover:shadow-md transition-shadow overflow-hidden bg-card`}>
+      <Card className={`rounded-md shadow-sm border border-border ${cardStyles.border} border-l-4 hover:shadow-md transition-shadow overflow-hidden bg-card`}>
         {/* CABECERA */}
         <CardHeader className="p-5 pb-3 border-b border-border flex-row justify-between items-start space-y-0">
           <div className="flex flex-col">
@@ -56,11 +56,11 @@ export function MetricCard({ data, isAdmin, onRefresh }: MetricCardProps) {
           </div>
           {isAdmin && (
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={() => setIsEditModalOpen(true)} className="h-8 text-xs font-semibold gap-1">
-                <Pencil size={14} /> <span className="hidden sm:inline">{t('History.edit')}</span>
+              <Button variant="outline" size="icon" onClick={() => setIsEditModalOpen(true)} className="h-8 w-8 text-foreground border border-input shadow-sm hover:bg-accent hover:text-accent-foreground hover:border-accent">
+                <Pencil size={16} />
               </Button>
-              <Button variant="destructive" size="sm" onClick={() => setIsDeleteModalOpen(true)} className="h-8 text-xs font-semibold gap-1">
-                <Trash2 size={14} /> <span className="hidden sm:inline">{t('History.delete')}</span>
+              <Button variant="destructive" size="icon" onClick={() => setIsDeleteModalOpen(true)} className="h-8 w-8">
+                <Trash2 size={16} />
               </Button>
             </div>
           )}
@@ -107,9 +107,9 @@ export function MetricCard({ data, isAdmin, onRefresh }: MetricCardProps) {
 
           {/* FOOTER */}
           {(data.measurementContext || data.notes) && (
-            <div className="bg-muted p-3 rounded-lg mt-1 text-sm border border-border col-span-full">
-              {data.measurementContext && <div className="mb-1 font-bold text-xs uppercase tracking-wide">{renderContext(data.measurementContext)}</div>}
-              {data.notes && <div className="text-muted-foreground italic flex gap-2 items-start text-[13px] leading-relaxed"><FileText size={14} className="mt-1 opacity-40 flex-shrink-0 text-muted-foreground" /><span>{data.notes}</span></div>}
+            <div className="mt-4 pt-3 border-t border-border col-span-full flex flex-col gap-2">
+              {data.measurementContext && <div className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full font-medium inline-block border border-border w-fit">{renderContext(data.measurementContext)}</div>}
+              {data.notes && <div className="text-muted-foreground italic flex gap-2 items-start text-[13px] leading-relaxed"><FileText size={14} className="mt-0.5 opacity-50 flex-shrink-0" /><span>{data.notes}</span></div>}
             </div>
           )}
         </CardContent>

@@ -7,6 +7,11 @@ const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY || "");
 export async function POST(req: Request) {
   try {
     const contentType = req.headers.get("content-type") || "";
+    const authHeader = req.headers.get("authorization");
+
+    if (!authHeader) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
     // --- CASE A: TEXT/JSON ANALYSIS (Briefing) ---
     if (contentType.includes("application/json")) {
@@ -63,7 +68,10 @@ export async function POST(req: Request) {
 
         await fetch(`${apiUrl}/daily-briefing`, {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': authHeader || ''
+          },
           body: JSON.stringify({
             date: today,
             status_es: json.es.status,

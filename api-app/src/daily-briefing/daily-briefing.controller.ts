@@ -1,6 +1,7 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, UseGuards } from '@nestjs/common';
 import { DailyBriefingService } from './daily-briefing.service';
 import { CreateBriefingDto } from './dtos/create-briefing.dto';
+import { AuthGuard } from '../health/common/guards/auth.guard';
 
 @Controller('daily-briefing')
 export class DailyBriefingController {
@@ -17,6 +18,7 @@ export class DailyBriefingController {
     }
 
     @Post()
+    @UseGuards(AuthGuard)
     async save(@Body() dto: CreateBriefingDto) {
         return this.service.saveBriefing(dto);
     }
