@@ -187,10 +187,10 @@ export function EditEventModal({ isOpen, onClose, event, onSuccess }: EditEventM
 
                         <div className="flex justify-end gap-3 pt-2">
                             <Button type="button" variant="outline" onClick={onClose} className="h-auto py-4 rounded-xl font-bold text-muted-foreground border-border hover:bg-hover hover:text-accent-foreground">
-                                <ArrowLeft size={18} className="mr-0 sm:mr-2" /> <span className="hidden sm:inline">{t('History.cancel')}</span>
+                                <ArrowLeft size={18} />
                             </Button>
-                            <Button type="submit" disabled={form.formState.isSubmitting} className="h-auto py-4 rounded-xl font-bold flex gap-2 bg-primary text-primary-foreground shadow-lg hover:shadow-xl hover:bg-primary/90 transition-all">
-                                <Save size={18} /> <span className="hidden sm:inline">{t('History.save')}</span>
+                            <Button type="submit" disabled={form.formState.isSubmitting} className="h-auto py-4 rounded-xl font-bold flex gap-2 bg-save text-save-foreground border border-border shadow-lg hover:shadow-xl hover:bg-primary hover:text-primary-foreground transition-all">
+                                <Save size={18} />
                             </Button>
                         </div>
                     </form>

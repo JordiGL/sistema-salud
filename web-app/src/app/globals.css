@@ -63,6 +63,10 @@
     /* CENTRALIZED HOVER */
     --hover: hsl(222 40% 96.1%);
     /* Consistent with secondary/muted */
+
+    /* BUTTONS */
+    --btn-save: hsl(0 0% 0%);
+    --btn-save-foreground: hsl(0 0% 100%);
   }
 
   .dark {
@@ -127,8 +131,13 @@
     /* CENTRALIZED HOVER */
     --hover: hsl(222 40% 25%);
     /* Matching secondary/muted for consistency */
+
+    /* BUTTONS */
+    --btn-save: #0f172a;
+    --btn-save-foreground: hsl(222 30% 85%);
   }
 }
+
 @layer base {
   * {
     @apply border-border;

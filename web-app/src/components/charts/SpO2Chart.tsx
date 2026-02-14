@@ -117,16 +117,22 @@ export function SpO2Chart({ data: initialData, events = [], isAdmin }: { data: M
       .filter(n => n > 0),
     [finalData]);
 
+  const filteredEvents = useMemo(() => {
+    if (!events) return [];
+    if (dateRange === 'all') return events;
+    const days = dateRange === '7d' ? 7 : 30;
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - days);
+    return events.filter(e => new Date(e.date) >= cutoff);
+  }, [events, dateRange]);
+
+  const uniqueEventTypes = useMemo(() => {
+    return Array.from(new Set(filteredEvents.map(e => e.type)));
+  }, [filteredEvents]);
+
   const tableData = useMemo(() => {
-    let relevantEvents = events || [];
-    if (dateRange !== 'all') {
-      const days = dateRange === '7d' ? 7 : 30;
-      const cutoff = new Date();
-      cutoff.setDate(cutoff.getDate() - days);
-      relevantEvents = relevantEvents.filter(e => new Date(e.date) >= cutoff);
-    }
-    return [...finalData, ...relevantEvents];
-  }, [finalData, events, dateRange]);
+    return [...finalData, ...filteredEvents];
+  }, [finalData, filteredEvents]);
 
   // Mostrar Skeleton solo en la carga inicial cuando no hay datos
   if (loading && chartData.length === 0) {
@@ -209,7 +215,18 @@ export function SpO2Chart({ data: initialData, events = [], isAdmin }: { data: M
             </div>
           ) : (
             /* DIV DE OPACITAT AFEGIT PER A LA CÀRREGA FLUIDA */
-            <div className={`flex flex-col md:flex-row gap-6 ${loading ? "opacity-50" : "opacity-100"} transition-opacity duration-300`}>
+            <div className={`flex flex-col gap-4 ${loading ? "opacity-50" : "opacity-100"} transition-opacity duration-300`}>
+              {/* Event Legend (Top) */}
+              {uniqueEventTypes.length > 0 && (
+                <div className="flex flex-wrap gap-3 px-2">
+                  {uniqueEventTypes.map(type => (
+                    <div key={type} className="flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-[#8b5cf6]" />
+                      <span className="text-[10px] uppercase font-bold text-muted-foreground">{getEventLabel(type)}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
               <div className="flex-1 min-w-0">
                 <ChartContainer config={chartConfig} className="w-full h-[400px]">
                   <LineChart data={finalData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
@@ -282,46 +299,26 @@ export function SpO2Chart({ data: initialData, events = [], isAdmin }: { data: M
                       activeDot={{ r: 6 }}
                     />
 
-                    {events && events.map((event) => (
+                    {filteredEvents.map((event) => (
                       <ReferenceLine
                         key={event.id}
                         x={new Date(event.date).getTime()}
                         stroke="#8b5cf6"
                         strokeDasharray="3 3"
+                        label={{
+                          position: 'insideTop',
+                          value: new Date(event.date).toLocaleDateString(undefined, { day: '2-digit', month: '2-digit' }),
+                          fill: '#8b5cf6',
+                          fontSize: 10,
+                          fontWeight: 600,
+                          dy: -10
+                        }}
                       />
                     ))}
                   </LineChart>
                 </ChartContainer>
               </div>
 
-              {/* Event Legend Sidebar */}
-              {events && events.length > 0 && (
-                <div className="w-full md:w-48 border-t md:border-t-0 md:border-l border-border pt-4 md:pt-0 pl-0 md:pl-4 space-y-3">
-                  <h4 className="text-[10px] font-bold uppercase text-muted-foreground mb-2 tracking-wider opacity-70">{t('HealthEvents.records')}</h4>
-                  <div className="md:hidden flex items-center gap-2 mb-2 text-[10px] font-medium text-muted-foreground/70">
-                    <MoveHorizontal size={12} className="animate-pulse" /> <span>{t('History.scrollHint')}</span> <MoveHorizontal size={12} className="animate-pulse" />
-                  </div>
-                  <div className="flex md:flex-col gap-3 overflow-x-auto md:overflow-x-visible md:max-h-[400px] md:overflow-y-auto pb-2 md:pb-0 pr-1 custom-scrollbar">
-                    {events.map((event) => (
-                      <div key={event.id} className="min-w-[140px] md:min-w-0 group relative pl-3 py-1 border-l-2 border-event-chemo transition-colors shrink-0">
-                        <div className="flex flex-col">
-                          <span className="text-[9px] font-bold text-event-chemo/80 uppercase tracking-wider mb-0.5">
-                            {new Date(event.date).toLocaleDateString(undefined, { day: '2-digit', month: '2-digit' })}
-                          </span>
-                          <span className="text-xs font-medium text-foreground leading-none">
-                            {getEventLabel(event.type)}
-                          </span>
-                        </div>
-                        {event.notes && (
-                          <p className="text-[10px] text-muted-foreground/70 line-clamp-1 mt-1 leading-tight">
-                            {event.notes}
-                          </p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
             </div>
           )}
         </CardContent>

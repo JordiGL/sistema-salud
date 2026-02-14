@@ -76,6 +76,10 @@ const config = {
                         muted: "hsl(var(--event-chemo-muted))",
                     }
                 },
+                save: {
+                    DEFAULT: "var(--btn-save)",
+                    foreground: "var(--btn-save-foreground)",
+                },
             },
             borderRadius: {
                 lg: "var(--radius)",

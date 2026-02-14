@@ -291,7 +291,7 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                 title={isOpen ? t('Form.toggleCollapse') : t('Form.toggleExpand')}
             >
                 <div className="flex items-center gap-3" onClick={(e) => e.stopPropagation()}>
-                    <div className="inline-flex items-center bg-muted/80 p-0.5 rounded-lg border border-border/40">
+                    <div className="flex items-center bg-muted/80 p-1 rounded-lg">
                         <Button
                             type="button"
                             variant="ghost"
@@ -301,15 +301,13 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                 if (!isOpen) setIsOpen(true);
                             }}
                             className={cn(
-                                "h-8 px-3 text-xs font-semibold rounded-md transition-all decoration-0 flex items-center gap-2",
+                                "h-8 w-8 rounded-md transition-all",
                                 activeTab === 'metrics'
                                     ? "bg-background text-foreground shadow-sm ring-1 ring-black/5 dark:ring-white/10"
                                     : "text-muted-foreground hover:text-foreground hover:bg-background/50"
                             )}
-                            title={t('HomePage.newRecord')}
                         >
-                            <Activity size={14} />
-                            <span className="hidden sm:inline">{t('HomePage.newRecord')}</span>
+                            <Activity size={16} />
                         </Button>
                         <Button
                             type="button"
@@ -320,15 +318,14 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                 if (!isOpen) setIsOpen(true);
                             }}
                             className={cn(
-                                "h-8 px-3 text-xs font-semibold rounded-md transition-all decoration-0 flex items-center gap-2",
+                                "h-8 w-8 rounded-md transition-all",
                                 activeTab === 'events'
                                     ? "bg-background text-foreground shadow-sm ring-1 ring-black/5 dark:ring-white/10"
                                     : "text-muted-foreground hover:text-foreground hover:bg-background/50"
                             )}
                             title={t('HealthEvents.newEvent')}
                         >
-                            <Calendar size={14} />
-                            <span className="hidden sm:inline">{t('HealthEvents.newEvent')}</span>
+                            <Calendar size={16} />
                         </Button>
                     </div>
                 </div>
@@ -550,11 +547,10 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                             />
                                             <div className="relative z-10 flex items-center gap-2">
                                                 <Eraser size={18} className={`transition-transform duration-700 ${resetProgress > 0 ? 'rotate-12' : ''}`} />
-                                                <span className="hidden sm:inline">{t('HomePage.clear') || 'Limpiar'}</span>
                                             </div>
                                         </Button>
-                                        <Button type="submit" disabled={form.formState.isSubmitting} className="h-auto px-6 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-all">
-                                            {form.formState.isSubmitting ? <Loader2 size={20} className="animate-spin" /> : <><Save size={20} /> <span className="hidden sm:inline">{t('HomePage.saveButton')}</span></>}
+                                        <Button type="submit" disabled={form.formState.isSubmitting} className="h-auto px-6 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl bg-save text-save-foreground border border-border hover:bg-primary hover:text-primary-foreground transition-all">
+                                            {form.formState.isSubmitting ? <Loader2 size={20} className="animate-spin" /> : <Save size={20} />}
                                         </Button>
                                     </div>
                                 </div>
@@ -658,11 +654,10 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                         />
                                         <div className="relative z-10 flex items-center gap-2">
                                             <Eraser size={18} className={`transition-transform duration-700 ${eventResetProgress > 0 ? 'rotate-12' : ''}`} />
-                                            <span className="hidden sm:inline">{t('HomePage.clear') || 'Limpiar'}</span>
                                         </div>
                                     </Button>
-                                    <Button type="submit" disabled={eventForm.formState.isSubmitting} className="h-auto px-6 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl bg-primary text-primary-foreground hover:bg-primary/90 transition-all">
-                                        {eventForm.formState.isSubmitting ? <Loader2 size={20} className="animate-spin" /> : <div className="flex items-center gap-2"><Save size={20} /> <span className="hidden sm:inline">{t('HealthEvents.save')}</span></div>}
+                                    <Button type="submit" disabled={eventForm.formState.isSubmitting} className="h-auto px-6 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl bg-save text-save-foreground border border-border hover:bg-primary hover:text-primary-foreground transition-all">
+                                        {eventForm.formState.isSubmitting ? <Loader2 size={20} className="animate-spin" /> : <Save size={20} />}
                                     </Button>
                                 </div>
                             </form>

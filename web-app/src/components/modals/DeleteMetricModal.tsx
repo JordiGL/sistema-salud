@@ -58,7 +58,7 @@ export function DeleteMetricModal({ isOpen, onClose, metricId, onSuccess, type =
             onClick={onClose}
             className="h-auto py-4 rounded-xl font-bold text-muted-foreground"
           >
-            <ArrowLeft size={18} className="mr-0 sm:mr-2" /> <span className="hidden sm:inline">{t('History.cancel')}</span>
+            <ArrowLeft size={18} />
           </Button>
           <Button
             variant="destructive"
@@ -66,7 +66,7 @@ export function DeleteMetricModal({ isOpen, onClose, metricId, onSuccess, type =
             disabled={isSubmitting}
             className="h-auto py-4 rounded-xl font-bold shadow-lg hover:shadow-xl"
           >
-            <Trash2 size={18} className="mr-0 sm:mr-2" /> <span className="hidden sm:inline">{t('History.delete')}</span>
+            <Trash2 size={18} />
           </Button>
         </div>
       </DialogContent>
