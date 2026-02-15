@@ -106,13 +106,18 @@ export function WeightChart({ data: initialData, events = [], isAdmin }: { data:
     })).sort((a, b) => a.timestamp - b.timestamp);
   }, [chartData, timeOfDay]);
 
+  // Definición de tipo para los puntos del gráfico (puede ser métrica o evento)
+  type ChartPoint = Partial<Metric> & Partial<HealthEvent> & {
+    timestamp: number;
+    isEvent: boolean;
+    weight: number;
+    createdAt: string | Date;
+  };
+
   // Translation helper for event types
-  const getEventLabel = (eventType: string) => {
-    try {
-      return t(`HealthEvents.types.${eventType}`);
-    } catch {
-      return eventType;
-    }
+  const getEventLabel = (type?: string) => {
+    if (!type) return '';
+    try { return t(`HealthEvents.types.${type}`); } catch { return type; }
   };
 
   // CALCULO DE DATOS PARA ESTADÍSTICAS
@@ -124,12 +129,65 @@ export function WeightChart({ data: initialData, events = [], isAdmin }: { data:
 
   const filteredEvents = useMemo(() => {
     if (!events) return [];
-    if (dateRange === 'all') return events;
-    const days = dateRange === '7d' ? 7 : 30;
-    const cutoff = new Date();
-    cutoff.setDate(cutoff.getDate() - days);
-    return events.filter(e => new Date(e.date) >= cutoff);
-  }, [events, dateRange]);
+
+    let result = events;
+
+    // 1. Filter by Date Range
+    if (dateRange !== 'all') {
+      const days = dateRange === '7d' ? 7 : 30;
+      const cutoff = new Date();
+      cutoff.setDate(cutoff.getDate() - days);
+      result = result.filter(e => new Date(e.date) >= cutoff);
+    }
+
+    // 2. Filter by Start of Records
+    if (finalData.length > 0) {
+      const startTime = finalData[0].timestamp;
+      result = result.filter(e => new Date(e.date).getTime() >= startTime);
+    }
+
+    return result;
+  }, [events, dateRange, finalData]);
+
+  // COMBINAR EVENTOS Y MÉTRICAS EN UN SOLO ARRAY PARA LA LÍNEA
+  const combinedData = useMemo(() => {
+    if (finalData.length === 0) return [];
+
+    // 1. Añadimos flags a las métricas originales
+    const points: ChartPoint[] = finalData.map(m => ({
+      ...m,
+      isEvent: false,
+      weight: Number(m.weight)
+    }));
+
+    // 2. Insertamos los eventos calculando su posición en la línea (interpolación)
+    filteredEvents.forEach(event => {
+      const eventTs = new Date(event.date).getTime();
+      const nextIdx = finalData.findIndex(d => d.timestamp > eventTs);
+
+      let val = 0;
+      if (nextIdx === 0) val = Number(finalData[0].weight);
+      else if (nextIdx === -1) val = Number(finalData[finalData.length - 1].weight);
+      else {
+        const p1 = finalData[nextIdx - 1];
+        const p2 = finalData[nextIdx];
+        const v1 = Number(p1.weight);
+        const v2 = Number(p2.weight);
+        const ratio = (eventTs - p1.timestamp) / (p2.timestamp - p1.timestamp);
+        val = v1 + ratio * (v2 - v1);
+      }
+
+      points.push({
+        ...event,
+        timestamp: eventTs,
+        weight: val,
+        isEvent: true,
+        createdAt: event.date
+      });
+    });
+
+    return points.sort((a, b) => a.timestamp - b.timestamp);
+  }, [finalData, filteredEvents]);
 
   const uniqueEventTypes = useMemo(() => {
     return Array.from(new Set(filteredEvents.map(e => e.type)));
@@ -231,13 +289,13 @@ export function WeightChart({ data: initialData, events = [], isAdmin }: { data:
               )}
               <div className="flex-1 min-w-0">
                 <ChartContainer config={chartConfig} className="w-full h-[400px]">
-                  <LineChart data={finalData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                  <LineChart data={combinedData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} stroke="#94a3b8" />
                     <XAxis
                       dataKey="timestamp"
                       type="number"
                       domain={['dataMin', 'dataMax']}
-                      tick={(props) => <CustomXAxisTick {...props} hideTime={finalData.length > 30} />}
+                      tick={(props) => <CustomXAxisTick {...props} hideTime={combinedData.length > 30} />}
                       interval="preserveStartEnd"
                       minTickGap={50}
                       axisLine={false}
@@ -252,54 +310,110 @@ export function WeightChart({ data: initialData, events = [], isAdmin }: { data:
                     />
                     <ChartTooltip
                       cursor={{ stroke: 'var(--border)', strokeWidth: 2 }}
-                      content={
-                        <ChartTooltipContent
-                          indicator="dot"
-                          className="w-[200px] rounded-2xl border border-border/10 shadow-xl bg-card/95 backdrop-blur-md p-3 text-foreground"
-                          labelFormatter={(value, payload) => {
-                            const dateValue = (payload && payload[0]?.payload?.createdAt) || value;
-                            if (!dateValue) return null;
-                            const date = new Date(dateValue);
-                            if (isNaN(date.getTime())) return null;
-                            return (
-                              <div className="flex flex-col border-b border-border pb-2 mb-2">
-                                <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">
-                                  {t('History.cols.date')}
-                                </span>
-                                <span className="text-xs font-bold text-foreground">
-                                  {date.toLocaleDateString('es-ES', { day: 'numeric', month: 'numeric', year: 'numeric' })}
-                                  <span className="mx-1 text-muted">|</span>
-                                  {date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false })}
-                                </span>
-                              </div>
-                            );
-                          }}
-                          formatter={(value, name, item) => (
-                            <div className="flex flex-col gap-2 w-full">
-                              <div className="flex items-center justify-between w-full my-0.5">
-                                <span className="text-muted-foreground text-xs font-medium">{tCharts('weightTitle')}</span>
-                                <span className="font-bold text-foreground text-sm">
-                                  {value} <span className="ml-1 font-normal text-[10px] text-muted-foreground uppercase">Kg</span>
-                                </span>
-                              </div>
-                              {item.payload.weightLocation && (
-                                <div className="flex items-center justify-between w-full pt-1.5 border-t border-border">
-                                  <span className="text-muted-foreground text-[10px] uppercase font-bold tracking-tight">{tFilter('location')}</span>
-                                  <span className="text-muted-foreground text-[11px] font-semibold italic">{renderLocation(item.payload.weightLocation)}</span>
-                                </div>
-                              )}
+                      content={({ active, payload }) => {
+                        if (!active || !payload || !payload.length) return null
+                        const data = payload[0].payload as ChartPoint
+                        const date = new Date(data.timestamp)
+
+                        return (
+                          <div className="w-[200px] rounded-2xl border border-border/10 shadow-xl bg-card/95 backdrop-blur-md p-3 text-foreground">
+                            <div className="flex flex-col border-b border-border pb-2 mb-2">
+                              <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">
+                                {t('History.cols.date')}
+                              </span>
+                              <span className="text-xs font-bold text-foreground">
+                                {date.toLocaleDateString('es-ES', { day: 'numeric', month: 'numeric', year: 'numeric' })}
+                                <span className="mx-1 text-muted">|</span>
+                                {date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false })}
+                              </span>
                             </div>
-                          )}
-                        />
-                      }
+
+                            {data.isEvent ? (
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs uppercase font-bold text-foreground">{getEventLabel(data.type)}</span>
+                                </div>
+                                {data.notes && <p className="text-[11px] text-muted-foreground italic leading-tight">"{data.notes}"</p>}
+                              </div>
+                            ) : (
+                              <div className="flex flex-col gap-2 w-full">
+                                <div className="flex items-center justify-between w-full my-0.5">
+                                  <span className="text-muted-foreground text-xs font-medium">{tCharts('weightTitle')}</span>
+                                  <span className="font-bold text-foreground text-sm">
+                                    {data.weight} <span className="ml-1 font-normal text-[10px] text-muted-foreground uppercase">Kg</span>
+                                  </span>
+                                </div>
+                                {data.weightLocation && (
+                                  <div className="flex items-center justify-between w-full pt-1.5 border-t border-border">
+                                    <span className="text-muted-foreground text-[10px] uppercase font-bold tracking-tight">{tFilter('location')}</span>
+                                    <span className="text-muted-foreground text-[11px] font-semibold italic">{renderLocation(data.weightLocation)}</span>
+                                  </div>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        )
+                      }}
                     />
                     <Line
                       type="monotone"
                       dataKey="weight"
                       stroke="var(--color-weight)"
                       strokeWidth={3}
-                      dot={{ r: 4, fill: "var(--color-weight)", strokeWidth: 2, stroke: '#fff' }}
-                      activeDot={{ r: 6 }}
+                      // --- PUNTO ESTÁTICO (Normal) ---
+                      dot={(props: any) => {
+                        const { cx, cy, payload } = props;
+                        if (payload.isEvent) {
+                          return (
+                            <rect
+                              key={`dot-ev-${payload.id}`}
+                              x={cx - 3}
+                              y={cy - 3}
+                              width={6}
+                              height={6}
+                              fill="#8b5cf6"
+                            />
+                          );
+                        }
+                        return (
+                          <circle
+                            key={`dot-reg-${payload.id}`}
+                            cx={cx}
+                            cy={cy}
+                            r={4}
+                            fill="var(--color-weight)"
+                            stroke="#fff"
+                            strokeWidth={2}
+                          />
+                        );
+                      }}
+                      // --- PUNTO ACTIVO (Hover) ---
+                      activeDot={(props: any) => {
+                        const { cx, cy, payload } = props;
+                        if (payload.isEvent) {
+                          return (
+                            <rect
+                              x={cx - 5}
+                              y={cy - 5}
+                              width={10}
+                              height={10}
+                              fill="#8b5cf6"
+                              stroke="#fff"
+                              strokeWidth={2}
+                            />
+                          );
+                        }
+                        return (
+                          <circle
+                            cx={cx}
+                            cy={cy}
+                            r={6}
+                            fill="var(--color-weight)"
+                            stroke="#fff"
+                            strokeWidth={2}
+                          />
+                        );
+                      }}
                     />
 
                     {filteredEvents.map((event) => (
@@ -308,14 +422,8 @@ export function WeightChart({ data: initialData, events = [], isAdmin }: { data:
                         x={new Date(event.date).getTime()}
                         stroke="#8b5cf6"
                         strokeDasharray="3 3"
-                        label={{
-                          position: 'insideTop',
-                          value: new Date(event.date).toLocaleDateString(undefined, { day: '2-digit', month: '2-digit' }),
-                          fill: '#8b5cf6',
-                          fontSize: 10,
-                          fontWeight: 600,
-                          dy: -10
-                        }}
+                        opacity={0.5}
+                        strokeWidth={1.5}
                       />
                     ))}
                   </LineChart>

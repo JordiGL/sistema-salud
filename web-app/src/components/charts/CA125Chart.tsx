@@ -1,13 +1,12 @@
 'use client';
 import { useState, useEffect, useMemo } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Label } from 'recharts';
-import { TestTube2, FileSpreadsheet, FileCode, MoveHorizontal } from 'lucide-react';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Label, ReferenceLine } from 'recharts';
+import { TestTube2, FileSpreadsheet, FileCode, Syringe } from 'lucide-react';
 import { ChartSkeleton } from './ChartSkeleton';
 import { useTranslations } from 'next-intl';
 import { metricApi } from '@/lib/api';
 import { useMetricManager } from '@/hooks/useMetricManager';
 import { Metric, HealthEvent } from '@/types/metrics';
-import { ReferenceLine } from 'recharts';
 import { StatsSummary } from '@/components/dashboard/StatsSummary';
 import { downloadCSV, downloadXML } from '@/lib/export-utils';
 import { HistoryTableView } from '@/components/health-history/HistoryTableView';
@@ -19,28 +18,19 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 
 const CustomXAxisTick = ({ x, y, payload, hideTime }: any) => {
-  const date = new Date(payload.value); // Works for timestamp or ISO string
+  const date = new Date(payload.value);
   return (
     <g transform={`translate(${x},${y})`}>
       <text x={0} y={18} textAnchor="middle" fill="#6b7280" fontSize={10} fontFamily="sans-serif">
-        <tspan x="0" dy="0">
-          {date.toLocaleDateString(undefined, { day: '2-digit', month: '2-digit' })}
-        </tspan>
-        {!hideTime && (
-          <tspan x="0" dy="14">
-            {date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
-          </tspan>
-        )}
+        <tspan x="0" dy="0">{date.toLocaleDateString(undefined, { day: '2-digit', month: '2-digit' })}</tspan>
+        {!hideTime && <tspan x="0" dy="14">{date.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}</tspan>}
       </text>
     </g>
   );
 };
 
 const chartConfig = {
-  ca125: {
-    label: "CA-125 (U/ml)",
-    color: "#475569",
-  },
+  ca125: { label: "CA-125 (U/ml)", color: "#475569" },
 } satisfies ChartConfig;
 
 export function CA125Chart({ data: initialData, events = [], isAdmin }: { data: Metric[], events?: HealthEvent[], isAdmin: boolean }) {
@@ -51,293 +41,258 @@ export function CA125Chart({ data: initialData, events = [], isAdmin }: { data: 
 
   const [chartData, setChartData] = useState<Metric[]>(() => [...initialData].reverse());
   const [loading, setLoading] = useState(false);
-
   const [dateRange, setDateRange] = useState<string>('all');
   const [contextFilter, setContextFilter] = useState<string>('all');
   const [timeOfDay, setTimeOfDay] = useState<string>('24h');
-
-  const availableContexts = useMemo(() => {
-    const contexts = initialData
-      .map(d => d.measurementContext)
-      .filter(c => c !== null && c !== undefined);
-    return Array.from(new Set(contexts));
-  }, [initialData]);
 
   useEffect(() => {
     const loadFilteredData = async () => {
       setLoading(true);
       try {
-        const newData = await metricApi.getAll({
-          range: dateRange as any,
-          context: contextFilter
-        });
+        const newData = await metricApi.getAll({ range: dateRange as any, context: contextFilter });
         setChartData(newData.reverse());
-      } catch (error) {
-        console.error("Error filtrando:", error);
-      } finally {
-        setLoading(false);
-      }
+      } catch (error) { console.error("Error filtrando:", error); }
+      finally { setLoading(false); }
     };
     loadFilteredData();
   }, [dateRange, contextFilter]);
 
-  const finalData = useMemo(() => {
+  const metricData = useMemo(() => {
     let result = chartData.filter(d => d.ca125 !== null && d.ca125 !== undefined);
-
     if (timeOfDay !== '24h') {
       result = result.filter(d => {
-        const dateObj = new Date(d.createdAt);
-        const hour = dateObj.getHours();
-        if (timeOfDay === 'am') return hour < 12;
-        if (timeOfDay === 'pm') return hour >= 12;
-        return true;
+        const hour = new Date(d.createdAt).getHours();
+        return timeOfDay === 'am' ? hour < 12 : hour >= 12;
       });
     }
-
-    // Add timestamp for numeric axis
     return result.map(d => ({
       ...d,
-      timestamp: new Date(d.createdAt).getTime()
+      timestamp: new Date(d.createdAt).getTime(),
+      ca125: Number(d.ca125)
     })).sort((a, b) => a.timestamp - b.timestamp);
   }, [chartData, timeOfDay]);
 
-  // Translation helper for event types
-  const getEventLabel = (eventType: string) => {
-    try {
-      return t(`HealthEvents.types.${eventType}`);
-    } catch {
-      return eventType;
-    }
-  };
-
-  const ca125Data = useMemo(() =>
-    finalData
-      .map(d => d.ca125 ? Number(d.ca125) : 0)
-      .filter(n => n > 0),
-    [finalData]);
-
   const filteredEvents = useMemo(() => {
     if (!events) return [];
-    if (dateRange === 'all') return events;
-    const days = dateRange === '7d' ? 7 : 30;
-    const cutoff = new Date();
-    cutoff.setDate(cutoff.getDate() - days);
-    return events.filter(e => new Date(e.date) >= cutoff);
-  }, [events, dateRange]);
 
-  const uniqueEventTypes = useMemo(() => {
-    return Array.from(new Set(filteredEvents.map(e => e.type)));
-  }, [filteredEvents]);
+    let result = events;
 
-  const tableData = useMemo(() => {
-    return [...finalData, ...filteredEvents];
-  }, [finalData, filteredEvents]);
+    // 1. Filter by Date Range
+    if (dateRange !== 'all') {
+      const cutoff = new Date();
+      cutoff.setDate(cutoff.getDate() - (dateRange === '7d' ? 7 : 30));
+      result = result.filter(e => new Date(e.date) >= cutoff);
+    }
 
-  // Si està carregant i no hi ha dades prèvies, mostrem el skeleton
-  if (loading && chartData.length === 0) {
-    return <ChartSkeleton />;
-  }
+    // 2. Filter by Start of Records (User requirement: Start from first record)
+    if (metricData.length > 0) {
+      const startTime = metricData[0].timestamp;
+      result = result.filter(e => new Date(e.date).getTime() >= startTime);
+    }
+
+    return result;
+  }, [events, dateRange, metricData]);
+
+  // Definición de tipo para los puntos del gráfico (puede ser métrica o evento)
+  type ChartPoint = Partial<Metric> & Partial<HealthEvent> & {
+    timestamp: number;
+    isEvent: boolean;
+    ca125: number;
+    createdAt: string | Date; // Unificación de fecha para tooltip
+  };
+
+  // COMBINAR EVENTOS Y MÉTRICAS EN UN SOLO ARRAY PARA LA LÍNEA
+  const combinedData = useMemo(() => {
+    if (metricData.length === 0) return [];
+
+    // 1. Añadimos flags a las métricas originales
+    const points: ChartPoint[] = metricData.map(m => ({
+      ...m,
+      isEvent: false,
+      // Aseguramos que ca125 sea number (ya lo filtramos en metricData pero TS puede quejarse)
+      ca125: Number(m.ca125)
+    }));
+
+    // 2. Insertamos los eventos calculando su posición en la línea (interpolación)
+    filteredEvents.forEach(event => {
+      const eventTs = new Date(event.date).getTime();
+      const nextIdx = metricData.findIndex(d => d.timestamp > eventTs);
+
+      let val = 0;
+      if (nextIdx === 0) val = metricData[0].ca125;
+      else if (nextIdx === -1) val = metricData[metricData.length - 1].ca125;
+      else {
+        const p1 = metricData[nextIdx - 1];
+        const p2 = metricData[nextIdx];
+        const ratio = (eventTs - p1.timestamp) / (p2.timestamp - p1.timestamp);
+        val = p1.ca125 + ratio * (p2.ca125 - p1.ca125);
+      }
+
+      points.push({
+        ...event,
+        timestamp: eventTs,
+        ca125: val,
+        isEvent: true,
+        createdAt: event.date
+      });
+    });
+
+    return points.sort((a, b) => a.timestamp - b.timestamp);
+  }, [metricData, filteredEvents]);
+
+  const getEventLabel = (type?: string) => {
+    if (!type) return '';
+    try { return t(`HealthEvents.types.${type}`); } catch { return type; }
+  };
+
+  if (loading && chartData.length === 0) return <ChartSkeleton />;
 
   return (
     <div className="space-y-6">
       <Card className="w-full relative overflow-hidden border-border shadow-sm rounded-3xl animate-in fade-in duration-500 bg-card">
-
-        {/* --- BARRA DE HERRAMIENTAS (HEADER) --- */}
         <CardHeader className="flex flex-col xl:flex-row xl:items-center justify-between gap-4 p-6">
           <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => downloadCSV(finalData, 'ca125_data', t)}
-              className="gap-1.5 text-xs font-bold text-muted-foreground bg-card border-border hover:bg-muted hover:text-foreground"
-              title="Descargar CSV"
-            >
+            <Button variant="outline" size="sm" onClick={() => downloadCSV(metricData, 'ca125_data', t)} className="gap-1.5 text-xs font-bold text-muted-foreground bg-card border-border hover:bg-muted">
               <FileSpreadsheet size={14} /> <span>CSV</span>
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => downloadXML(finalData, 'ca125_data', t)}
-              className="gap-1.5 text-xs font-bold text-muted-foreground bg-card border-border hover:bg-muted hover:text-foreground"
-              title="Descargar XML"
-            >
-              <FileCode size={14} /> <span>XML</span>
-            </Button>
           </div>
-
-          <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center overflow-x-auto pb-1 sm:pb-0">
-            <Tabs value={dateRange} onValueChange={setDateRange} className="shrink-0">
-              <TabsList className="bg-muted h-9 p-1 rounded-xl">
-                <TabsTrigger value="7d" className="text-[11px] h-7 rounded-lg data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">{tFilter('7days')}</TabsTrigger>
-                <TabsTrigger value="30d" className="text-[11px] h-7 rounded-lg data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">{tFilter('30days')}</TabsTrigger>
-                <TabsTrigger value="all" className="text-[11px] h-7 rounded-lg data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">{tFilter('all')}</TabsTrigger>
-              </TabsList>
-            </Tabs>
-
-            <Tabs value={timeOfDay} onValueChange={setTimeOfDay} className="shrink-0">
-              <TabsList className="bg-muted h-9 p-1 rounded-xl">
-                <TabsTrigger value="24h" className="text-[11px] h-7 rounded-lg uppercase data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">{tFilter('24h')}</TabsTrigger>
-                <TabsTrigger value="am" className="text-[11px] h-7 rounded-lg uppercase data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">{tFilter('am')}</TabsTrigger>
-                <TabsTrigger value="pm" className="text-[11px] h-7 rounded-lg uppercase data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm">{tFilter('pm')}</TabsTrigger>
-              </TabsList>
-            </Tabs>
-
-            <div className="hidden sm:block w-px h-6 bg-border mx-1"></div>
-
-            <div className="flex items-center gap-2 shrink-0">
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-wider hidden md:inline">
-                {tFilter('contexts')}
-              </span>
-              <Select value={contextFilter} onValueChange={setContextFilter}>
-                <SelectTrigger className="h-9 min-w-[100px] text-xs font-bold border-border bg-muted/40 hover:bg-muted focus:ring-slate-200">
-                  <SelectValue placeholder={tFilter('allContexts')} />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">{tFilter('allContexts')}</SelectItem>
-                  {availableContexts.map((ctx: any, idx) => (
-                    <SelectItem key={idx} value={ctx}>{renderContext(ctx)}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+          <Tabs value={dateRange} onValueChange={setDateRange} className="shrink-0">
+            <TabsList className="bg-muted h-9 p-1 rounded-xl">
+              <TabsTrigger value="7d" className="text-[11px] h-7 rounded-lg">{tFilter('7days')}</TabsTrigger>
+              <TabsTrigger value="30d" className="text-[11px] h-7 rounded-lg">{tFilter('30days')}</TabsTrigger>
+              <TabsTrigger value="all" className="text-[11px] h-7 rounded-lg">{tFilter('all')}</TabsTrigger>
+            </TabsList>
+          </Tabs>
         </CardHeader>
 
         <CardContent>
-          {finalData.length === 0 ? (
-            <div className="flex flex-col items-center justify-center text-muted-foreground animate-in fade-in duration-500">
-              <div className="p-4 bg-muted rounded-full mb-3">
-                <TestTube2 size={32} className="opacity-20 text-muted-foreground" />
-              </div>
-              <p className="font-medium text-sm text-muted-foreground">{tCharts('noData')}</p>
-            </div>
-          ) : (
-            /* DIV DE OPACITAT AFEGIT PER A LA CÀRREGA FLUIDA */
-            <div className={`flex flex-col gap-4 ${loading ? "opacity-50" : "opacity-100"} transition-opacity duration-300`}>
-              {/* Event Legend (Top) */}
-              {uniqueEventTypes.length > 0 && (
-                <div className="flex flex-wrap gap-3 px-2">
-                  {uniqueEventTypes.map(type => (
-                    <div key={type} className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-[#8b5cf6]" />
-                      <span className="text-[10px] uppercase font-bold text-muted-foreground">{getEventLabel(type)}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-              <div className="flex-1 min-w-0">
-                <ChartContainer config={chartConfig} className="w-full h-[400px]">
-                  <LineChart data={finalData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} stroke="#94a3b8" />
-                    <XAxis
-                      dataKey="timestamp"
-                      type="number"
-                      domain={['dataMin', 'dataMax']}
-                      tick={(props) => <CustomXAxisTick {...props} hideTime={finalData.length > 30} />}
-                      interval="preserveStartEnd"
-                      minTickGap={50}
-                      axisLine={false}
-                      tickLine={false}
-                    />
-                    <YAxis domain={['auto', 'auto']} tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} tickCount={6} />
-                    <ChartTooltip
-                      cursor={{ stroke: 'var(--border)', strokeWidth: 2 }}
-                      content={
-                        <ChartTooltipContent
-                          indicator="dot"
-                          className="w-[200px] rounded-2xl border border-border/10 shadow-xl bg-card/95 backdrop-blur-md p-3 text-foreground"
-                          labelFormatter={(value, payload) => {
-                            const dateValue = (payload && payload[0]?.payload?.createdAt) || value;
-                            if (!dateValue) return null;
-                            const date = new Date(dateValue);
-                            if (isNaN(date.getTime())) return null;
-                            return (
-                              <div className="flex flex-col border-b border-border pb-2 mb-2">
-                                <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">
-                                  {t('History.cols.date')}
-                                </span>
-                                <span className="text-xs font-bold text-foreground">
-                                  {date.toLocaleDateString('es-ES', { day: 'numeric', month: 'numeric', year: 'numeric' })}
-                                  <span className="mx-1 text-muted">|</span>
-                                  {date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false })}
-                                </span>
+          <div className={`flex flex-col gap-4 ${loading ? "opacity-50" : "opacity-100"} transition-opacity duration-300`}>
+            <div className="flex-1 min-w-0">
+              <ChartContainer config={chartConfig} className="w-full h-[400px]">
+                <LineChart data={combinedData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} stroke="#94a3b8" />
+                  <XAxis dataKey="timestamp" type="number" domain={['dataMin', 'dataMax']} tick={(props) => <CustomXAxisTick {...props} hideTime={combinedData.length > 30} />} axisLine={false} tickLine={false} />
+                  <YAxis domain={['auto', 'auto']} tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+
+                  <ChartTooltip
+                    cursor={{ stroke: 'var(--border)', strokeWidth: 2 }}
+                    content={({ active, payload }) => {
+                      if (!active || !payload || !payload.length) return null;
+                      const data = payload[0].payload;
+                      const date = new Date(data.timestamp);
+                      return (
+                        <div className="w-[220px] rounded-2xl border border-border shadow-xl bg-card/95 backdrop-blur-md p-3 text-foreground">
+                          <div className="flex flex-col border-b border-border pb-2 mb-2">
+                            <span className="text-[10px] uppercase font-bold text-muted-foreground">{t('History.cols.date')}</span>
+                            <span className="text-xs font-bold">{date.toLocaleDateString()} | {date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                          </div>
+                          {data.isEvent ? (
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs uppercase">{getEventLabel(data.type)}</span>
                               </div>
-                            );
-                          }}
-                          formatter={(value, name, item) => (
-                            <div className="flex flex-col gap-2 w-full">
-                              <div className="flex items-center justify-between w-full my-0.5">
-                                <span className="text-muted-foreground text-xs font-medium">
-                                  {tCharts('ca125Title')}
-                                </span>
-                                <span className="font-bold text-foreground text-sm">
-                                  {value}
-                                  <span className="ml-1 font-normal text-[10px] text-muted-foreground uppercase">
-                                    U/ml
-                                  </span>
-                                </span>
-                              </div>
-                              {item.payload.measurementContext && (
-                                <div className="flex items-center justify-between w-full pt-1.5 border-t border-border">
-                                  <span className="text-muted-foreground text-[10px] uppercase font-bold tracking-tight">{t('History.cols.context')}</span>
-                                  <span className="text-muted-foreground text-[11px] font-semibold italic">{renderContext(item.payload.measurementContext)}</span>
-                                </div>
-                              )}
+                              {data.notes && <p className="text-[11px] text-muted-foreground italic leading-tight">"{data.notes}"</p>}
+                            </div>
+                          ) : (
+                            <div className="flex justify-between items-center">
+                              <span className="text-xs text-muted-foreground">CA-125</span>
+                              <span className="text-sm font-bold">{data.ca125} U/ml</span>
                             </div>
                           )}
-                        />
+                        </div>
+                      );
+                    }}
+                  />
+
+                  {/* LÍNEA ÚNICA CON DOTS PERSONALIZADOS */}
+                  <Line
+                    type="monotone"
+                    dataKey="ca125"
+                    stroke="var(--color-ca125)"
+                    strokeWidth={3}
+                    // --- PUNTO ESTÁTICO (Normal) ---
+                    dot={(props: any) => {
+                      const { cx, cy, payload } = props;
+                      if (payload.isEvent) {
+                        return (
+                          <rect
+                            key={`dot-ev-${payload.id}`}
+                            x={cx - 3}
+                            y={cy - 3}
+                            width={6}
+                            height={6}
+                            fill="#8b5cf6"
+                          />
+                        );
                       }
+                      return (
+                        <circle
+                          key={`dot-reg-${payload.id}`}
+                          cx={cx}
+                          cy={cy}
+                          r={4}
+                          fill="var(--color-ca125)"
+                          stroke="#fff"
+                          strokeWidth={2}
+                        />
+                      );
+                    }}
+                    // --- PUNTO ACTIVO (Hover) ---
+                    activeDot={(props: any) => {
+                      const { cx, cy, payload } = props;
+                      if (payload.isEvent) {
+                        return (
+                          <rect
+                            x={cx - 5}
+                            y={cy - 5}
+                            width={10}
+                            height={10}
+                            fill="#8b5cf6"
+                            stroke="#fff"
+                            strokeWidth={2}
+                          />
+                        );
+                      }
+                      return (
+                        <circle
+                          cx={cx}
+                          cy={cy}
+                          r={6}
+                          fill="var(--color-ca125)"
+                          stroke="#fff"
+                          strokeWidth={2}
+                        />
+                      );
+                    }}
+                  />
+
+                  {filteredEvents.map((event) => (
+                    <ReferenceLine
+                      key={event.id}
+                      x={new Date(event.date).getTime()}
+                      stroke="#8b5cf6"
+                      strokeDasharray="3 3"
+                      opacity={0.5}
+                      strokeWidth={1.5}
                     />
-                    <Line type="monotone" dataKey="ca125" stroke="var(--color-ca125)" strokeWidth={3} dot={{ r: 4, fill: "var(--color-ca125)", strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 6 }} />
-
-                    {/* Event Markers */}
-                    {filteredEvents.map((event) => (
-                      <ReferenceLine
-                        key={event.id}
-                        x={new Date(event.date).getTime()}
-                        stroke="#8b5cf6"
-                        strokeDasharray="3 3"
-                        label={{
-                          position: 'insideTop',
-                          value: new Date(event.date).toLocaleDateString(undefined, { day: '2-digit', month: '2-digit' }),
-                          fill: '#8b5cf6',
-                          fontSize: 10,
-                          fontWeight: 600,
-                          dy: -10
-                        }}
-                      />
-                    ))}
-                  </LineChart>
-                </ChartContainer>
-              </div>
-
+                  ))}
+                </LineChart>
+              </ChartContainer>
             </div>
-          )}
+          </div>
         </CardContent>
 
-        {finalData.length > 0 && (
-          <CardFooter className="pt-6 border-t border-border block">
-            <StatsSummary
-              label={tCharts('ca125Title')}
-              data={ca125Data}
-              colorClass="text-muted-foreground"
-              bgClass="bg-muted/50"
-              unit="U/ml"
-              legendDotColor="#475569"
-              showAvg={false}
-            />
-          </CardFooter>
-        )}
+        <CardFooter className="pt-6 border-t border-border">
+          <StatsSummary label={tCharts('ca125Title')} data={metricData.map(d => d.ca125)} unit="U/ml" showAvg={false} />
+        </CardFooter>
       </Card>
 
-      <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 delay-100">
-        <HistoryTableView
-          data={tableData}
-          isAdmin={false} // Read-only
-          onRefresh={() => { }}
-          visibleColumns={['createdAt', 'measurementContext', 'ca125', 'notes']}
-        />
-      </div>
+      <HistoryTableView
+        data={[...metricData, ...filteredEvents]}
+        isAdmin={isAdmin}
+        onRefresh={() => { }}
+        visibleColumns={['createdAt', 'measurementContext', 'ca125', 'notes']}
+      />
     </div>
   );
 }

@@ -115,13 +115,19 @@ export function BloodPressureChart({ data: initialData, events = [], isAdmin }: 
     })).sort((a, b) => a.timestamp - b.timestamp);
   }, [chartData, timeOfDay]);
 
+  // Definición de tipo para los puntos del gráfico
+  type ChartPoint = Partial<Metric> & Partial<HealthEvent> & {
+    timestamp: number;
+    isEvent: boolean;
+    systolic_graph?: number;
+    diastolic_graph?: number;
+    createdAt: string | Date;
+  };
+
   // Translation helper for event types
-  const getEventLabel = (eventType: string) => {
-    try {
-      return t(`HealthEvents.types.${eventType}`);
-    } catch {
-      return eventType;
-    }
+  const getEventLabel = (type?: string) => {
+    if (!type) return '';
+    try { return t(`HealthEvents.types.${type}`); } catch { return type; }
   };
 
   const systolicData = useMemo(() =>
@@ -138,12 +144,80 @@ export function BloodPressureChart({ data: initialData, events = [], isAdmin }: 
 
   const filteredEvents = useMemo(() => {
     if (!events) return [];
-    if (dateRange === 'all') return events;
-    const days = dateRange === '7d' ? 7 : 30;
-    const cutoff = new Date();
-    cutoff.setDate(cutoff.getDate() - days);
-    return events.filter(e => new Date(e.date) >= cutoff);
-  }, [events, dateRange]);
+
+    let result = events;
+
+    if (dateRange !== 'all') {
+      const days = dateRange === '7d' ? 7 : 30;
+      const cutoff = new Date();
+      cutoff.setDate(cutoff.getDate() - days);
+      result = result.filter(e => new Date(e.date) >= cutoff);
+    }
+
+    if (finalData.length > 0) {
+      const startTime = finalData[0].timestamp;
+      result = result.filter(e => new Date(e.date).getTime() >= startTime);
+    }
+
+    return result;
+  }, [events, dateRange, finalData]);
+
+  // COMBINAR EVENTOS Y MÉTRICAS EN UN SOLO ARRAY PARA LA LÍNEA
+  const combinedData = useMemo(() => {
+    if (finalData.length === 0) return [];
+
+    // 1. Añadimos flags a las métricas originales
+    const points: ChartPoint[] = finalData.map(m => ({
+      ...m,
+      isEvent: false,
+      systolic_graph: m.systolic_graph,
+      diastolic_graph: m.diastolic_graph
+    }));
+
+    // 2. Insertamos los eventos calculando su posición en la línea (interpolación doble)
+    filteredEvents.forEach(event => {
+      const eventTs = new Date(event.date).getTime();
+      const nextIdx = finalData.findIndex(d => d.timestamp > eventTs);
+
+      let sysVal = 0, diaVal = 0;
+
+      // Helper para obtener valores seguros
+      const getVals = (idx: number) => ({
+        s: finalData[idx]?.systolic_graph ?? 0,
+        d: finalData[idx]?.diastolic_graph ?? 0,
+        t: finalData[idx]?.timestamp ?? 0
+      });
+
+      if (nextIdx === 0) {
+        const v = getVals(0);
+        sysVal = v.s;
+        diaVal = v.d;
+      } else if (nextIdx === -1) {
+        const v = getVals(finalData.length - 1);
+        sysVal = v.s;
+        diaVal = v.d;
+      } else {
+        const p1 = getVals(nextIdx - 1);
+        const p2 = getVals(nextIdx);
+        const ratio = (eventTs - p1.t) / (p2.t - p1.t);
+
+        sysVal = p1.s + ratio * (p2.s - p1.s);
+        diaVal = p1.d + ratio * (p2.d - p1.d);
+      }
+
+      points.push({
+        ...event,
+        timestamp: eventTs,
+        systolic_graph: sysVal,
+        diastolic_graph: diaVal,
+        isEvent: true,
+        createdAt: event.date
+      });
+    });
+
+    return points.sort((a, b) => a.timestamp - b.timestamp);
+  }, [finalData, filteredEvents]);
+
 
   const uniqueEventTypes = useMemo(() => {
     return Array.from(new Set(filteredEvents.map(e => e.type)));
@@ -157,6 +231,61 @@ export function BloodPressureChart({ data: initialData, events = [], isAdmin }: 
   if (loading && chartData.length === 0) {
     return <ChartSkeleton />;
   }
+
+  // Define custom dot renderer separately to reuse
+  const CustomDot = (props: any, color: string) => {
+    const { cx, cy, payload } = props;
+    if (payload.isEvent) {
+      return (
+        <rect
+          key={`dot-ev-${payload.id}-${color}`}
+          x={cx - 3}
+          y={cy - 3}
+          width={6}
+          height={6}
+          fill="#8b5cf6"
+        />
+      );
+    }
+    return (
+      <circle
+        key={`dot-reg-${payload.id}-${color}`}
+        cx={cx}
+        cy={cy}
+        r={4}
+        fill={color}
+        stroke="#fff"
+        strokeWidth={2}
+      />
+    );
+  };
+
+  const CustomActiveDot = (props: any, color: string) => {
+    const { cx, cy, payload } = props;
+    if (payload.isEvent) {
+      return (
+        <rect
+          x={cx - 5}
+          y={cy - 5}
+          width={10}
+          height={10}
+          fill="#8b5cf6"
+          stroke="#fff"
+          strokeWidth={2}
+        />
+      );
+    }
+    return (
+      <circle
+        cx={cx}
+        cy={cy}
+        r={6}
+        fill={color}
+        stroke="#fff"
+        strokeWidth={2}
+      />
+    );
+  };
 
   return (
     <div className="space-y-6">
@@ -251,13 +380,13 @@ export function BloodPressureChart({ data: initialData, events = [], isAdmin }: 
               )}
               <div className="flex-1 min-w-0">
                 <ChartContainer config={chartConfig} className="w-full h-[400px]">
-                  <LineChart data={finalData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
+                  <LineChart data={combinedData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                     <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} stroke="#94a3b8" />
                     <XAxis
                       dataKey="timestamp"
                       type="number"
                       domain={['dataMin', 'dataMax']}
-                      tick={(props) => <CustomXAxisTick {...props} hideTime={finalData.length > 30} />}
+                      tick={(props) => <CustomXAxisTick {...props} hideTime={combinedData.length > 30} />}
                       interval="preserveStartEnd"
                       minTickGap={50}
                       axisLine={false}
@@ -272,64 +401,70 @@ export function BloodPressureChart({ data: initialData, events = [], isAdmin }: 
                     />
                     <ChartTooltip
                       cursor={{ stroke: 'var(--border)', strokeWidth: 2 }}
-                      content={
-                        <ChartTooltipContent
-                          indicator="line"
-                          className="w-[200px] rounded-2xl border border-border/10 shadow-xl bg-card/95 backdrop-blur-md p-3 text-foreground"
-                          labelFormatter={(value, payload) => {
-                            const dateValue = value || (payload && payload[0]?.payload?.createdAt);
-                            if (!dateValue) return null;
-                            const date = new Date(dateValue);
-                            if (isNaN(date.getTime())) return null;
-                            return (
-                              <div className="flex flex-col border-b border-border pb-2 mb-2">
-                                <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">
-                                  {t('History.cols.date')}
-                                </span>
-                                <span className="text-xs font-bold text-foreground">
-                                  {date.toLocaleDateString('es-ES', { day: 'numeric', month: 'numeric', year: 'numeric' })}
-                                  <span className="mx-1 text-muted">|</span>
-                                  {date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false })}
-                                </span>
-                              </div>
-                            );
-                          }}
-                          formatter={(value, name, item) => {
-                            const labelMap: Record<string, string> = {
-                              systolic_graph: tCharts('systolic'),
-                              diastolic_graph: tCharts('diastolic'),
-                            };
+                      content={({ active, payload }) => {
+                        if (!active || !payload || !payload.length) return null;
+                        const data = payload[0].payload as ChartPoint;
+                        const date = new Date(data.timestamp);
 
-                            return (
+                        return (
+                          <div className="w-[200px] rounded-2xl border border-border/10 shadow-xl bg-card/95 backdrop-blur-md p-3 text-foreground">
+                            <div className="flex flex-col border-b border-border pb-2 mb-2">
+                              <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">
+                                {t('History.cols.date')}
+                              </span>
+                              <span className="text-xs font-bold text-foreground">
+                                {date.toLocaleDateString('es-ES', { day: 'numeric', month: 'numeric', year: 'numeric' })}
+                                <span className="mx-1 text-muted">|</span>
+                                {date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', hour12: false })}
+                              </span>
+                            </div>
+
+                            {data.isEvent ? (
+                              <div className="space-y-1">
+                                <div className="flex items-center gap-2">
+                                  <span className="text-xs uppercase font-bold text-foreground">{getEventLabel(data.type)}</span>
+                                </div>
+                                {data.notes && <p className="text-[11px] text-muted-foreground italic leading-tight">"{data.notes}"</p>}
+                              </div>
+                            ) : (
                               <div className="flex flex-col gap-2 w-full">
                                 <div className="flex items-center justify-between w-full my-0.5">
-                                  <div className="flex items-center gap-2">
-                                    <span className="text-muted-foreground text-xs font-medium">
-                                      {labelMap[name as string] || name}
-                                    </span>
-                                  </div>
-                                  <span className="font-bold text-foreground text-sm">
-                                    {value}
-                                    <span className="ml-1 font-normal text-[10px] text-muted-foreground uppercase">
-                                      mmHg
-                                    </span>
-                                  </span>
+                                  <span className="text-muted-foreground text-xs font-medium">{tCharts('systolic')}</span>
+                                  <span className="font-bold text-foreground text-sm">{data.systolic_graph} <span className="ml-1 font-normal text-[10px] uppercase">mmHg</span></span>
                                 </div>
-                                {name === 'diastolic_graph' && item.payload.measurementContext && (
+                                <div className="flex items-center justify-between w-full my-0.5">
+                                  <span className="text-muted-foreground text-xs font-medium">{tCharts('diastolic')}</span>
+                                  <span className="font-bold text-foreground text-sm">{data.diastolic_graph} <span className="ml-1 font-normal text-[10px] uppercase">mmHg</span></span>
+                                </div>
+                                {data.measurementContext && (
                                   <div className="flex items-center justify-between w-full pt-1.5 border-t border-border">
                                     <span className="text-muted-foreground text-[10px] uppercase font-bold tracking-tight">{t('History.cols.context')}</span>
-                                    <span className="text-muted-foreground text-[11px] font-semibold italic">{renderContext(item.payload.measurementContext)}</span>
+                                    <span className="text-muted-foreground text-[11px] font-semibold italic">{renderContext(data.measurementContext)}</span>
                                   </div>
                                 )}
                               </div>
-                            );
-                          }}
-                        />
-                      }
+                            )}
+                          </div>
+                        );
+                      }}
                     />
 
-                    <Line type="monotone" dataKey="systolic_graph" stroke="var(--chart-systolic)" strokeWidth={3} dot={{ r: 4, fill: "var(--chart-systolic)", strokeWidth: 2, stroke: '#fff' }} activeDot={{ r: 6 }} />
-                    <Line type="monotone" dataKey="diastolic_graph" stroke="var(--chart-diastolic)" strokeWidth={3} dot={{ r: 4, fill: "var(--chart-diastolic)", strokeWidth: 2, stroke: '#fff' }} />
+                    <Line
+                      type="monotone"
+                      dataKey="systolic_graph"
+                      stroke="var(--chart-systolic)"
+                      strokeWidth={3}
+                      dot={(props: any) => CustomDot(props, "var(--chart-systolic)")}
+                      activeDot={(props: any) => CustomActiveDot(props, "var(--chart-systolic)")}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="diastolic_graph"
+                      stroke="var(--chart-diastolic)"
+                      strokeWidth={3}
+                      dot={(props: any) => CustomDot(props, "var(--chart-diastolic)")}
+                      activeDot={(props: any) => CustomActiveDot(props, "var(--chart-diastolic)")}
+                    />
 
                     {filteredEvents.map((event) => (
                       <ReferenceLine
@@ -337,14 +472,8 @@ export function BloodPressureChart({ data: initialData, events = [], isAdmin }: 
                         x={new Date(event.date).getTime()}
                         stroke="#8b5cf6"
                         strokeDasharray="3 3"
-                        label={{
-                          position: 'insideTop',
-                          value: new Date(event.date).toLocaleDateString(undefined, { day: '2-digit', month: '2-digit' }),
-                          fill: '#8b5cf6',
-                          fontSize: 10,
-                          fontWeight: 600,
-                          dy: -10
-                        }}
+                        opacity={0.5}
+                        strokeWidth={1.5}
                       />
                     ))}
                   </LineChart>
