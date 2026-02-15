@@ -71,6 +71,7 @@ const config = {
                     alert: "var(--metric-alert)",
                 },
                 event: {
+                    DEFAULT: "var(--chart-event)",
                     chemo: {
                         DEFAULT: "var(--event-chemo)",
                         muted: "var(--event-chemo-muted)",

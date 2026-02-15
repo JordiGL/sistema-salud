@@ -40,17 +40,11 @@ const CustomXAxisTick = ({ x, y, payload, hideTime }: any) => {
 const chartConfig = {
   systolic: {
     label: "Sistólica",
-    theme: {
-      light: "#475569",
-      dark: "#4c8edfff",
-    },
+    color: "var(--chart-systolic)",
   },
   diastolic: {
     label: "Diastólica",
-    theme: {
-      light: "#94a3b8",
-      dark: "#64748b",
-    },
+    color: "var(--chart-diastolic)",
   },
 } satisfies ChartConfig;
 
@@ -243,7 +237,7 @@ export function BloodPressureChart({ data: initialData, events = [], isAdmin }: 
           y={cy - 3}
           width={6}
           height={6}
-          fill="#8b5cf6"
+          fill="var(--chart-event)"
         />
       );
     }
@@ -269,7 +263,7 @@ export function BloodPressureChart({ data: initialData, events = [], isAdmin }: 
           y={cy - 5}
           width={10}
           height={10}
-          fill="#8b5cf6"
+          fill="var(--chart-event)"
           stroke="#fff"
           strokeWidth={2}
         />
@@ -372,7 +366,7 @@ export function BloodPressureChart({ data: initialData, events = [], isAdmin }: 
                 <div className="flex flex-wrap gap-3 px-2">
                   {uniqueEventTypes.map(type => (
                     <div key={type} className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-[#8b5cf6]" />
+                      <span className="w-2 h-2 rounded-full bg-[var(--chart-event)]" />
                       <span className="text-[10px] uppercase font-bold text-muted-foreground">{getEventLabel(type)}</span>
                     </div>
                   ))}
@@ -470,7 +464,7 @@ export function BloodPressureChart({ data: initialData, events = [], isAdmin }: 
                       <ReferenceLine
                         key={event.id}
                         x={new Date(event.date).getTime()}
-                        stroke="#8b5cf6"
+                        stroke="var(--chart-event)"
                         strokeDasharray="3 3"
                         opacity={0.5}
                         strokeWidth={1.5}

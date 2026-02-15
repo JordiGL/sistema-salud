@@ -276,7 +276,7 @@ export function PulseChart({ data: initialData, events = [], isAdmin }: { data: 
                 <div className="flex flex-wrap gap-3 px-2">
                   {uniqueEventTypes.map(type => (
                     <div key={type} className="flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-[#8b5cf6]" />
+                      <span className="w-2 h-2 rounded-full bg-[var(--chart-event)]" />
                       <span className="text-[10px] uppercase font-bold text-muted-foreground">{getEventLabel(type)}</span>
                     </div>
                   ))}
@@ -352,7 +352,7 @@ export function PulseChart({ data: initialData, events = [], isAdmin }: { data: 
                     <Line
                       type="monotone"
                       dataKey="pulse"
-                      stroke="var(--color-pulse)"
+                      stroke="var(--chart-metric)"
                       strokeWidth={3}
                       // --- PUNTO ESTÁTICO (Normal) ---
                       dot={(props: any) => {
@@ -365,7 +365,7 @@ export function PulseChart({ data: initialData, events = [], isAdmin }: { data: 
                               y={cy - 3}
                               width={6}
                               height={6}
-                              fill="#8b5cf6"
+                              fill="var(--chart-event)"
                             />
                           );
                         }
@@ -375,7 +375,7 @@ export function PulseChart({ data: initialData, events = [], isAdmin }: { data: 
                             cx={cx}
                             cy={cy}
                             r={4}
-                            fill="var(--color-pulse)"
+                            fill="var(--chart-metric)"
                             stroke="#fff"
                             strokeWidth={2}
                           />
@@ -391,7 +391,7 @@ export function PulseChart({ data: initialData, events = [], isAdmin }: { data: 
                               y={cy - 5}
                               width={10}
                               height={10}
-                              fill="#8b5cf6"
+                              fill="var(--chart-event)"
                               stroke="#fff"
                               strokeWidth={2}
                             />
@@ -402,7 +402,7 @@ export function PulseChart({ data: initialData, events = [], isAdmin }: { data: 
                             cx={cx}
                             cy={cy}
                             r={6}
-                            fill="var(--color-pulse)"
+                            fill="var(--chart-metric)"
                             stroke="#fff"
                             strokeWidth={2}
                           />
@@ -414,7 +414,7 @@ export function PulseChart({ data: initialData, events = [], isAdmin }: { data: 
                       <ReferenceLine
                         key={event.id}
                         x={new Date(event.date).getTime()}
-                        stroke="#8b5cf6"
+                        stroke="var(--chart-event)"
                         strokeDasharray="3 3"
                         opacity={0.5}
                         strokeWidth={1.5}
@@ -437,7 +437,7 @@ export function PulseChart({ data: initialData, events = [], isAdmin }: { data: 
               colorClass="text-muted-foreground"
               bgClass="bg-muted/50"
               unit="bpm"
-              legendDotColor="#475569"
+              legendDotColor="var(--chart-metric)"
             />
           </CardFooter>
         )}

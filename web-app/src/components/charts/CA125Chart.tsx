@@ -222,7 +222,7 @@ export function CA125Chart({ data: initialData, events = [], isAdmin }: { data: 
                   <Line
                     type="monotone"
                     dataKey="ca125"
-                    stroke="var(--color-ca125)"
+                    stroke="var(--chart-metric)"
                     strokeWidth={3}
                     // --- PUNTO ESTÁTICO (Normal) ---
                     dot={(props: any) => {
@@ -235,7 +235,7 @@ export function CA125Chart({ data: initialData, events = [], isAdmin }: { data: 
                             y={cy - 3}
                             width={6}
                             height={6}
-                            fill="#8b5cf6"
+                            fill="var(--chart-event)"
                           />
                         );
                       }
@@ -245,7 +245,7 @@ export function CA125Chart({ data: initialData, events = [], isAdmin }: { data: 
                           cx={cx}
                           cy={cy}
                           r={4}
-                          fill="var(--color-ca125)"
+                          fill="var(--chart-metric)"
                           stroke="#fff"
                           strokeWidth={2}
                         />
@@ -261,7 +261,7 @@ export function CA125Chart({ data: initialData, events = [], isAdmin }: { data: 
                             y={cy - 5}
                             width={10}
                             height={10}
-                            fill="#8b5cf6"
+                            fill="var(--chart-event)"
                             stroke="#fff"
                             strokeWidth={2}
                           />
@@ -272,7 +272,7 @@ export function CA125Chart({ data: initialData, events = [], isAdmin }: { data: 
                           cx={cx}
                           cy={cy}
                           r={6}
-                          fill="var(--color-ca125)"
+                          fill="var(--chart-metric)"
                           stroke="#fff"
                           strokeWidth={2}
                         />
@@ -284,7 +284,7 @@ export function CA125Chart({ data: initialData, events = [], isAdmin }: { data: 
                     <ReferenceLine
                       key={event.id}
                       x={new Date(event.date).getTime()}
-                      stroke="#8b5cf6"
+                      stroke="var(--chart-event)"
                       strokeDasharray="3 3"
                       opacity={0.5}
                       strokeWidth={1.5}
@@ -297,7 +297,13 @@ export function CA125Chart({ data: initialData, events = [], isAdmin }: { data: 
         </CardContent>
 
         <CardFooter className="pt-6 border-t border-border">
-          <StatsSummary label={tCharts('ca125Title')} data={metricData.map(d => d.ca125)} unit="U/ml" showAvg={false} />
+          <StatsSummary
+            label={tCharts('ca125Title')}
+            data={metricData.map(d => d.ca125)}
+            unit="U/ml"
+            showAvg={false}
+            legendDotColor="var(--chart-metric)"
+          />
         </CardFooter>
       </Card>
 

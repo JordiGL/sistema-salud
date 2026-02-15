@@ -2,219 +2,225 @@
 @config "../../tailwind.config.ts";
 
 @layer base {
-  :root {
-    /* ========================================================================
+   :root {
+      /* ========================================================================
        1. GLOBAL PAGE BACKGROUND & TEXT
        Color principal del fondo de la web y texto base
        ======================================================================== */
-    --background: #f8fafc;
-    /* Slate-50: Softer, premium background */
-    --foreground: #0f172a;
-    /* Slate-900: Deep, accessible text */
+      --background: #f8fafc;
+      /* Slate-50: Softer, premium background */
+      --foreground: #0f172a;
+      /* Slate-900: Deep, accessible text */
 
-    /* ========================================================================
+      /* ========================================================================
        2. CONTAINERS, CARDS & TABLES
        Fondo de tablas, tarjetas y contenedores
        ======================================================================== */
-    --card: #ffffff;
-    /* Pure white cards pop against Slate-50 */
-    --card-foreground: #0f172a;
+      --card: #ffffff;
+      /* Pure white cards pop against Slate-50 */
+      --card-foreground: #0f172a;
 
-    --popover: #ffffff;
-    --popover-foreground: #0f172a;
+      --popover: #ffffff;
+      --popover-foreground: #0f172a;
 
-    /* ========================================================================
+      /* ========================================================================
        3. BUTTONS (BOTONES)
        Colores específicos para acciones principales
        ======================================================================== */
 
-    /* Primary / Generic */
-    --primary: #0f172a;
-    /* Slate-900: Strong, professional primary */
-    --primary-foreground: #f8fafc;
+      /* Primary / Generic */
+      --primary: #0f172a;
+      /* Slate-900: Strong, professional primary */
+      --primary-foreground: #f8fafc;
 
-    /* Secondary */
-    --secondary: #f1f5f9;
-    /* Slate-100: Subtle secondary backgrounds */
-    --secondary-foreground: #0f172a;
+      /* Secondary */
+      --secondary: #f1f5f9;
+      /* Slate-100: Subtle secondary backgrounds */
+      --secondary-foreground: #0f172a;
 
-    /* SAVE Button (Guardar) */
-    --btn-save: #0f172a;
-    /* Unified with Primary */
-    --btn-save-foreground: #ffffff;
+      /* SAVE Button (Guardar) */
+      --btn-save: #0f172a;
+      /* Unified with Primary */
+      --btn-save-foreground: #ffffff;
 
-    /* CLEAR Button (Limpiar) */
-    --btn-clear: #ffffff;
-    --btn-clear-foreground: #64748b;
-    /* Slate-500: Softer text for clear */
-    --btn-clear-hover: #f1f5f9;
+      /* CLEAR Button (Limpiar) */
+      --btn-clear: #ffffff;
+      --btn-clear-foreground: #64748b;
+      /* Slate-500: Softer text for clear */
+      --btn-clear-hover: #f1f5f9;
 
-    /* DELETE Button (Eliminar) */
-    --destructive: #ef4444;
-    /* Red-500 */
-    --destructive-foreground: #ffffff;
-    /* Alias semantic specific for Delete button */
-    --btn-delete: var(--destructive);
-    --btn-delete-foreground: var(--destructive-foreground);
+      /* DELETE Button (Eliminar) */
+      --destructive: #ef4444;
+      /* Red-500 */
+      --destructive-foreground: #ffffff;
+      /* Alias semantic specific for Delete button */
+      --btn-delete: var(--destructive);
+      --btn-delete-foreground: var(--destructive-foreground);
 
-    /* ========================================================================
+      /* ========================================================================
        4. INPUTS & BORDERS
        Fondo de inputs y color de bordes
        ======================================================================== */
-    --input: #ffffff;
-    /* White inputs */
-    --border: #e2e8f0;
-    /* Slate-200: Subtle definition */
-    --ring: #0f172a;
-    /* Focus ring matches primary */
-    --radius: 0.5rem;
+      --input: #ffffff;
+      /* White inputs */
+      --border: #e2e8f0;
+      /* Slate-200: Subtle definition */
+      --ring: #0f172a;
+      /* Focus ring matches primary */
+      --radius: 0.5rem;
 
-    /* ========================================================================
+      /* ========================================================================
        5. DATA VISUALIZATION (CHARTS)
        Colores de los gráficos (Sistólica, Diastólica, Peso, etc.)
        ======================================================================== */
-    --chart-systolic: #1e293b;
-    /* Slate-800 */
-    --chart-diastolic: #64748b;
-    /* Slate-500 */
-    --chart-metric: #475569;
-    /* Slate-600 */
+      --chart-systolic: #1e293b;
+      /* Slate-800 */
+      --chart-diastolic: #64748b;
+      /* Slate-500 */
+      --chart-metric: #475569;
+      /* Slate-600 */
 
-    /* ========================================================================
+      /* ========================================================================
        6. HEALTH STATUS INDICATORS
        Colores para estados de salud (Estable, Alerta, Precaución)
        ======================================================================== */
-    --metric-stable: #10b981;
-    /* Emerald-500 */
-    --metric-warning: #f59e0b;
-    /* Amber-500 */
-    --metric-alert: #ef4444;
-    /* Red-500 */
+      --metric-stable: #10b981;
+      /* Emerald-500 */
+      --metric-warning: #f59e0b;
+      /* Amber-500 */
+      --metric-alert: #ef4444;
+      /* Red-500 */
 
-    /* ========================================================================
+      /* ========================================================================
        7. EVENTS (EVENTOS)
        Colores para tipos de eventos (Quimio, Visitas, etc.)
        ======================================================================== */
-    --event-chemo: #7e22ce;
-    /* Purple-700 */
-    --event-chemo-muted: #f3e8ff;
-    /* Purple-100 */
+      --chart-event: #41b9ff;
+      /* Blue-700 */
 
-    /* ========================================================================
+      /* Legacy alias - linked to chart-event */
+      --event-chemo: var(--chart-event);
+      --event-chemo-muted: #f3e8ff;
+      /* Purple-100 */
+
+      /* ========================================================================
        8. UTILITIES & ACCENTS
        Hover centralizado y otros acentos
        ======================================================================== */
-    --hover: #f1f5f9;
-    /* Slate-100 */
+      --hover: #f1f5f9;
+      /* Slate-100 */
 
-    --muted: #f1f5f9;
-    /* Slate-100 */
-    --muted-foreground: #64748b;
-    /* Slate-500: Elegant muted text */
+      --muted: #f1f5f9;
+      /* Slate-100 */
+      --muted-foreground: #64748b;
+      /* Slate-500: Elegant muted text */
 
-    --accent: #f1f5f9;
-    --accent-foreground: #0f172a;
+      --accent: #f1f5f9;
+      --accent-foreground: #0f172a;
 
-    /* Brand Colors (Static) */
-    --vital-main: #0f172a;
-    --vital-ai: #4f46e5;
-    /* Indigo-600 */
-  }
+      /* Brand Colors (Static) */
+      --vital-main: #0f172a;
+      --vital-ai: #4f46e5;
+      /* Indigo-600 */
+   }
 
-  .dark {
-    /* ========================================================================
+   .dark {
+      /* ========================================================================
        DARK MODE OVERRIDES
        ======================================================================== */
 
-    /* 1. Global Background */
-    --background: #020617;
-    /* Slate-950: Cleaner, deeper dark */
-    --foreground: #f8fafc;
-    /* Slate-50: High contrast text */
+      /* 1. Global Background */
+      --background: #020617;
+      /* Slate-950: Cleaner, deeper dark */
+      --foreground: #f8fafc;
+      /* Slate-50: High contrast text */
 
-    /* 2. Containers */
-    --card: #0f172a;
-    /* Slate-900: Slightly lighter for depth */
-    --card-foreground: #f8fafc;
+      /* 2. Containers */
+      --card: #0f172a;
+      /* Slate-900: Slightly lighter for depth */
+      --card-foreground: #f8fafc;
 
-    --popover: #0f172a;
-    --popover-foreground: #f8fafc;
+      --popover: #0f172a;
+      --popover-foreground: #f8fafc;
 
-    /* 3. Buttons */
-    --primary: #3b82f6;
-    /* Blue-500: Vibrant primary action */
-    --primary-foreground: #ffffff;
+      /* 3. Buttons */
+      --primary: #3b82f6;
+      /* Blue-500: Vibrant primary action */
+      --primary-foreground: #ffffff;
 
-    --secondary: #1e293b;
-    /* Slate-800 */
-    --secondary-foreground: #f8fafc;
+      --secondary: #1e293b;
+      /* Slate-800 */
+      --secondary-foreground: #f8fafc;
 
-    --btn-save: #1e293b;
-    /* Slate-800: More subtle save button */
-    --btn-save-foreground: #ffffff;
+      --btn-save: #1e293b;
+      /* Slate-800: More subtle save button */
+      --btn-save-foreground: #ffffff;
 
-    --btn-clear: #1e293b;
-    /* Discrete dark button */
-    --btn-clear-foreground: #f8fafc;
-    --btn-clear-hover: #334155;
+      --btn-clear: #1e293b;
+      /* Discrete dark button */
+      --btn-clear-foreground: #f8fafc;
+      --btn-clear-hover: #334155;
 
-    --destructive: #7f1d1d;
-    /* Red-900 */
-    --destructive-foreground: #f8fafc;
-    --btn-delete: var(--destructive);
-    --btn-delete-foreground: var(--destructive-foreground);
+      --destructive: #7f1d1d;
+      /* Red-900 */
+      --destructive-foreground: #f8fafc;
+      --btn-delete: var(--destructive);
+      --btn-delete-foreground: var(--destructive-foreground);
 
-    /* 4. Inputs & Borders */
-    --input: #1e293b;
-    /* Slate-800 */
-    --border: #1e293b;
-    /* Subtle dark border */
-    --ring: #3b82f6;
-    /* Focus ring matches primary */
+      /* 4. Inputs & Borders */
+      --input: #1e293b;
+      /* Slate-800 */
+      --border: #1e293b;
+      /* Subtle dark border */
+      --ring: #3b82f6;
+      /* Focus ring matches primary */
 
-    /* 5. Charts (Dark) */
-    --chart-systolic: #60a5fa;
-    /* Blue-400 */
-    --chart-diastolic: #94a3b8;
-    /* Slate-400 */
-    --chart-metric: #cbd5e1;
-    /* Slate-300 */
+      /* 5. Charts (Dark) */
+      --chart-systolic: #637391;
+      /* Blue-400 */
+      --chart-diastolic: #cbd5e1;
+      /* Slate-400 */
+      --chart-metric: #cbd5e1;
+      /* Slate-300 */
 
-    /* 6. Health Status (Dark) */
-    --metric-stable: #34d399;
-    /* Emerald-400 */
-    --metric-warning: #fbbf24;
-    /* Amber-400 */
-    --metric-alert: #f87171;
-    /* Red-400 */
+      /* 6. Health Status (Dark) */
+      --metric-stable: #34d399;
+      /* Emerald-400 */
+      --metric-warning: #fbbf24;
+      /* Amber-400 */
+      --metric-alert: #f87171;
+      /* Red-400 */
 
-    /* 7. Events (Dark) */
-    --event-chemo: #c084fc;
-    /* Purple-400 */
-    --event-chemo-muted: #3b2c4d;
-    /* Dark Purple Muted */
+      /* 7. Events (Dark) */
+      --chart-event: #ff8800;
+      /* Orange-400 */
 
-    /* 8. Utilities */
-    --hover: #1e293b;
-    /* Consistent hover state */
+      /* Legacy alias - linked to chart-event */
+      --event-chemo: var(--chart-event);
+      --event-chemo-muted: #3b2c4d;
+      /* Dark Purple Muted */
 
-    --muted: #1e293b;
-    --muted-foreground: #94a3b8;
+      /* 8. Utilities */
+      --hover: #1e293b;
+      /* Consistent hover state */
 
-    --accent: #1e293b;
-    --accent-foreground: #f8fafc;
+      --muted: #1e293b;
+      --muted-foreground: #94a3b8;
 
-    --vital-ai: #818cf8;
-    /* Indigo-400 */
-  }
+      --accent: #1e293b;
+      --accent-foreground: #f8fafc;
+
+      --vital-ai: #818cf8;
+      /* Indigo-400 */
+   }
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
+   * {
+      @apply border-border;
+   }
 
-  body {
-    @apply bg-background text-foreground;
-  }
+   body {
+      @apply bg-background text-foreground;
+   }
 }
