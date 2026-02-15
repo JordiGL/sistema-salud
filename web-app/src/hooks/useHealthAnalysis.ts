@@ -28,9 +28,12 @@ export function useHealthAnalysis() {
             const uploadData = new FormData();
             uploadData.append("file", file);
 
-            // Use the constant instead of hardcoded string
+            const token = localStorage.getItem(STORAGE_KEYS.TOKEN);
             const response = await fetch(API_ROUTES.ANALYZE, {
                 method: "POST",
+                headers: {
+                    "Authorization": `Bearer ${token}`,
+                },
                 body: uploadData,
             });
 
