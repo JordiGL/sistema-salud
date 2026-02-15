@@ -436,6 +436,11 @@ export function BloodPressureChart({ data: initialData, events = [], isAdmin }: 
                                     <span className="text-muted-foreground text-[11px] font-semibold italic">{renderContext(data.measurementContext)}</span>
                                   </div>
                                 )}
+                                {data.notes && (
+                                  <div className="pt-1.5 border-t border-border">
+                                    <p className="text-[11px] text-muted-foreground italic leading-tight">"{data.notes}"</p>
+                                  </div>
+                                )}
                               </div>
                             )}
                           </div>

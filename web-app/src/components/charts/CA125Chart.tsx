@@ -208,9 +208,16 @@ export function CA125Chart({ data: initialData, events = [], isAdmin }: { data: 
                               {data.notes && <p className="text-[11px] text-muted-foreground italic leading-tight">"{data.notes}"</p>}
                             </div>
                           ) : (
-                            <div className="flex justify-between items-center">
-                              <span className="text-xs text-muted-foreground">CA-125</span>
-                              <span className="text-sm font-bold">{data.ca125} U/ml</span>
+                            <div className="flex flex-col gap-2 w-full">
+                              <div className="flex justify-between items-center my-0.5">
+                                <span className="text-xs text-muted-foreground font-medium">CA-125</span>
+                                <span className="text-sm font-bold text-foreground">{data.ca125} U/ml</span>
+                              </div>
+                              {data.notes && (
+                                <div className="pt-1.5 border-t border-border">
+                                  <p className="text-[11px] text-muted-foreground italic leading-tight">"{data.notes}"</p>
+                                </div>
+                              )}
                             </div>
                           )}
                         </div>
