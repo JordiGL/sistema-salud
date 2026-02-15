@@ -192,8 +192,8 @@
       /* Red-400 */
 
       /* 7. Events (Dark) */
-      --chart-event: #ff8800;
-      /* Orange-400 */
+      --chart-event: #41b9ff;
+      /* Blue-700 */
 
       /* Legacy alias - linked to chart-event */
       --event-chemo: var(--chart-event);

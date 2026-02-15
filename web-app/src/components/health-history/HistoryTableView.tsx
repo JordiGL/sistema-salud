@@ -129,17 +129,6 @@ export function HistoryTableView({ data, isAdmin, onRefresh, embedded = false, v
                   </div>
                 </TableHead>
               )}
-              {isColumnVisible('measurementContext') && (
-                <TableHead
-                  className="min-w-[100px] cursor-pointer hover:bg-muted/50 transition-colors group select-none"
-                  onClick={() => handleSort('measurementContext')}
-                >
-                  <div className="flex items-center">
-                    {t('History.cols.context')}
-                    <SortIcon columnKey="measurementContext" />
-                  </div>
-                </TableHead>
-              )}
               {isColumnVisible('bloodPressure') && (
                 <TableHead
                   className="min-w-[100px] cursor-pointer hover:bg-muted/50 transition-colors group select-none"
@@ -170,6 +159,17 @@ export function HistoryTableView({ data, isAdmin, onRefresh, embedded = false, v
                   <div className="flex items-center">
                     {t('History.cols.spo2')}
                     <SortIcon columnKey="spo2" />
+                  </div>
+                </TableHead>
+              )}
+              {isColumnVisible('measurementContext') && (
+                <TableHead
+                  className="min-w-[100px] cursor-pointer hover:bg-muted/50 transition-colors group select-none"
+                  onClick={() => handleSort('measurementContext')}
+                >
+                  <div className="flex items-center">
+                    {t('History.cols.context')}
+                    <SortIcon columnKey="measurementContext" />
                   </div>
                 </TableHead>
               )}
@@ -224,26 +224,26 @@ export function HistoryTableView({ data, isAdmin, onRefresh, embedded = false, v
               if (isEvent(row)) {
                 const dateObj = new Date(row.date || row.createdAt);
                 return (
-                  <TableRow key={row.id} className="bg-event-chemo-muted/50 hover:bg-event-chemo-muted border-l-4 border-event-chemo transition-colors">
+                  <TableRow key={row.id} className="transition-colors hover:opacity-90 border-l-4 border-[var(--chart-event)]" style={{ backgroundColor: 'color-mix(in srgb, var(--chart-event), transparent 85%)' }}>
                     {isColumnVisible('createdAt') && (
-                      <TableCell className="font-medium text-event-chemo">
+                      <TableCell className="font-medium text-foreground">
                         <div className="flex flex-col">
                           <span>{dateObj.toLocaleDateString()}</span>
                           <span className="text-xs opacity-70 font-normal">{dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                         </div>
                       </TableCell>
                     )}
-                    {isColumnVisible('measurementContext') && (
+                    {/* Empty cells for metrics */}
+                    {isColumnVisible('bloodPressure') && (
                       <TableCell>
                         <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full font-medium inline-block border border-border">
                           {t(('HealthEvents.types.' + row.type) as any)}
                         </span>
                       </TableCell>
                     )}
-                    {/* Empty cells for metrics */}
-                    {isColumnVisible('bloodPressure') && <TableCell><span className="text-muted-foreground/10">-</span></TableCell>}
                     {isColumnVisible('pulse') && <TableCell><span className="text-muted-foreground/10">-</span></TableCell>}
                     {isColumnVisible('spo2') && <TableCell><span className="text-muted-foreground/10">-</span></TableCell>}
+                    {isColumnVisible('measurementContext') && <TableCell><span className="text-muted-foreground/10">-</span></TableCell>}
                     {isColumnVisible('ca125') && <TableCell className="border-l border-border"><span className="text-muted-foreground/10">-</span></TableCell>}
                     {isColumnVisible('weight') && <TableCell className="border-l border-border"><span className="text-muted-foreground/10">-</span></TableCell>}
                     {isColumnVisible('weightLocation') && <TableCell><span className="text-muted-foreground/10">-</span></TableCell>}
@@ -325,16 +325,6 @@ export function HistoryTableView({ data, isAdmin, onRefresh, embedded = false, v
                     </TableCell>
                   )}
 
-                  {isColumnVisible('measurementContext') && (
-                    <TableCell>
-                      {row.measurementContext ? (
-                        <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full font-medium inline-block border border-border">
-                          {renderContext(row.measurementContext)}
-                        </span>
-                      ) : <span className="text-muted-foreground/30">-</span>}
-                    </TableCell>
-                  )}
-
                   {isColumnVisible('bloodPressure') && (
                     <TableCell>{row.bloodPressure ? <span className="font-bold"><span className={STATUS_COLORS[sysStatus].text}>{sys}</span><span className="text-muted-foreground/40 mx-0.5">/</span><span className={STATUS_COLORS[diaStatus].text}>{dia}</span></span> : <span className="text-muted-foreground/30">-</span>}</TableCell>
                   )}
@@ -343,6 +333,15 @@ export function HistoryTableView({ data, isAdmin, onRefresh, embedded = false, v
                   )}
                   {isColumnVisible('spo2') && (
                     <TableCell className="font-bold">{row.spo2 ? <span className={STATUS_COLORS[spo2Status].text}>{row.spo2}</span> : <span className="text-muted-foreground/30">-</span>}</TableCell>
+                  )}
+                  {isColumnVisible('measurementContext') && (
+                    <TableCell>
+                      {row.measurementContext ? (
+                        <span className="text-xs text-muted-foreground bg-muted px-2 py-1 rounded-full font-medium inline-block border border-border">
+                          {renderContext(row.measurementContext)}
+                        </span>
+                      ) : <span className="text-muted-foreground/30">-</span>}
+                    </TableCell>
                   )}
                   {isColumnVisible('ca125') && (
                     <TableCell className="border-l border-border">{row.ca125 ? <span className="font-bold text-foreground">{row.ca125}</span> : <span className="text-muted-foreground/30">-</span>}</TableCell>
