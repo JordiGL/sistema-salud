@@ -45,6 +45,20 @@ export function CA125Chart({ data: initialData, events = [], isAdmin }: { data: 
   const [contextFilter, setContextFilter] = useState<string>('all');
   const [timeOfDay, setTimeOfDay] = useState<string>('24h');
 
+  // Compute fixed domain based on ALL data to prevent jumping
+  const yDomain = useMemo(() => {
+    const values = initialData
+      .map(d => d.ca125)
+      .filter(v => v !== null && v !== undefined && !isNaN(Number(v)))
+      .map(Number);
+
+    if (values.length === 0) return [0, 'auto'];
+
+    const max = Math.max(...values);
+    // Add 10-20% padding on top
+    return [0, Math.ceil(max * 1.2)];
+  }, [initialData]);
+
   useEffect(() => {
     const loadFilteredData = async () => {
       setLoading(true);
@@ -172,7 +186,7 @@ export function CA125Chart({ data: initialData, events = [], isAdmin }: { data: 
                 <LineChart data={combinedData} margin={{ top: 10, right: 30, left: 0, bottom: 0 }}>
                   <CartesianGrid strokeDasharray="3 3" opacity={0.15} vertical={false} stroke="#94a3b8" />
                   <XAxis dataKey="timestamp" type="number" domain={['dataMin', 'dataMax']} tick={(props) => <CustomXAxisTick {...props} hideTime={combinedData.length > 30} />} axisLine={false} tickLine={false} />
-                  <YAxis domain={['auto', 'auto']} tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
+                  <YAxis domain={yDomain as any} tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} />
 
                   <ChartTooltip
                     cursor={{ stroke: 'var(--border)', strokeWidth: 2 }}

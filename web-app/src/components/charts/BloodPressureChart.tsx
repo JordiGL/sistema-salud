@@ -393,7 +393,7 @@ export function BloodPressureChart({ data: initialData, events = [], isAdmin }: 
                       tickLine={false}
                     />
                     <YAxis
-                      domain={['auto', 'auto']}
+                      domain={[40, 200]}
                       tick={{ fontSize: 11, fill: '#94a3b8' }}
                       axisLine={false}
                       tickLine={false}

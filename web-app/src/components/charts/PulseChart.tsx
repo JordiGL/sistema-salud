@@ -296,7 +296,7 @@ export function PulseChart({ data: initialData, events = [], isAdmin }: { data: 
                       axisLine={false}
                       tickLine={false}
                     />
-                    <YAxis domain={['auto', 'auto']} tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} tickCount={6} />
+                    <YAxis domain={[40, 180]} tick={{ fontSize: 11, fill: '#94a3b8' }} axisLine={false} tickLine={false} tickCount={6} />
                     <ChartTooltip
                       cursor={{ stroke: 'var(--border)', strokeWidth: 2 }}
                       content={({ active, payload }) => {

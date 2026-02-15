@@ -66,6 +66,21 @@ export function WeightChart({ data: initialData, events = [], isAdmin }: { data:
     return Array.from(new Set(locs));
   }, [initialData]);
 
+  // Compute fixed domain based on ALL data (initialData) to prevent jumping
+  const yDomain = useMemo(() => {
+    const weights = initialData
+      .map(d => d.weight)
+      .filter(w => w !== null && w !== undefined && !isNaN(Number(w)))
+      .map(Number);
+
+    if (weights.length === 0) return ['auto', 'auto'];
+
+    const min = Math.min(...weights);
+    const max = Math.max(...weights);
+    // Add ±5kg padding
+    return [Math.floor(Math.max(0, min - 5)), Math.ceil(max + 5)];
+  }, [initialData]);
+
   // Server-Side Filtering
   useEffect(() => {
     const loadFilteredData = async () => {
@@ -302,7 +317,7 @@ export function WeightChart({ data: initialData, events = [], isAdmin }: { data:
                       tickLine={false}
                     />
                     <YAxis
-                      domain={[45, 'auto']}
+                      domain={yDomain as any}
                       tick={{ fontSize: 11, fill: '#94a3b8' }}
                       axisLine={false}
                       tickLine={false}
