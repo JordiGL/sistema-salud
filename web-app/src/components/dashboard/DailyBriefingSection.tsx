@@ -40,7 +40,8 @@ export function DailyBriefingSection({ metrics, isAdmin }: DailyBriefingSectionP
         try {
             // Assuming API runs on localhost:3000 or typically configured via env
             // We use API_ROUTES.BASE directly.
-            const response = await fetch(`${API_ROUTES.BASE}${API_ROUTES.DAILY_BRIEFING}/today`);
+            const endpoint = isAdmin ? '/latest' : '/today';
+            const response = await fetch(`${API_ROUTES.BASE}${API_ROUTES.DAILY_BRIEFING}${endpoint}`);
 
             if (response.ok) {
                 const text = await response.text();

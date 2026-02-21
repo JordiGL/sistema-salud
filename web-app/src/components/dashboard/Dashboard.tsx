@@ -179,15 +179,15 @@ export function Dashboard({ initialMetrics }: DashboardProps) {
 
         <div className="max-w-7xl mx-auto p-4 md:p-8 space-y-8 w-full">
 
+          {/* --- AI BRIEFING --- */}
+          {activeTab === 'history' && <DailyBriefingSection metrics={metrics} isAdmin={isAdmin} />}
+
           {/* --- FORMULARI --- */}
-          {isAdmin && (
+          {isAdmin && activeTab === 'history' && (
             <div className="mb-8">
               <HealthDataForm onSuccess={refreshData} />
             </div>
           )}
-
-          {/* --- AI BRIEFING --- */}
-          {activeTab === 'history' && <DailyBriefingSection metrics={metrics} isAdmin={isAdmin} />}
 
           {/* --- ÀREA DE CONTINGUT --- */}
           <div className="min-h-[500px]">
