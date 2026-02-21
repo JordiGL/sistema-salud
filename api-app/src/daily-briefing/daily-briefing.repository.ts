@@ -14,6 +14,12 @@ export class DailyBriefingRepository extends PrismaClient implements OnModuleIni
         });
     }
 
+    async getLatestBriefing(): Promise<DailyBriefing | null> {
+        return this.dailyBriefing.findFirst({
+            orderBy: { date: 'desc' },
+        });
+    }
+
     async upsertBriefing(data: CreateBriefingDto): Promise<DailyBriefing> {
         return this.dailyBriefing.upsert({
             where: { date: data.date },

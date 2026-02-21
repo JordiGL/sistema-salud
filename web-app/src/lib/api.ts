@@ -99,6 +99,7 @@ function preparePayload(data: any): Partial<Metric> {
   if (data.measurementContext !== undefined) clean.measurementContext = cleanString(data.measurementContext);
   if (data.weightLocation !== undefined) clean.weightLocation = cleanString(data.weightLocation);
   if (data.notes !== undefined) clean.notes = cleanString(data.notes);
+  if (data.createdAt !== undefined) clean.createdAt = cleanString(data.createdAt);
 
   if (data.pulse !== undefined) clean.pulse = cleanNumber(data.pulse);
   if (data.spo2 !== undefined) clean.spo2 = cleanNumber(data.spo2);

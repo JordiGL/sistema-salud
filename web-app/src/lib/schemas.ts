@@ -39,6 +39,10 @@ export const metricSchema = z.object({
         .transform(val => val === '' ? undefined : Number(val))
         .pipe(z.number().min(0).optional()),
 
+    createdAt: z.string().optional(),
+    editDate: z.string().optional(),
+    editTime: z.string().optional(),
+
 }).refine(data => {
     // At least one metric or note is present? User didn't specify, but usually good practice.
     // Not enforcing for now as legacy code didn't seem to enforce strictly other than individual checks.

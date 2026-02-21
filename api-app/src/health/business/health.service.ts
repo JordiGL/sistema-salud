@@ -11,6 +11,7 @@ export interface CreateHealthData {
   measurementContext?: string;
   weightLocation?: string;
   notes?: string;
+  createdAt?: string;
 }
 
 export interface CreateEventData {
@@ -87,8 +88,11 @@ export class HealthService {
   // Editar
   // Editar
   async updateHealthData(id: string, data: Partial<CreateHealthData>) {
-    // Validaciones extra si fueran necesarias
-    return this.repository.updateMetric(id, data);
+    const updatePayload: any = { ...data };
+    if (updatePayload.createdAt) {
+      updatePayload.createdAt = new Date(updatePayload.createdAt);
+    }
+    return this.repository.updateMetric(id, updatePayload);
   }
 
   // --- HEALTH EVENTS ---

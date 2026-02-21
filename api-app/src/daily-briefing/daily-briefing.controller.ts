@@ -12,6 +12,11 @@ export class DailyBriefingController {
         return this.service.getTodayBriefing();
     }
 
+    @Get('latest')
+    async getLatest() {
+        return this.service.getLatestBriefing();
+    }
+
     @Get(':date')
     async getByDate(@Param('date') date: string) {
         return this.service.getBriefingByDate(date);

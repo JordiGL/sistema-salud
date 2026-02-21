@@ -58,4 +58,8 @@ export class CreateMetricDto {
   @IsNumber()
   @Min(0)
   ca125?: number;
+
+  @IsOptional()
+  @IsString()
+  createdAt?: string;
 }

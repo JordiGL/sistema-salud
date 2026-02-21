@@ -11,6 +11,10 @@ export class DailyBriefingService {
         return this.repository.getBriefing(today);
     }
 
+    async getLatestBriefing() {
+        return this.repository.getLatestBriefing();
+    }
+
     async getBriefingByDate(date: string) {
         return this.repository.getBriefing(date);
     }
