@@ -380,97 +380,92 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                         <Heart size={18} /> {t('Form.physiologicalData')}
                                     </div>
 
-                                    <div className="flex flex-col gap-4 pt-2">
-                                        <div className="flex flex-wrap gap-6">
-                                            <div className="flex-1 min-w-[200px]">
-                                                <FormField
-                                                    control={form.control}
-                                                    name="measurementContext"
-                                                    render={({ field }) => (
-                                                        <FormItem>
-                                                            <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.contextLabel')}</FormLabel>
-                                                            <Select onValueChange={field.onChange} defaultValue={field.value ?? undefined} value={field.value || ""}>
-                                                                <FormControl>
-                                                                    <SelectTrigger className="bg-background border-border">
-                                                                        <SelectValue placeholder={t('Form.contextPlaceholder')} />
-                                                                    </SelectTrigger>
-                                                                </FormControl>
-                                                                <SelectContent>
-                                                                    {contextOptions.map((opt) => (
-                                                                        <SelectItem key={opt.key} value={opt.key}>
-                                                                            {translateOption('ContextOptions', opt)}
-                                                                        </SelectItem>
-                                                                    ))}
-                                                                </SelectContent>
-                                                            </Select>
-                                                            <FormMessage />
-                                                        </FormItem>
-                                                    )}
-                                                />
-                                            </div>
-                                            <div className="w-24">
-                                                <FormField
-                                                    control={form.control}
-                                                    name="ca125"
-                                                    render={({ field }) => (
-                                                        <FormItem>
-                                                            <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.ca125Label')}</FormLabel>
+                                    <div className="grid grid-cols-2 lg:flex lg:flex-row gap-4 pt-2">
+                                        <div className="col-span-2 lg:flex-1 lg:min-w-[150px]">
+                                            <FormField
+                                                control={form.control}
+                                                name="measurementContext"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.contextLabel')}</FormLabel>
+                                                        <Select onValueChange={field.onChange} defaultValue={field.value ?? undefined} value={field.value || ""}>
                                                             <FormControl>
-                                                                <Input type="number" placeholder="35.5" className="text-center font-mono bg-background border-border text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
+                                                                <SelectTrigger className="bg-background border-border">
+                                                                    <SelectValue placeholder={t('Form.contextPlaceholder')} />
+                                                                </SelectTrigger>
                                                             </FormControl>
-                                                            <FormMessage />
-                                                        </FormItem>
-                                                    )}
-                                                />
-                                            </div>
+                                                            <SelectContent>
+                                                                {contextOptions.map((opt) => (
+                                                                    <SelectItem key={opt.key} value={opt.key}>
+                                                                        {translateOption('ContextOptions', opt)}
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
                                         </div>
-
-                                        <div className="flex flex-wrap gap-6">
-                                            <div className="w-24">
-                                                <FormField
-                                                    control={form.control}
-                                                    name="bloodPressure"
-                                                    render={({ field }) => (
-                                                        <FormItem>
-                                                            <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.bpLabel')}</FormLabel>
-                                                            <FormControl>
-                                                                <Input placeholder="120/80" className="text-center font-mono bg-background border-border text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
-                                                            </FormControl>
-                                                            <FormMessage />
-                                                        </FormItem>
-                                                    )}
-                                                />
-                                            </div>
-                                            <div className="w-24">
-                                                <FormField
-                                                    control={form.control}
-                                                    name="pulse"
-                                                    render={({ field }) => (
-                                                        <FormItem>
-                                                            <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.pulseLabel')}</FormLabel>
-                                                            <FormControl>
-                                                                <Input type="number" placeholder="80" className="text-center font-mono bg-background border-border text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
-                                                            </FormControl>
-                                                            <FormMessage />
-                                                        </FormItem>
-                                                    )}
-                                                />
-                                            </div>
-                                            <div className="w-24">
-                                                <FormField
-                                                    control={form.control}
-                                                    name="spo2"
-                                                    render={({ field }) => (
-                                                        <FormItem>
-                                                            <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.spo2Label')}</FormLabel>
-                                                            <FormControl>
-                                                                <Input type="number" placeholder="98" className="text-center font-mono bg-background border-border text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
-                                                            </FormControl>
-                                                            <FormMessage />
-                                                        </FormItem>
-                                                    )}
-                                                />
-                                            </div>
+                                        <div className="col-span-1 lg:w-24">
+                                            <FormField
+                                                control={form.control}
+                                                name="ca125"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.ca125Label')}</FormLabel>
+                                                        <FormControl>
+                                                            <Input type="number" placeholder="35.5" className="text-center font-mono bg-background border-border text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </div>
+                                        <div className="col-span-1 lg:w-24">
+                                            <FormField
+                                                control={form.control}
+                                                name="bloodPressure"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.bpLabel')}</FormLabel>
+                                                        <FormControl>
+                                                            <Input placeholder="120/80" className="text-center font-mono bg-background border-border text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </div>
+                                        <div className="col-span-1 lg:w-24">
+                                            <FormField
+                                                control={form.control}
+                                                name="pulse"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.pulseLabel')}</FormLabel>
+                                                        <FormControl>
+                                                            <Input type="number" placeholder="80" className="text-center font-mono bg-background border-border text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </div>
+                                        <div className="col-span-1 lg:w-24">
+                                            <FormField
+                                                control={form.control}
+                                                name="spo2"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.spo2Label')}</FormLabel>
+                                                        <FormControl>
+                                                            <Input type="number" placeholder="98" className="text-center font-mono bg-background border-border text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
                                         </div>
                                     </div>
                                 </div>
@@ -480,44 +475,48 @@ export function HealthDataForm({ onSuccess }: HealthDataFormProps) {
                                     <div className="flex items-center gap-2 mb-4 text-foreground font-bold border-b border-border pb-2">
                                         <Scale size={18} /> {t('Form.weightControl')}
                                     </div>
-                                    <div className="space-y-4 grow">
-                                        <FormField
-                                            control={form.control}
-                                            name="weightLocation"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.locationLabel')}</FormLabel>
-                                                    <Select onValueChange={field.onChange} defaultValue={field.value ?? undefined} value={field.value || ""}>
+                                    <div className="flex flex-row gap-4 grow">
+                                        <div className="flex-1 min-w-[120px]">
+                                            <FormField
+                                                control={form.control}
+                                                name="weightLocation"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.locationLabel')}</FormLabel>
+                                                        <Select onValueChange={field.onChange} defaultValue={field.value ?? undefined} value={field.value || ""}>
+                                                            <FormControl>
+                                                                <SelectTrigger className="bg-background border-border">
+                                                                    <SelectValue placeholder={t('Form.locationPlaceholder')} />
+                                                                </SelectTrigger>
+                                                            </FormControl>
+                                                            <SelectContent>
+                                                                {locationOptions.map((opt) => (
+                                                                    <SelectItem key={opt.key} value={opt.key}>
+                                                                        {translateOption('LocationOptions', opt)}
+                                                                    </SelectItem>
+                                                                ))}
+                                                            </SelectContent>
+                                                        </Select>
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </div>
+                                        <div className="w-24 shrink-0">
+                                            <FormField
+                                                control={form.control}
+                                                name="weight"
+                                                render={({ field }) => (
+                                                    <FormItem>
+                                                        <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.kgLabel')}</FormLabel>
                                                         <FormControl>
-                                                            <SelectTrigger className="bg-background border-border">
-                                                                <SelectValue placeholder={t('Form.locationPlaceholder')} />
-                                                            </SelectTrigger>
+                                                            <Input type="number" placeholder="75.5" className="text-center font-mono bg-background border-border text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
                                                         </FormControl>
-                                                        <SelectContent>
-                                                            {locationOptions.map((opt) => (
-                                                                <SelectItem key={opt.key} value={opt.key}>
-                                                                    {translateOption('LocationOptions', opt)}
-                                                                </SelectItem>
-                                                            ))}
-                                                        </SelectContent>
-                                                    </Select>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
-                                        <FormField
-                                            control={form.control}
-                                            name="weight"
-                                            render={({ field }) => (
-                                                <FormItem>
-                                                    <FormLabel className="text-xs font-bold text-muted-foreground uppercase tracking-wider">{t('Form.kgLabel')}</FormLabel>
-                                                    <FormControl>
-                                                        <Input type="number" placeholder="75.5" className="text-center font-mono text-lg bg-background border-border text-foreground placeholder:text-muted-foreground" {...field} value={field.value || ''} />
-                                                    </FormControl>
-                                                    <FormMessage />
-                                                </FormItem>
-                                            )}
-                                        />
+                                                        <FormMessage />
+                                                    </FormItem>
+                                                )}
+                                            />
+                                        </div>
                                     </div>
                                 </div>
 
