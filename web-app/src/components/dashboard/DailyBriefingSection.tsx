@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations, useLocale } from "next-intl";
-import { Sparkles, TrendingUp, Activity, RefreshCw } from "lucide-react";
+import { Sparkles, TrendingUp, Activity, RefreshCw, Calendar } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -18,6 +18,7 @@ interface DailyBriefingSectionProps {
 interface BriefingData {
     status: string;
     trend: string;
+    date?: string;
 }
 
 export function DailyBriefingSection({ metrics, isAdmin }: DailyBriefingSectionProps) {
@@ -38,9 +39,8 @@ export function DailyBriefingSection({ metrics, isAdmin }: DailyBriefingSectionP
     // Auto-generate on mount or when metrics change
     const checkDatabase = async (): Promise<'found' | 'not-found' | 'error'> => {
         try {
-            // Assuming API runs on localhost:3000 or typically configured via env
             // We use API_ROUTES.BASE directly.
-            const endpoint = isAdmin ? '/latest' : '/today';
+            const endpoint = '/latest';
             const response = await fetch(`${API_ROUTES.BASE}${API_ROUTES.DAILY_BRIEFING}${endpoint}`);
 
             if (response.ok) {
@@ -55,7 +55,7 @@ export function DailyBriefingSection({ metrics, isAdmin }: DailyBriefingSectionP
                     const trend = locale === 'ca' ? data.trend_ca : data.trend_es;
 
                     if (status && trend) {
-                        setBriefing({ status, trend });
+                        setBriefing({ status, trend, date: data.date });
                         setHasLoaded(true);
                         return 'found'; // Found in DB
                     }
@@ -79,7 +79,10 @@ export function DailyBriefingSection({ metrics, isAdmin }: DailyBriefingSectionP
         const result = await generateBriefing(recentMetrics, undefined, locale);
 
         if (result) {
-            setBriefing(result);
+            setBriefing({
+                ...result,
+                date: (result as any).date || new Date().toISOString()
+            });
             setHasLoaded(true);
         }
     };
@@ -131,6 +134,14 @@ export function DailyBriefingSection({ metrics, isAdmin }: DailyBriefingSectionP
                         </div>
                     ) : (
                         <>
+                            {briefing.date && (
+                                <div className="flex justify-end mb-3">
+                                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-muted/30 border border-border/50 text-xs font-medium text-muted-foreground">
+                                        <Calendar size={12} />
+                                        <span>{new Date(briefing.date).toLocaleDateString(locale, { dateStyle: 'medium' })}</span>
+                                    </div>
+                                </div>
+                            )}
                             <div className="grid gap-4 sm:grid-cols-2">
                                 {/* 1. Status */}
                                 <div className="space-y-2 p-3 rounded-lg bg-muted/10 border border-border">
