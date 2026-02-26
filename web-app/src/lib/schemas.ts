@@ -17,9 +17,9 @@ export const metricSchema = z.object({
             return sys >= dia;
         }, { message: "La sistólica debe ser mayor o igual a la diastólica" }),
 
-    measurementContext: z.enum(CONTEXT_KEYS).optional().or(z.literal('')),
+    measurementContext: z.enum(CONTEXT_KEYS).optional().or(z.literal('')).or(z.literal('-')).transform(val => val === '-' ? '' : val),
 
-    weightLocation: z.enum(LOCATION_KEYS).optional().or(z.literal('')),
+    weightLocation: z.enum(LOCATION_KEYS).optional().or(z.literal('')).or(z.literal('-')).transform(val => val === '-' ? '' : val),
 
     notes: z.string().optional(),
 

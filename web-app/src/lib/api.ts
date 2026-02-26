@@ -95,16 +95,21 @@ function preparePayload(data: any): Partial<Metric> {
   };
 
   // Mapeig explícit
-  if (data.bloodPressure !== undefined) clean.bloodPressure = cleanString(data.bloodPressure);
-  if (data.measurementContext !== undefined) clean.measurementContext = cleanString(data.measurementContext);
-  if (data.weightLocation !== undefined) clean.weightLocation = cleanString(data.weightLocation);
-  if (data.notes !== undefined) clean.notes = cleanString(data.notes);
-  if (data.createdAt !== undefined) clean.createdAt = cleanString(data.createdAt);
+  // Siempre enviamos todos los campos para que, en caso de estar vacíos/undefined, 
+  // se envíen como null y el cursor de la BDD se actualice borrando el valor anterior.
+  clean.bloodPressure = cleanString(data.bloodPressure);
+  clean.measurementContext = cleanString(data.measurementContext);
+  clean.weightLocation = cleanString(data.weightLocation);
+  clean.notes = cleanString(data.notes);
 
-  if (data.pulse !== undefined) clean.pulse = cleanNumber(data.pulse);
-  if (data.spo2 !== undefined) clean.spo2 = cleanNumber(data.spo2);
-  if (data.weight !== undefined) clean.weight = cleanNumber(data.weight);
-  if (data.ca125 !== undefined) clean.ca125 = cleanNumber(data.ca125);
+  if (data.createdAt !== undefined) {
+    clean.createdAt = cleanString(data.createdAt);
+  }
+
+  clean.pulse = cleanNumber(data.pulse);
+  clean.spo2 = cleanNumber(data.spo2);
+  clean.weight = cleanNumber(data.weight);
+  clean.ca125 = cleanNumber(data.ca125);
 
   return clean;
 }

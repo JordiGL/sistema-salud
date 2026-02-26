@@ -171,7 +171,7 @@ export function EditMetricModal({ isOpen, onClose, metric, onSuccess, contextOpt
                         <Select onValueChange={field.onChange} defaultValue={field.value ?? undefined} value={field.value || ""}>
                           <FormControl>
                             <SelectTrigger className="bg-background border-border">
-                              <SelectValue placeholder="-" />
+                              <SelectValue placeholder={t('Form.contextPlaceholder')} />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -271,7 +271,7 @@ export function EditMetricModal({ isOpen, onClose, metric, onSuccess, contextOpt
                       <Select onValueChange={field.onChange} defaultValue={field.value ?? undefined} value={field.value || ""}>
                         <FormControl>
                           <SelectTrigger className="bg-background border-border">
-                            <SelectValue placeholder="-" />
+                            <SelectValue placeholder={t('Form.locationPlaceholder')} />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>

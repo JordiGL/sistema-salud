@@ -126,7 +126,7 @@ export function EditEventModal({ isOpen, onClose, event, onSuccess }: EditEventM
                                     <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
                                         <FormControl>
                                             <SelectTrigger className="bg-background border-input">
-                                                <SelectValue placeholder="-" />
+                                                <SelectValue placeholder={t('HealthEvents.typePlaceholder')} />
                                             </SelectTrigger>
                                         </FormControl>
                                         <SelectContent>
