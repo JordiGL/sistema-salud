@@ -148,13 +148,21 @@ export function BloodPressureChart({ data: initialData, events = [], isAdmin }: 
       result = result.filter(e => new Date(e.date) >= cutoff);
     }
 
+    return result;
+  }, [events, dateRange]);
+
+  const chartEvents = useMemo(() => {
+    let result = filteredEvents;
     if (finalData.length > 0) {
       const startTime = finalData[0].timestamp;
-      result = result.filter(e => new Date(e.date).getTime() >= startTime);
+      const endTime = finalData[finalData.length - 1].timestamp;
+      result = result.filter(e => {
+        const time = new Date(e.date).getTime();
+        return time >= startTime && time <= endTime;
+      });
     }
-
     return result;
-  }, [events, dateRange, finalData]);
+  }, [filteredEvents, finalData]);
 
   // COMBINAR EVENTOS Y MÉTRICAS EN UN SOLO ARRAY PARA LA LÍNEA
   const combinedData = useMemo(() => {
@@ -169,7 +177,7 @@ export function BloodPressureChart({ data: initialData, events = [], isAdmin }: 
     }));
 
     // 2. Insertamos los eventos calculando su posición en la línea (interpolación doble)
-    filteredEvents.forEach(event => {
+    chartEvents.forEach(event => {
       const eventTs = new Date(event.date).getTime();
       const nextIdx = finalData.findIndex(d => d.timestamp > eventTs);
 
@@ -210,12 +218,12 @@ export function BloodPressureChart({ data: initialData, events = [], isAdmin }: 
     });
 
     return points.sort((a, b) => a.timestamp - b.timestamp);
-  }, [finalData, filteredEvents]);
+  }, [finalData, chartEvents]);
 
 
   const uniqueEventTypes = useMemo(() => {
-    return Array.from(new Set(filteredEvents.map(e => e.type)));
-  }, [filteredEvents]);
+    return Array.from(new Set(chartEvents.map(e => e.type)));
+  }, [chartEvents]);
 
   const tableData = useMemo(() => {
     return [...finalData, ...filteredEvents];
@@ -465,7 +473,7 @@ export function BloodPressureChart({ data: initialData, events = [], isAdmin }: 
                       activeDot={(props: any) => CustomActiveDot(props, "var(--chart-diastolic)")}
                     />
 
-                    {filteredEvents.map((event) => (
+                    {chartEvents.map((event) => (
                       <ReferenceLine
                         key={event.id}
                         x={new Date(event.date).getTime()}

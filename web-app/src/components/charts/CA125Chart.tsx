@@ -98,14 +98,21 @@ export function CA125Chart({ data: initialData, events = [], isAdmin }: { data: 
       result = result.filter(e => new Date(e.date) >= cutoff);
     }
 
-    // 2. Filter by Start of Records (User requirement: Start from first record)
+    return result;
+  }, [events, dateRange]);
+
+  const chartEvents = useMemo(() => {
+    let result = filteredEvents;
     if (metricData.length > 0) {
       const startTime = metricData[0].timestamp;
-      result = result.filter(e => new Date(e.date).getTime() >= startTime);
+      const endTime = metricData[metricData.length - 1].timestamp;
+      result = result.filter(e => {
+        const time = new Date(e.date).getTime();
+        return time >= startTime && time <= endTime;
+      });
     }
-
     return result;
-  }, [events, dateRange, metricData]);
+  }, [filteredEvents, metricData]);
 
   // Definición de tipo para los puntos del gráfico (puede ser métrica o evento)
   type ChartPoint = Partial<Metric> & Partial<HealthEvent> & {
@@ -128,7 +135,7 @@ export function CA125Chart({ data: initialData, events = [], isAdmin }: { data: 
     }));
 
     // 2. Insertamos los eventos calculando su posición en la línea (interpolación)
-    filteredEvents.forEach(event => {
+    chartEvents.forEach(event => {
       const eventTs = new Date(event.date).getTime();
       const nextIdx = metricData.findIndex(d => d.timestamp > eventTs);
 
@@ -152,7 +159,7 @@ export function CA125Chart({ data: initialData, events = [], isAdmin }: { data: 
     });
 
     return points.sort((a, b) => a.timestamp - b.timestamp);
-  }, [metricData, filteredEvents]);
+  }, [metricData, chartEvents]);
 
   const getEventLabel = (type?: string) => {
     if (!type) return '';
@@ -287,7 +294,7 @@ export function CA125Chart({ data: initialData, events = [], isAdmin }: { data: 
                     }}
                   />
 
-                  {filteredEvents.map((event) => (
+                  {chartEvents.map((event) => (
                     <ReferenceLine
                       key={event.id}
                       x={new Date(event.date).getTime()}
